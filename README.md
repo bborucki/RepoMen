@@ -1,6 +1,6 @@
-Distibuted Systems Spring 2013
-TEAM: RepoMen
+Distributed Systems Spring 2013
+Team: RepoMen
 Members:
-Brian Borucki, bborucki@bu.edu
-Chris Sullivan, csully@bu.edu
-Drew Berry, drewb19@bu.edu
+Member 0 Chris Sullivan csully@bu.edu
+Member 1 Brian Borucki bborucki@bu.edu
+Member 2 Drew Berry drewb19@bu.edu
