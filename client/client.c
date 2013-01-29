@@ -110,8 +110,8 @@ doConnect(void)
   VPRINTF("BEGIN: %s\n", globals.in.data);
 
   if (globals.connected==1) {
-    // Add some code here ... probably a useful error message to stderr
-    //  eg. fprintf(stderr, "some string ...", args);
+   
+    fprintf(stderr, "%s" , "Not connected.");
   } else {
     // be sure you understand what the next two lines are doing
     for (i=0; i<len; i++) if (globals.in.data[i]==':') globals.in.data[i]=' ';
