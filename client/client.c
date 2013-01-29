@@ -28,7 +28,7 @@
 
 #include "../lib/net.h"
 
-#define TEAMNAME 
+#define TEAMNAME "RepoMen"
 
 #define BUFLEN 16384
 #define STRLEN 80
@@ -62,7 +62,7 @@ getInput()
   int len;
   char *ret;
 
-  STUDY THIS CODE AND EXPLAIN WHAT IT DOES AND WHY IN YOUR LOG FILE
+  // STUDY THIS CODE AND EXPLAIN WHAT IT DOES AND WHY IN YOUR LOG FILE
 
   // to make debugging easier we zero the data of the buffer
   bzero(globals.in.data, sizeof(globals.in.data));
@@ -110,8 +110,8 @@ doConnect(void)
   VPRINTF("BEGIN: %s\n", globals.in.data);
 
   if (globals.connected==1) {
-    Add some code here ... probably a useful error message to stderr
-      eg. fprintf(stderr, "some string ...", args);
+    // Add some code here ... probably a useful error message to stderr
+    //  eg. fprintf(stderr, "some string ...", args);
   } else {
     // be sure you understand what the next two lines are doing
     for (i=0; i<len; i++) if (globals.in.data[i]==':') globals.in.data[i]=' ';
@@ -119,12 +119,12 @@ doConnect(void)
 	   &globals.port);
     
     if (strlen(globals.server)==0 || globals.port==0) {
-      Add some code here ... probably a useful error message to stderr
-      eg. fprintf(stderr, "some string ...", args);
+      //  Add some code here ... probably a useful error message to stderr
+      // eg. fprintf(stderr, "some string ...", args);
     } else {
       VPRINTF("connecting to: server=%s port=%d...", 
 	      globals.server, globals.port);
-      if (net_setup_connection(probably need to pass proper args here)<0) {
+      if (net_setup_connection( //probably need to pass proper args here)<0) {
 	fprintf(stderr, " failed NOT connected server=%s port=%d\n", 
 		globals.server, globals.port);
       } else {
@@ -144,7 +144,7 @@ sendStr(char *str, int fd)
   int len=0, nlen=0;
   char *buf;
   
-  STUDY THIS FUNCTION AND EXPAIN IN YOUR LOG FILE WHAT IT DOES AND HOW
+  // STUDY THIS FUNCTION AND EXPAIN IN YOUR LOG FILE WHAT IT DOES AND HOW
 
   len = strlen(str);
   if (len==0) return 1;
@@ -232,7 +232,7 @@ main(int argc, char **argv)
   while (1) {
     if (prompt(menu)>=0) rc=doCmd(); else rc=-1;
     if (rc<0) break;
-    What do you think the next line is for
+    // What do you think the next line is for?: redisplays the menu
     if (rc==1) menu=1; else menu=0;
   }
 
