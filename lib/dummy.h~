@@ -1,11 +1,4 @@
-#ifndef __<TEAMNAME>_DUMMY_H__
-#define __<TEAMNAME>_DUMMY_H__
+#ifndef __<RepoMen>_DUMMY_H__
+#define __<RepoMen>_DUMMY_H__
 void dummy_hello(void);
 #endif
----- contents of dummy.c ----
-#include <stdio.h>
-void
-dummy_hello(void)
-{
-printf("dummy_hello(): Hello from lib\n");
-}
