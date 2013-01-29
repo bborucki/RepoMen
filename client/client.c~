@@ -124,7 +124,7 @@ doConnect(void)
     } else {
       VPRINTF("connecting to: server=%s port=%d...", 
 	      globals.server, globals.port);
-      if (net_setup_connection(probably need to pass proper args here)<0) {
+      if (net_setup_connection(&globals.serverFD, &globals.server, globals.port)){
 	fprintf(stderr, " failed NOT connected server=%s port=%d\n", 
 		globals.server, globals.port);
       } else {
@@ -210,13 +210,13 @@ doCmd(void)
 
   if (strlen(globals.in.data)==0) return rc;
   else if (strncmp(globals.in.data, "connect", 
-		   sizeof("connect")-1)==0) rc = add a call to the right func
+		   sizeof("connect")-1)==0) rc = doConnect();
   else if (strncmp(globals.in.data, "send", 
-		   sizeof("send")-1)==0) rc = add a call to the right func
+		   sizeof("send")-1)==0) rc = doSend();
   else if (strncmp(globals.in.data, "quit", 
-		   sizeof("quit")-1)==0) rc = add a call to the right func
+		   sizeof("quit")-1)==0) rc = doQuit();
   else if (strncmp(globals.in.data, "verbose", 
-		   sizeof("verbose")-1)==0) rc = add a call to the right func
+		   sizeof("verbose")-1)==0) rc = doVerbose();
   else printf("Unknown Command\n");
 
   return rc;
