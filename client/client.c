@@ -109,23 +109,23 @@ doConnect(void)
 
   VPRINTF("BEGIN: %s\n", globals.in.data);
 
-  if (globals.connected==1) {
-   
-    fprintf(stderr, "%s" , "Not connected.");
+  if (globals.connected==1) {   
+    fprintf(stderr, "%s" , "failed - ALREADY CONNECTED - server=%s port = %d\n",
+	    globals.server, globals.port);
   } else {
     // be sure you understand what the next two lines are doing
     for (i=0; i<len; i++) if (globals.in.data[i]==':') globals.in.data[i]=' ';
     sscanf(globals.in.data, "%*s %" XSTR(STRLEN) "s %d", globals.server,
 	   &globals.port);
-    
+ 
     if (strlen(globals.server)==0 || globals.port==0) {
-      //  Add some code here ... probably a useful error message to stderr
-      // eg. fprintf(stderr, "some string ...", args);
+	fprintf(stderr, " failed - INVALID IP:PORT - server=%s port=%d\n", 
+		globals.server, globals.port);
     } else {
       VPRINTF("connecting to: server=%s port=%d...", 
 	      globals.server, globals.port);
       if (net_setup_connection(&globals.serverFD, globals.server, globals.port)){
-	fprintf(stderr, " failed NOT connected server=%s port=%d\n", 
+	fprintf(stderr, " failed - NOT CONNECTED - server=%s port=%d\n", 
 		globals.server, globals.port);
       } else {
 	globals.connected=1;

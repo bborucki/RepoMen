@@ -11,3 +11,30 @@ Comments/Notes:
 Drew - upon running the make file in server we recieved an error about the architecture of the system, 
 but the file seemed to make.
 
+-----------------------------------------------
+
+Mon Jan 30 17:32:46 EST 2013
+Attendees: Chris, Brian Drew
+Questions: 
+
+Decisions: 
+
+Todo: 
+
+Comments/Notes:
+
+Explanation of getInput:
+Takes input from the user, and places it in the globals struct.  It does
+this by first zeroing the buffer (in.data and in.newline), and then reads
+from stdin into in.data, returning a pointer to the the input string. If
+no input, len = 0, else len = length of the input string. It then removes 
+a newline character if present and sets in.newline = 1. Finally it returns
+the length of the input.
+
+Explanation of sendStr:
+Takes a pointer to a string and writes first the length of the string and 
+then the string itself to the server's file descriptor, effectively
+sending it to the server.  The function then creates a buffer and reads 
+the file descriptor into it, checking for length. If the length read into
+the buffer is not the same as that of what was written to the file
+descriptor, return -1, else write the buffer to stdout.

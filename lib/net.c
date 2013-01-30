@@ -165,7 +165,8 @@ net_writen(FDType fd, const void *vptr, size_t n)
   const char	*ptr;
   
   ptr = vptr;
-  MISSING A LINE OF CODE HERE
+  //  MISSING A LINE OF CODE HERE
+  nleft = n;
   while (nleft > 0) {
 #ifndef __APPLE__
     if ( (nwritten = send(fd, ptr, nleft, MSG_NOSIGNAL)) <= 0) {
@@ -180,7 +181,8 @@ net_writen(FDType fd, const void *vptr, size_t n)
 	return(-1);	/* error */
     }
     
-    MISSING A LINE IF CODE HERE
+    //MISSING A LINE IF CODE HERE
+    nleft -= nwritten;
     ptr   += nwritten;
   }
   return(n);
@@ -195,7 +197,8 @@ net_readn(FDType fd, void *vptr, size_t n)
   char    *ptr;
 
   ptr = vptr;
-  MISSING LINE OF CODE HERE
+  //  MISSING LINE OF CODE HERE
+  nleft = n;
   while (nleft > 0) {
 #ifndef __APPLE__
     if ( (nread = recv(fd, ptr, nleft, MSG_NOSIGNAL)) < 0) {
@@ -212,7 +215,8 @@ net_readn(FDType fd, void *vptr, size_t n)
       break;                          /* EOF */
 
     nleft -= nread;
-    MISSING LINE OF CODE HERE
+    //MISSING LINE OF CODE HERE
+    ptr   += nread; 
   }
   return(n - nleft);              /* return >= 0 */
 }
