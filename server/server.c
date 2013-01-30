@@ -93,7 +93,7 @@ main(int argc, char **argv)
 
   bzero(&globals, sizeof(globals));
 
-  if (net_setup_listen_socket(&listenfd, &port)) {
+  if (!net_setup_listen_socket(&listenfd, &port)) {
     fprintf(stderr, "net_setup_listen_socket FAILED!\n");
     exit(-1);
   }
