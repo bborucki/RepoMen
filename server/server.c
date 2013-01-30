@@ -49,7 +49,7 @@ str_echo(int sockfd)
   char *buf;
   
   while (1) {
-    n = lnet_readn(sockfd, buf, len);
+    n = net_readn(sockfd, buf, len);
     if (n != sizeof(int)) {
       fprintf(stderr, "%s: ERROR failed to read len: %d!=%d"
 	      " ... closing connection\n", __func__, n, (int)sizeof(int));
