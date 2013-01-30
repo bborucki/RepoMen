@@ -1,4 +1,4 @@
-CFLAGS := -g
+CFLAGS := -g -lpthread
 targets=server
 src = server.c
 objs = $(patsubst %.c,%.o,$(src))
