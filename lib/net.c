@@ -218,6 +218,7 @@ net_readn(FDType fd, void *vptr, size_t n)
     //MISSING LINE OF CODE HERE
     ptr   += nread; 
   }
+    
   return(n - nleft);              /* return >= 0 */
 }
 /* end readn */
