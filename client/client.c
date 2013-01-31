@@ -124,7 +124,7 @@ doConnect(void)
     } else {
       VPRINTF("connecting to: server=%s port=%d...", 
 	      globals.server, globals.port);
-      if (net_setup_connection(&globals.serverFD, globals.server, globals.port)){
+      if (net_setup_connection(&globals.serverFD, globals.server, globals.port)<0){
 	fprintf(stderr, " failed - NOT CONNECTED - server=%s port=%d\n", 
 		globals.server, globals.port);
       } else {
