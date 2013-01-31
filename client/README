@@ -1,0 +1,15 @@
+To run:
+In BASH - "./client.c"
+
+To Use:
+There are 4 commands that the user may issue:
+
+ - verbose -used for debugging, allows the user to see the progress being
+   	   made by the program 
+
+ - connect -used for connecting to a server. The syntax is "connect <IP:PORT>"
+
+ - quit    -ends the program
+
+ - send    -used to send a string to the server, which will echo the string
+   	   back. The syntax is "send <string>" 
