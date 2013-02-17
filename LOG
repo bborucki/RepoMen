@@ -51,3 +51,21 @@ which time the server creates a unique pthread for the client that
 joined. The pthread gives the client the illusion that the client is
 working one on one with the server, even though the server is possibly managing
 several different clients at the same time. 
+
+--------------------------------------------
+Sat Feb 16 18:16:12 EST 2013
+Attendees: Chris, Brian, Drew
+Questions: 
+
+Decisions: When working together, use one comp/one large display
+
+Todo: Begin implementation of NYI
+
+Comments/Notes:
+
+Began discussing the project, sat up further times to meet and decided to
+use a different set up while working together -a computer hooked up to a
+large display.  We imported the new code into our repo and replaced all
+cases of "ADD CODE" with "NYI" and wrote a macro, placed in protocol.h,
+which will allow us to trace the execution and implement the necessary
+functions.

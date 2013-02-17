@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include <strings.h>
+#include <string.h>
 #include <errno.h>
 #include <pthread.h>
 

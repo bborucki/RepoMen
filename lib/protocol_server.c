@@ -76,7 +76,9 @@ proto_server_set_req_handler(Proto_Msg_Types mt, Proto_MT_Handler h)
       mt<PROTO_MT_REQ_BASE_RESERVED_LAST) {
     i = mt - PROTO_MT_REQ_BASE_RESERVED_FIRST - 1;
 
-    NYI;
+    //    NYI;
+    Proto_Server.base_req_handlers[i] = h;
+
     return 1;
   } else {
     return -1;
@@ -124,7 +126,8 @@ proto_server_event_listen(void *arg)
   }
 
   for (;;) {
-    NYI; //connfd = ADD CODE
+    //    NYI; //connfd = ADD CODE
+    connfd = (int) arg;
     if (connfd < 0) {
       fprintf(stderr, "Error: EventListen accept failed (%d)\n", errno);
     } else {
@@ -132,8 +135,8 @@ proto_server_event_listen(void *arg)
       fprintf(stderr, "EventListen: connfd=%d -> ", connfd);
       
       
-      if (1) {
-	NYI;//FILL IF STATEMENT
+      //	NYI;//FILL IF STATEMENT
+      if (Proto_Server.EventNumSubscribers >= PROTO_SERVER_MAX_EVENT_SUBSCRIBERS){
 	fprintf(stderr, "oops no space for any more event subscribers\n");
 	close(connfd);
       } else {
@@ -227,7 +230,8 @@ proto_server_rpc_listen(void *arg)
   }
 
   for (;;) {
-    NYI; //connfd = ADD CODE
+    //    NYI; //connfd = ADD CODE
+    connfd = (unsigned long) arg;
     if (connfd < 0) {
       fprintf(stderr, "Error: proto_server_rpc_listen accept failed (%d)\n", errno);
     } else {
@@ -290,11 +294,12 @@ proto_server_init(void)
 
   proto_session_init(&Proto_Server.EventSession);
 
-  proto_server_set_session_lost_handler(
-				     proto_session_lost_default_handler);
+  proto_server_set_session_lost_handler(proto_session_lost_default_handler);
+
   for (i=PROTO_MT_REQ_BASE_RESERVED_FIRST+1; 
        i<PROTO_MT_REQ_BASE_RESERVED_LAST; i++) {
-    NYI; //ADD CODE
+    //    NYI; //ADD CODE
+    proto_server_set_req_handler(i, proto_server_mt_null_handler);
   }
 
 
