@@ -127,7 +127,7 @@ proto_server_event_listen(void *arg)
 
   for (;;) {
     //    NYI; //connfd = ADD CODE
-    connfd = (int) arg;
+    connfd = net_accept(fd);
     if (connfd < 0) {
       fprintf(stderr, "Error: EventListen accept failed (%d)\n", errno);
     } else {
@@ -136,7 +136,7 @@ proto_server_event_listen(void *arg)
       
       
       //	NYI;//FILL IF STATEMENT
-      if (Proto_Server.EventNumSubscribers >= PROTO_SERVER_MAX_EVENT_SUBSCRIBERS){
+      if ( PROTO_SERVER_MAX_EVENT_SUBSCRIBERS - Proto_Server.EventNumSubscribers<0){
 	fprintf(stderr, "oops no space for any more event subscribers\n");
 	close(connfd);
       } else {
@@ -231,7 +231,7 @@ proto_server_rpc_listen(void *arg)
 
   for (;;) {
     //    NYI; //connfd = ADD CODE
-    connfd = (unsigned long) arg;
+    connfd = net_accept(fd);
     if (connfd < 0) {
       fprintf(stderr, "Error: proto_server_rpc_listen accept failed (%d)\n", errno);
     } else {

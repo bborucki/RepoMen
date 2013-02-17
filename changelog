@@ -6,5 +6,3 @@ get the server to run:
 	  -corrected #include<strings.h>
 	protocol_server.c implemented:
 	  -line 300, 80, 130, 139, 233
-	protocol_session.c
-	  -line 293
