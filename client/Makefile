@@ -1,4 +1,4 @@
-CFLAGS := -g
+CFLAGS := -g -pthread
 targets=client
 src = client.c
 objs = $(patsubst %.c,%.o,$(src))
