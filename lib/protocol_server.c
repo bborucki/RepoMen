@@ -131,8 +131,9 @@ proto_server_event_listen(void *arg)
       int i;
       fprintf(stderr, "EventListen: connfd=%d -> ", connfd);
       
-      NYI;
-      if (ADD CODE<0) {
+      
+      if (1) {
+	NYI;//FILL IF STATEMENT
 	fprintf(stderr, "oops no space for any more event subscribers\n");
 	close(connfd);
       } else {
@@ -156,8 +157,9 @@ proto_server_post_event(void)
     Proto_Server.EventSession.fd = Proto_Server.EventSubscribers[i];
     if (Proto_Server.EventSession.fd != -1) {
       num--;
-      NYI;
-      if (ADD CODE)<0) {
+      
+      if (1) {
+	NYI;
 	// must have lost an event connection
 	close(Proto_Server.EventSession.fd);
 	Proto_Server.EventSubscribers[i]=-1;
@@ -197,12 +199,14 @@ proto_server_req_dispatcher(void * arg)
   for (;;) {
     if (proto_session_rcv_msg(&s)==1) {
       NYI;
-	if (hdlr(&s)<0) goto leave;
+      if (hdlr(&s)<0) goto leave;
       }
-    } else {
+    else {
       goto leave;
     }
   }
+
+
  leave:
  NYI; // Proto_Server.ADD CODE
   close(s.fd);

@@ -12,4 +12,4 @@ libdagame.a: $(objs)
 $(objs) : $(src)
 
 clean:
-	rm $(objs) $(targets)
+	rm $(objs) $(targets) *~

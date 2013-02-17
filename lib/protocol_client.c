@@ -119,7 +119,7 @@ proto_client_event_dispatcher(void * arg)
       mt = proto_session_hdr_unmarshall_type(s);
       if (mt > PROTO_MT_EVENT_BASE_RESERVED_FIRST && 
 	  mt < PROTO_MT_EVENT_BASE_RESERVED_LAST) {
-	ADD CODE
+	NYI;//ADD CODE
 	if (hdlr(s)<0) goto leave;
       }
     } else {
@@ -147,7 +147,7 @@ proto_client_init(Proto_Client_Handle *ch)
 
   for (mt=PROTO_MT_EVENT_BASE_RESERVED_FIRST+1;
        mt<PROTO_MT_EVENT_BASE_RESERVED_LAST; mt++)
-    ADD CODE
+    NYI; //ADD CODE
 
   *ch = c;
   return 1;
