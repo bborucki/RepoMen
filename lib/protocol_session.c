@@ -80,51 +80,51 @@ static void
 proto_session_hdr_marshall_pstate(Proto_Session *s, Proto_Player_State *ps)
 {
     s->shdr.pstate.v0.raw  = htonl(ps->v0.raw);
-  ADD CODE 
+    NYI;
 
 }
 
 static void
 proto_session_hdr_unmarshall_pstate(Proto_Session *s, Proto_Player_State *ps)
 {
-  ADD CODE 
+  NYI;
 
 }
 
 static void
 proto_session_hdr_marshall_gstate(Proto_Session *s, Proto_Game_State *gs)
 {
-  ADD CODE 
+  NYI;
 }
 
 static void
 proto_session_hdr_unmarshall_gstate(Proto_Session *s, Proto_Game_State *gs)
 {
-  ADD CODE 
+  NYI;
 }
 
 static int
 proto_session_hdr_unmarshall_blen(Proto_Session *s)
 {
-  ADD CODE 
+  NYI;
 }
 
 static void
 proto_session_hdr_marshall_type(Proto_Session *s, Proto_Msg_Types t)
 {
-  ADD CODE 
+  NYI;
 }
 
 static int
 proto_session_hdr_unmarshall_version(Proto_Session *s)
 {
-  ADD CODE 
+  NYI;
 }
 
 extern Proto_Msg_Types
 proto_session_hdr_unmarshall_type(Proto_Session *s)
 {
-  ADD CODE 
+  NYI;
 }
 
 extern void
@@ -270,7 +270,7 @@ proto_session_send_msg(Proto_Session *s, int reset)
   s->shdr.blen = htonl(s->slen);
 
   // write request
-  ADD CODE
+  NYI;
   
   if (proto_debug()) {
     fprintf(stderr, "%p: proto_session_send_msg: SENT:\n", pthread_self());
@@ -290,7 +290,7 @@ proto_session_rcv_msg(Proto_Session *s)
   proto_session_reset_receive(s);
 
   // read reply
-  ADD CODE
+  NYI;
 
   if (proto_debug()) {
     fprintf(stderr, "%p: proto_session_rcv_msg: RCVED:\n", pthread_self());
@@ -304,7 +304,7 @@ proto_session_rpc(Proto_Session *s)
 {
   int rc;
   
-  ADD CODE
+  NYI;
 
   return rc;
 }
