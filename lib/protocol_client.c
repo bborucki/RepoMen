@@ -32,6 +32,8 @@
 #include "protocol_client.h"
 
 
+
+
 typedef struct {
   Proto_Session rpc_session;
   Proto_Session event_session;
@@ -73,7 +75,7 @@ proto_client_set_event_handler(Proto_Client_Handle ch, Proto_Msg_Types mt,
   if (mt>PROTO_MT_EVENT_BASE_RESERVED_FIRST && 
       mt<PROTO_MT_EVENT_BASE_RESERVED_LAST) {
     i=mt - PROTO_MT_EVENT_BASE_RESERVED_FIRST - 1;
-    ADD CODE
+    NYI;
     return 1;
   } else {
     return -1;
@@ -109,8 +111,8 @@ proto_client_event_dispatcher(void * arg)
 
   pthread_detach(pthread_self());
 
-  c = ADD CODE
-  s = ADD CODE
+  NYI;//c = ADD CODE
+  NYI;//s = ADD CODE
 
   for (;;) {
     if (proto_session_rcv_msg(s)==1) {
@@ -121,7 +123,7 @@ proto_client_event_dispatcher(void * arg)
 	if (hdlr(s)<0) goto leave;
       }
     } else {
-      ADD CODE
+      NYI;// ADD CODE
       goto leave;
     }
   }
@@ -191,16 +193,16 @@ do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt)
   Proto_Session *s;
   Proto_Client *c = ch;
 
-  s = ADD CODE
+  NYI;// s = ADD CODE
   // marshall
 
   marshall_mtonly(s, mt);
-  rc = proto_session_ADD CODE
+  NYI;// rc = proto_session_ADD CODE
 
   if (rc==1) {
     proto_session_body_unmarshall_int(s, 0, &rc);
   } else {
-    ADD CODE
+    NYI;// ADD CODE
   }
   
   return rc;

@@ -16,6 +16,10 @@
 //                 V2:  int
 //     BLEN     : int length of body
 
+
+#include <assert.h>
+#define NYI fprintf(stderr, "%s: NYI\n", __func__); assert(0);
+
 #define PROTOCOL_BASE_VERSION 0
 
 typedef enum  {
