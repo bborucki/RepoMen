@@ -1,0 +1,10 @@
+For when things go wrong - 
+
+I've made the following changes (in chronological order) in an attempt to
+get the server to run:
+	protocol_session.c
+	  -corrected #include<strings.h>
+	protocol_server.c implemented:
+	  -line 300, 80, 130, 139, 233
+	protocol_session.c
+	  -line 293
