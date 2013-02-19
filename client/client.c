@@ -99,7 +99,7 @@ prompt(int menu)
 }
 
 
-// FIXME:  this is ugly maybe the speration of the proto_client code and
+// FIXME:  this is uly maybe the speration of the proto_client code and
 //         the game code is dumb
 int
 game_process_reply(Client *C)
@@ -215,7 +215,7 @@ usage(char *pgm)
            "  host port: if both host and port are specifed then the game\n"
 	   "examples:\n" 
            " %s 12345 : starts client connecting to localhost:12345\n"
-	  " %s localhost 12345 : starts client connecting to locaalhost:12345\n",
+	  " %s localhost 12345 : starts client connecting to localhost:12345\n",
 	   pgm, pgm, pgm, pgm);
  
 }

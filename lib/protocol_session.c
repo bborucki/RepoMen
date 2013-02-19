@@ -80,51 +80,66 @@ static void
 proto_session_hdr_marshall_pstate(Proto_Session *s, Proto_Player_State *ps)
 {
     s->shdr.pstate.v0.raw  = htonl(ps->v0.raw);
-    NYI;
+    s->shdr.pstate.v1.raw  = htonl(ps->v1.raw);
+    s->shdr.pstate.v2.raw  = htonl(ps->v2.raw);
+    s->shdr.pstate.v3.raw  = htonl(ps->v3.raw);
+    //    NYI;
 
 }
 
 static void
 proto_session_hdr_unmarshall_pstate(Proto_Session *s, Proto_Player_State *ps)
 {
-  NYI;
+  ps = &(s->rhdr.pstate);
 
+  //  NYI;
 }
 
 static void
 proto_session_hdr_marshall_gstate(Proto_Session *s, Proto_Game_State *gs)
 {
-  NYI;
+    s->shdr.gstate.v0.raw  = htonl(gs->v0.raw);
+    s->shdr.gstate.v1.raw  = htonl(gs->v1.raw);
+    s->shdr.gstate.v2.raw  = htonl(gs->v2.raw);
+
+    //  NYI;
 }
 
 static void
 proto_session_hdr_unmarshall_gstate(Proto_Session *s, Proto_Game_State *gs)
 {
-  NYI;
+  gs = &(s->rhdr.gstate);
+
+  //  NYI;
 }
 
 static int
 proto_session_hdr_unmarshall_blen(Proto_Session *s)
 {
-  NYI;
+  return s->rhdr.blen;
+
+  //  NYI;
 }
 
 static void
 proto_session_hdr_marshall_type(Proto_Session *s, Proto_Msg_Types t)
 {
-  NYI;
+  //  NYI;
+  s->shdr.type = t;
 }
 
 static int
 proto_session_hdr_unmarshall_version(Proto_Session *s)
 {
-  NYI;
+  //  NYI;
+  return s->rhdr.version;
 }
 
 extern Proto_Msg_Types
 proto_session_hdr_unmarshall_type(Proto_Session *s)
 {
-  NYI;
+  return s->rhdr.type;
+  //  NYI;
 }
 
 extern void
@@ -290,7 +305,9 @@ proto_session_rcv_msg(Proto_Session *s)
   proto_session_reset_receive(s);
 
   // read reply
-  NYI;
+  //  NYI
+  proto_session_hdr_unmarshall(s, &(s->rhdr));
+  //  proto_session_body_unmarshall(s, &(s->rhdr));
 
   if (proto_debug()) {
     fprintf(stderr, "%p: proto_session_rcv_msg: RCVED:\n", pthread_self());

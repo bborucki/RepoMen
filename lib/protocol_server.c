@@ -201,7 +201,16 @@ proto_server_req_dispatcher(void * arg)
 
   for (;;) {
     if (proto_session_rcv_msg(&s)==1) {
-      NYI;
+
+      mt = s.rhdr.type;
+      i = mt - PROTO_MT_REQ_BASE_RESERVED_FIRST - 1;
+      hdlr = Proto_Server.base_req_handlers[i];
+
+
+      proto_session_reset_receive(&s);
+
+      //      NYI;
+
       if (hdlr(&s)<0) goto leave;
       }
     else {
@@ -211,7 +220,10 @@ proto_server_req_dispatcher(void * arg)
 
 
  leave:
- NYI; // Proto_Server.ADD CODE
+  Proto_Server.EventSession = s;
+
+    // NYI; // Proto_Server.ADD CODE
+
   close(s.fd);
   return NULL;
 }
