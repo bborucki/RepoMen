@@ -285,7 +285,8 @@ proto_session_send_msg(Proto_Session *s, int reset)
   s->shdr.blen = htonl(s->slen);
 
   // write request
-  NYI;
+  proto_session_hdr_marshall(s, &(s->rhdr));
+  //  NYI;
   
   if (proto_debug()) {
     fprintf(stderr, "%p: proto_session_send_msg: SENT:\n", pthread_self());
@@ -321,8 +322,11 @@ proto_session_rpc(Proto_Session *s)
 {
   int rc;
   
-  NYI;
-
+  rc = proto_session_send_msg(s, 1);  
+    
+    
+    //NYI;
+    
   return rc;
 }
 

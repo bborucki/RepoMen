@@ -202,16 +202,19 @@ do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt)
   Proto_Session *s;
   Proto_Client *c = ch;
 
-  NYI;// s = ADD CODE
-  // marshall
+  //  NYI;// s = ADD CODE
+  s = &(c->rpc_session);  
 
   marshall_mtonly(s, mt);
-  NYI;// rc = proto_session_ADD CODE
-
+  
+  //  NYI;// 
+  rc = proto_session_rpc(s);
+  
   if (rc==1) {
     proto_session_body_unmarshall_int(s, 0, &rc);
   } else {
-    NYI;// ADD CODE
+    c->session_lost_handler(s);
+    //    NYI;// ADD CODE
   }
   
   return rc;
