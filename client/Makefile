@@ -13,4 +13,4 @@ client: $(objs) ../lib/net.c
 $(objs) : $(src)
 
 clean:
-	rm $(objs) $(targets)
+	rm -f $(objs) $(targets)
