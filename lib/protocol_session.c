@@ -116,7 +116,6 @@ static int
 proto_session_hdr_unmarshall_blen(Proto_Session *s)
 {
   return ntohl(s->rhdr.blen);
-
   //  NYI;
 }
 
@@ -286,7 +285,6 @@ proto_session_send_msg(Proto_Session *s, int reset)
 
   // write request   //  NYI;
 
-  // write from ... the session?... into fd
   if(net_writen(s->fd, &(s->shdr), sizeof(Proto_Msg_Hdr)) < 0)
     return -1;
   net_writen(s->fd, s->sbuf, s->slen);
@@ -314,7 +312,6 @@ proto_session_rcv_msg(Proto_Session *s)
 
   // read reply   //  NYI
 
-  //read reply from session fd into ... session?
   if(net_readn(s->fd, &(s->rhdr), sizeof(Proto_Msg_Hdr)) < 0)
     return -1;
   net_readn(s->fd, s->rbuf, s->rlen);
@@ -332,8 +329,9 @@ proto_session_rpc(Proto_Session *s)
   int rc;
   
   //NYI;
-  rc = proto_session_send_msg(s, 1);  
-    
+  proto_session_send_msg(s, 1);
+  rc = proto_session_rcv_msg(s);
+
   return rc;
 }
 

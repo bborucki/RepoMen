@@ -202,7 +202,7 @@ proto_server_req_dispatcher(void * arg)
   for (;;) {
     if (proto_session_rcv_msg(&s)==1) {
       fprintf(stderr, "starting req-disp for loop\n");
-      mt = s.rhdr.type;
+      mt = proto_session_hdr_unmarshall_type(&s);
       i = mt - PROTO_MT_REQ_BASE_RESERVED_FIRST; //took out -1
 
       fprintf(stderr, "attempting to access handler.... i = %d\n", i);
@@ -286,7 +286,7 @@ proto_server_mt_null_handler(Proto_Session *s)
 
   // setup dummy reply header : set correct reply message type and 
   // everything else empty
-  bzero(&h, sizeof(s));
+  bzero(&h, sizeof(h));
   h.type = proto_session_hdr_unmarshall_type(s);
   h.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
   proto_session_hdr_marshall(s, &h);
@@ -295,6 +295,8 @@ proto_server_mt_null_handler(Proto_Session *s)
   proto_session_body_marshall_int(s, 0xdeadbeef);
 
   rc=proto_session_send_msg(s,1);
+
+  proto_session_dump(s);
 
   return rc;
 }
