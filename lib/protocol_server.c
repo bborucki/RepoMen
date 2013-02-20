@@ -196,17 +196,14 @@ proto_server_req_dispatcher(void * arg)
 
   s.fd = (FDType) arg_value;
 
-  fprintf(stderr, "proto_rpc_dispatcher: %p: Started: fd=%d\n", 
+  fprintf(stderr, "proto_req_dispatcher: %p: Started: fd=%d\n", 
 	  pthread_self(), s.fd);
 
   for (;;) {
     if (proto_session_rcv_msg(&s)==1) {
-
       mt = s.rhdr.type;
-      i = mt - PROTO_MT_REQ_BASE_RESERVED_FIRST - 1;
+      i = mt - PROTO_MT_REQ_BASE_RESERVED_FIRST; //took out -1
       hdlr = Proto_Server.base_req_handlers[i];
-
-
       proto_session_reset_receive(&s);
 
       //      NYI;
@@ -313,7 +310,6 @@ proto_server_init(void)
     //    NYI; //ADD CODE
     proto_server_set_req_handler(i, proto_server_mt_null_handler);
   }
-
 
   for (i=0; i<PROTO_SERVER_MAX_EVENT_SUBSCRIBERS; i++) {
     Proto_Server.EventSubscribers[i]=-1;

@@ -285,7 +285,7 @@ proto_session_send_msg(Proto_Session *s, int reset)
   s->shdr.blen = htonl(s->slen);
 
   // write request
-  proto_session_hdr_marshall(s, &(s->rhdr));
+  proto_session_hdr_unmarshall(s, &(s->shdr));
   //  NYI;
   
   if (proto_debug()) {
@@ -307,7 +307,8 @@ proto_session_rcv_msg(Proto_Session *s)
 
   // read reply
   //  NYI
-  proto_session_hdr_unmarshall(s, &(s->rhdr));
+  proto_session_hdr_marshall(s, &(s->rhdr));
+
   //  proto_session_body_unmarshall(s, &(s->rhdr));
 
   if (proto_debug()) {
