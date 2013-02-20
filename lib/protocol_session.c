@@ -84,7 +84,6 @@ proto_session_hdr_marshall_pstate(Proto_Session *s, Proto_Player_State *ps)
     s->shdr.pstate.v2.raw  = htonl(ps->v2.raw);
     s->shdr.pstate.v3.raw  = htonl(ps->v3.raw);
     //    NYI;
-
 }
 
 static void
@@ -108,7 +107,7 @@ proto_session_hdr_marshall_gstate(Proto_Session *s, Proto_Game_State *gs)
 static void
 proto_session_hdr_unmarshall_gstate(Proto_Session *s, Proto_Game_State *gs)
 {
-  gs = &(s->rhdr.gstate);
+  gs = &(s->rhdr.gstate); //might be wrong
 
   //  NYI;
 }
@@ -116,7 +115,7 @@ proto_session_hdr_unmarshall_gstate(Proto_Session *s, Proto_Game_State *gs)
 static int
 proto_session_hdr_unmarshall_blen(Proto_Session *s)
 {
-  return s->rhdr.blen;
+  return ntohl(s->rhdr.blen);
 
   //  NYI;
 }
@@ -125,20 +124,20 @@ static void
 proto_session_hdr_marshall_type(Proto_Session *s, Proto_Msg_Types t)
 {
   //  NYI;
-  s->shdr.type = t;
+  s->shdr.type = htonl(t); 
 }
 
 static int
 proto_session_hdr_unmarshall_version(Proto_Session *s)
 {
   //  NYI;
-  return s->rhdr.version;
+  return ntohl(s->rhdr.version);
 }
 
 extern Proto_Msg_Types
 proto_session_hdr_unmarshall_type(Proto_Session *s)
 {
-  return s->rhdr.type;
+  return ntohl(s->rhdr.type);
   //  NYI;
 }
 
@@ -288,9 +287,10 @@ proto_session_send_msg(Proto_Session *s, int reset)
   // write request   //  NYI;
 
   // write from ... the session?... into fd
-  if(net_writen(s->fd, s ,sizeof(*s)) < 0)
+  if(net_writen(s->fd, &(s->shdr), sizeof(Proto_Msg_Hdr)) < 0)
     return -1;
-  
+  net_writen(s->fd, s->sbuf, s->slen);
+
   if (proto_debug()) {
     fprintf(stderr, "%p: proto_session_send_msg: SENT:\n", pthread_self());
     proto_session_dump(s);
@@ -309,15 +309,15 @@ proto_session_send_msg(Proto_Session *s, int reset)
 extern int
 proto_session_rcv_msg(Proto_Session *s)
 {
-
   // clear rhdr and rlen
   proto_session_reset_receive(s);
 
   // read reply   //  NYI
 
   //read reply from session fd into ... session?
-  if(net_readn(s->fd, s, sizeof(*s)) < 0)
+  if(net_readn(s->fd, &(s->rhdr), sizeof(Proto_Msg_Hdr)) < 0)
     return -1;
+  net_readn(s->fd, s->rbuf, s->rlen);
 
   if (proto_debug()) {
     fprintf(stderr, "%p: proto_session_rcv_msg: RCVED:\n", pthread_self());

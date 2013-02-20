@@ -201,12 +201,16 @@ proto_server_req_dispatcher(void * arg)
 
   for (;;) {
     if (proto_session_rcv_msg(&s)==1) {
+      fprintf(stderr, "starting req-disp for loop\n");
       mt = s.rhdr.type;
       i = mt - PROTO_MT_REQ_BASE_RESERVED_FIRST; //took out -1
+
+      fprintf(stderr, "attempting to access handler.... i = %d\n", i);
       hdlr = Proto_Server.base_req_handlers[i];
       
       //      NYI;
-      
+      fprintf(stderr, "end of req-disp for loop\n");      
+
       if (hdlr(&s)<0) goto leave;
     }
     else {
@@ -216,6 +220,7 @@ proto_server_req_dispatcher(void * arg)
 
 
  leave:
+      fprintf(stderr, "leaing\n");
   Proto_Server.EventSession = s; //correct?
 
   // NYI;  //  Proto_Server.

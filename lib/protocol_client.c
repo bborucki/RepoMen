@@ -121,6 +121,8 @@ proto_client_event_dispatcher(void * arg)
   //  NYI;//c = ADD CODE
   //  NYI;//s = ADD CODE
 
+
+  fprintf(stderr, "Starting for loop in client dispatcher...");
   for (;;) {
     if (proto_session_rcv_msg(s)==1) {
       mt = proto_session_hdr_unmarshall_type(s);
@@ -198,7 +200,6 @@ marshall_mtonly(Proto_Session *s, Proto_Msg_Types mt) {
 static int 
 do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt)
 {
-  fprintf(stderr, "\n\nDUMMY RPC, mt = %d\n\n", mt);
   int rc;
   Proto_Session *s;
   Proto_Client *c = ch;
@@ -207,7 +208,7 @@ do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt)
   s = &(c->rpc_session);  
 
   marshall_mtonly(s, mt);
-  
+
   //  NYI;// 
   rc = proto_session_rpc(s);
   
