@@ -198,6 +198,7 @@ marshall_mtonly(Proto_Session *s, Proto_Msg_Types mt) {
 static int 
 do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt)
 {
+  fprintf(stderr, "\n\nDUMMY RPC, mt = %d\n\n", mt);
   int rc;
   Proto_Session *s;
   Proto_Client *c = ch;

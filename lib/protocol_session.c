@@ -288,7 +288,7 @@ proto_session_send_msg(Proto_Session *s, int reset)
   // write request   //  NYI;
 
   // write from ... the session?... into fd
-  if(net_writen(s->fd, s,sizeof(*s)) < 0)
+  if(net_writen(s->fd, s ,sizeof(*s)) < 0)
     return -1;
   
   if (proto_debug()) {
@@ -306,7 +306,6 @@ proto_session_send_msg(Proto_Session *s, int reset)
 //Assuming that the calling function is responsible for unmarshalling
 //session passed to us is empty, need to fill it out, return < 0 when
 //nothing read/to read
-
 extern int
 proto_session_rcv_msg(Proto_Session *s)
 {
