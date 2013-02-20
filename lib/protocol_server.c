@@ -204,12 +204,11 @@ proto_server_req_dispatcher(void * arg)
       mt = s.rhdr.type;
       i = mt - PROTO_MT_REQ_BASE_RESERVED_FIRST; //took out -1
       hdlr = Proto_Server.base_req_handlers[i];
-      proto_session_reset_receive(&s);
-
+      
       //      NYI;
-
+      
       if (hdlr(&s)<0) goto leave;
-      }
+    }
     else {
       goto leave;
     }
@@ -217,9 +216,9 @@ proto_server_req_dispatcher(void * arg)
 
 
  leave:
-  Proto_Server.EventSession = s;
+  Proto_Server.EventSession = s; //correct?
 
-    // NYI; // Proto_Server.ADD CODE
+  // NYI;  //  Proto_Server.
 
   close(s.fd);
   return NULL;

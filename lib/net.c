@@ -189,7 +189,7 @@ net_writen(FDType fd, const void *vptr, size_t n)
 }
 
 /* Read "n" bytes from a descriptor. */
-extern ssize_t    
+extern ssize_t
 net_readn(FDType fd, void *vptr, size_t n)
 {
   size_t  nleft;

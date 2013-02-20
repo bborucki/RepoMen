@@ -144,8 +144,7 @@ proto_session_hdr_unmarshall_type(Proto_Session *s)
 
 extern void
 proto_session_hdr_unmarshall(Proto_Session *s, Proto_Msg_Hdr *h)
-{
-  
+{  
   h->version = proto_session_hdr_unmarshall_version(s);
   h->type = proto_session_hdr_unmarshall_type(s);
   proto_session_hdr_unmarshall_sver(s, &h->sver);
@@ -279,14 +278,18 @@ proto_session_body_unmarshall_bytes(Proto_Session *s, int offset, int len,
 
 // rc < 0 on comm failures
 // rc == 1 indicates comm success
+// session passed to us contains header and body information,
+// need to send that information to fd
 extern  int
 proto_session_send_msg(Proto_Session *s, int reset)
 {
   s->shdr.blen = htonl(s->slen);
 
-  // write request
-  proto_session_hdr_unmarshall(s, &(s->shdr));
-  //  NYI;
+  // write request   //  NYI;
+
+  // write from ... the session?... into fd
+  if(net_writen(s->fd, s,sizeof(*s)) < 0)
+    return -1;
   
   if (proto_debug()) {
     fprintf(stderr, "%p: proto_session_send_msg: SENT:\n", pthread_self());
@@ -299,17 +302,23 @@ proto_session_send_msg(Proto_Session *s, int reset)
   return 1;
 }
 
+
+//Assuming that the calling function is responsible for unmarshalling
+//session passed to us is empty, need to fill it out, return < 0 when
+//nothing read/to read
+
 extern int
 proto_session_rcv_msg(Proto_Session *s)
 {
-  
+
+  // clear rhdr and rlen
   proto_session_reset_receive(s);
 
-  // read reply
-  //  NYI
-  proto_session_hdr_marshall(s, &(s->rhdr));
+  // read reply   //  NYI
 
-  //  proto_session_body_unmarshall(s, &(s->rhdr));
+  //read reply from session fd into ... session?
+  if(net_readn(s->fd, s, sizeof(*s)) < 0)
+    return -1;
 
   if (proto_debug()) {
     fprintf(stderr, "%p: proto_session_rcv_msg: RCVED:\n", pthread_self());
@@ -323,10 +332,8 @@ proto_session_rpc(Proto_Session *s)
 {
   int rc;
   
+  //NYI;
   rc = proto_session_send_msg(s, 1);  
-    
-    
-    //NYI;
     
   return rc;
 }
