@@ -53,14 +53,14 @@ proto_session_init(Proto_Session *s)
 extern void
 proto_session_reset_send(Proto_Session *s)
 {
-  bzero(&s->shdr, sizeof(s->shdr));
+  bzero(&s->shdr, sizeof(Proto_Msg_Hdr));
   s->slen = 0;
 }
 
 extern void
 proto_session_reset_receive(Proto_Session *s)
 {
-  bzero(&s->rhdr, sizeof(s->rhdr));
+  bzero(&s->rhdr, sizeof(Proto_Msg_Hdr));
   s->rlen = 0;
 }
 
@@ -314,7 +314,7 @@ proto_session_rcv_msg(Proto_Session *s)
 
   if(net_readn(s->fd, &(s->rhdr), sizeof(Proto_Msg_Hdr)) < 0)
     return -1;
-  net_readn(s->fd, s->rbuf, s->rlen);
+  net_readn(s->fd, s->rbuf, ntohl(s->rhdr.blen));
 
   if (proto_debug()) {
     fprintf(stderr, "%p: proto_session_rcv_msg: RCVED:\n", pthread_self());
@@ -334,4 +334,3 @@ proto_session_rpc(Proto_Session *s)
 
   return rc;
 }
-

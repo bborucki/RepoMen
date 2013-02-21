@@ -121,8 +121,6 @@ proto_client_event_dispatcher(void * arg)
   //  NYI;//c = ADD CODE
   //  NYI;//s = ADD CODE
 
-
-  fprintf(stderr, "Starting for loop in client dispatcher...");
   for (;;) {
     if (proto_session_rcv_msg(s)==1) {
       mt = proto_session_hdr_unmarshall_type(s);

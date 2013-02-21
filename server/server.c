@@ -80,7 +80,7 @@ prompt(int menu)
 
   if (menu) printf("%s:", MenuString);
   fflush(stdout);
-  c=getchar();;
+  c=getchar();
   return c;
 }
 
