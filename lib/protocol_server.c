@@ -96,15 +96,21 @@ proto_server_record_event_subscriber(int fd, int *num)
   if (Proto_Server.EventLastSubscriber < PROTO_SERVER_MAX_EVENT_SUBSCRIBERS
       && Proto_Server.EventSubscribers[Proto_Server.EventLastSubscriber]
       ==-1) {
-    NYI;
+    Proto_Server.EventNumSubscribers++;
+    Proto_Server.EventSubscribers[0]=fd;
+    //    NYI; // if first subscriber?
     rc = 1;
-  } else {
+  } else { //else search for first free array element
     int i;
     for (i=0; i< PROTO_SERVER_MAX_EVENT_SUBSCRIBERS; i++) {
       if (Proto_Server.EventSubscribers[i]==-1) {
-	NYI;
+	Proto_Server.EventSubscribers[i]=fd;
+	Proto_Server.EventNumSubscribers++;
+	//	NYI;
+
 	*num=i;
 	rc=1;
+	break;
       }
     }
   }
@@ -134,13 +140,15 @@ proto_server_event_listen(void *arg)
       int i;
       fprintf(stderr, "EventListen: connfd=%d -> ", connfd);
       
-      
+      NYI; //NEED TO SET "i"
       //	NYI;//FILL IF STATEMENT
-      if ( PROTO_SERVER_MAX_EVENT_SUBSCRIBERS - Proto_Server.EventNumSubscribers<0){
+      //unsure of second arguement of record
+      if (proto_server_record_event_subscriber(connfd, &(Proto_Server.EventLastSubscriber))<0){
 	fprintf(stderr, "oops no space for any more event subscribers\n");
 	close(connfd);
       } else {
 	fprintf(stderr, "subscriber num %d\n", i);
+	fprintf(stderr, "num of subscribers %d\n", Proto_Server.EventNumSubscribers);
       }
     } 
   }
