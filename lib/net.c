@@ -47,7 +47,6 @@ net_accept(FDType fd)
 {
   FDType nfd;
 
-
   nfd=accept(fd, NULL, NULL);
 
 #ifdef __APPLE__

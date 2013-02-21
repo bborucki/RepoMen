@@ -196,7 +196,7 @@ proto_server_req_dispatcher(void * arg)
 
   s.fd = (FDType) arg_value;
 
-  fprintf(stderr, "proto_req_dispatcher: %p: Started: fd=%d\n", 
+  fprintf(stderr, "\nproto_req_dispatcher: %p: Started: fd=%d\n", 
 	  pthread_self(), s.fd);
 
   for (;;) {
@@ -206,7 +206,6 @@ proto_server_req_dispatcher(void * arg)
       hdlr = Proto_Server.base_req_handlers[i];
       
       //      NYI;
-      fprintf(stderr, "end of req-disp for loop\n");      
 
       if (hdlr(&s)<0) goto leave;
     }
@@ -217,7 +216,7 @@ proto_server_req_dispatcher(void * arg)
 
 
  leave:
-  Proto_Server.EventSession = s;
+  Proto_Server.session_lost_handler;
 
   // NYI;  //  Proto_Server.
 
@@ -292,8 +291,6 @@ proto_server_mt_null_handler(Proto_Session *s)
 
   rc=proto_session_send_msg(s,1);
 
-  proto_session_dump(s);
-
   return rc;
 }
 
@@ -319,7 +316,6 @@ proto_server_init(void)
   Proto_Server.EventNumSubscribers=0;
   Proto_Server.EventLastSubscriber=0;
   pthread_mutex_init(&Proto_Server.EventSubscribersLock, 0);
-
 
   rc=net_setup_listen_socket(&(Proto_Server.RPCListenFD),
 			     &(Proto_Server.RPCPort));
