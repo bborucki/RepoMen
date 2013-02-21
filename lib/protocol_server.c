@@ -140,7 +140,7 @@ proto_server_event_listen(void *arg)
       int i;
       fprintf(stderr, "EventListen: connfd=%d -> ", connfd);
       
-      NYI; //NEED TO SET "i"
+      //      NYI; //NEED TO SET "i"
       //	NYI;//FILL IF STATEMENT
       //unsure of second arguement of record
       if (proto_server_record_event_subscriber(connfd, &(Proto_Server.EventLastSubscriber))<0){
@@ -148,7 +148,6 @@ proto_server_event_listen(void *arg)
 	close(connfd);
       } else {
 	fprintf(stderr, "subscriber num %d\n", i);
-	fprintf(stderr, "num of subscribers %d\n", Proto_Server.EventNumSubscribers);
       }
     } 
   }
