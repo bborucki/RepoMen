@@ -203,7 +203,7 @@ proto_server_req_dispatcher(void * arg)
     if (proto_session_rcv_msg(&s)==1) {
       fprintf(stderr, "starting req-disp for loop\n");
       mt = proto_session_hdr_unmarshall_type(&s);
-      i = mt - PROTO_MT_REQ_BASE_RESERVED_FIRST; //took out -1
+      i = mt - PROTO_MT_REQ_BASE_RESERVED_FIRST - 1; //took out -1
 
       fprintf(stderr, "attempting to access handler.... i = %d\n", i);
       hdlr = Proto_Server.base_req_handlers[i];
