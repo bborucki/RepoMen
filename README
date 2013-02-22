@@ -6,7 +6,7 @@ Member 1 Brian Borucki bborucki@bu.edu
 Member 2 Drew Berry drewb19@bu.edu
 
 To build the system:
-run in bash: "source make.sh"
+run in bash: "make"
 
 To run the server:
 Navigate to /RepoMen/server and run in bash "./server.c"

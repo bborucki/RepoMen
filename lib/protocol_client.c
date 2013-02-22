@@ -32,8 +32,6 @@
 #include "protocol_client.h"
 
 
-
-
 typedef struct {
   Proto_Session rpc_session;
   Proto_Session event_session;
@@ -126,11 +124,15 @@ proto_client_event_dispatcher(void * arg)
       mt = proto_session_hdr_unmarshall_type(s);
       if (mt > PROTO_MT_EVENT_BASE_RESERVED_FIRST && 
 	  mt < PROTO_MT_EVENT_BASE_RESERVED_LAST) {
-	NYI;//ADD CODE
+	i = mt - PROTO_MT_EVENT_BASE_RESERVED_FIRST - 1;	
+	hdlr = c->base_event_handlers[i];
+	//	NYI;//ADD CODE
 	if (hdlr(s)<0) goto leave;
       }
     } else {
-      NYI;// ADD CODE
+      c->session_lost_handler;
+      //      NYI;// ADD CODE
+      
       goto leave;
     }
   }

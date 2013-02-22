@@ -34,8 +34,8 @@ doUpdateClients(void)
   Proto_Session *s;
   Proto_Msg_Hdr hdr;
   s = proto_server_event_session();
+  bzero(&(hdr), sizeof(hdr));
 
-  proto_session_reset_send(s);
   hdr.type = PROTO_MT_EVENT_BASE_UPDATE;
   proto_session_hdr_marshall(s, &hdr);
 
