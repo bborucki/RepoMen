@@ -168,8 +168,8 @@ proto_server_post_event(void)
     if (Proto_Server.EventSession.fd != -1) {
       num--;
       
-      if (1) {
-	NYI;
+      if (proto_session_send_msg(&(Proto_Server.EventSession),1)<0) {
+	//	NYI;
 	// must have lost an event connection
 	close(Proto_Server.EventSession.fd);
 	Proto_Server.EventSubscribers[i]=-1;

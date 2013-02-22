@@ -33,12 +33,13 @@ doUpdateClients(void)
 {
   Proto_Session *s;
   Proto_Msg_Hdr hdr;
-
   s = proto_server_event_session();
+
+  proto_session_reset_send(s);
   hdr.type = PROTO_MT_EVENT_BASE_UPDATE;
   proto_session_hdr_marshall(s, &hdr);
 
-  fprintf(stderr, "\nServer updating cliennts with session:\n");
+  fprintf(stderr, "\nServer updating clients with session:\n");
   proto_session_dump(s);
   
   proto_server_post_event();
