@@ -75,9 +75,11 @@ proto_server_set_req_handler(Proto_Msg_Types mt, Proto_MT_Handler h)
   if (mt>PROTO_MT_REQ_BASE_RESERVED_FIRST &&
       mt<PROTO_MT_REQ_BASE_RESERVED_LAST) {
     i = mt - PROTO_MT_REQ_BASE_RESERVED_FIRST - 1;
+    
 
+    
     //    NYI;
-    Proto_Server.base_req_handlers[i] = h;
+   Proto_Server.base_req_handlers[i] = h;
 
     return 1;
   } else {
@@ -314,7 +316,10 @@ proto_server_init(void)
   for (i=PROTO_MT_REQ_BASE_RESERVED_FIRST+1; 
        i<PROTO_MT_REQ_BASE_RESERVED_LAST; i++) {
     //    NYI; //ADD CODE
-    proto_server_set_req_handler(i, proto_server_mt_null_handler);
+    if(i = PROTO_REQ_BASE_MOVE)
+      proto_server_set_req_handler(i,proto_server_mover);
+    else      
+      proto_server_set_req_handler(i, proto_server_mt_null_handler);
   }
 
   for (i=0; i<PROTO_SERVER_MAX_EVENT_SUBSCRIBERS; i++) {
@@ -352,4 +357,13 @@ proto_server_init(void)
   }
 
   return 0;
+}
+
+
+int
+proto_server_mover(Proto_Session *s){
+  proto_session_hdr_unmarshall(s,s->rhdr);
+  int mv =  s->rhdr.pstate.v0;
+  if(make_move(mv)){
+    
 }
