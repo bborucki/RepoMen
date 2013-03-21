@@ -316,13 +316,7 @@ proto_server_init(void)
   for (i=PROTO_MT_REQ_BASE_RESERVED_FIRST+1; 
        i<PROTO_MT_REQ_BASE_RESERVED_LAST; i++) {
     //    NYI; //ADD CODE
-    /*
-    if(i = PROTO_MT_REQ_BASE_MOVE)
-      proto_server_set_req_handler(i,proto_server_mover);
-    else      
-      proto_server_set_req_handler(i, proto_server_mt_null_handler);
-  }
-    */
+    
   for (i=0; i<PROTO_SERVER_MAX_EVENT_SUBSCRIBERS; i++) {
     Proto_Server.EventSubscribers[i]=-1;
   }
