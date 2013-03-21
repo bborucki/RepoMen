@@ -20,7 +20,7 @@ typedef struct Cell{
   int y;
   int obj1;
   int obj2;
-} cell;
+} Cell;
 
 char** load_maze(char* mappath)
 {

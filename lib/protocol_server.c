@@ -321,7 +321,7 @@ proto_server_query_handler(Proto_Session *s)
   h.pstate.v2.raw = Server_Map->dim;
 
   proto_session_hdr_marshall(s, &h);
-  proto_session_body_marshall(s, 0xdeadbeef);
+  proto_session_body_marshall_int(s, 0xdeadbeef);
   
   rc = proto_session_send_msg(s,1);
   
@@ -334,7 +334,7 @@ proto_server_init(void)
   int i;
   int rc;
   Server_Map = (Map*)malloc(sizeof(Map));
-  map_load(Server_Map);
+  load_map(Server_Map);
   proto_session_init(&Proto_Server.EventSession);
 
   proto_server_set_session_lost_handler(proto_session_lost_default_handler);
