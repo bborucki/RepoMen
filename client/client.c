@@ -26,6 +26,7 @@
 #include "../lib/types.h"
 #include "../lib/protocol_client.h"
 #include "../lib/protocol_utils.h"
+#include "../lib/map.h"
 
 #define STRLEN 81
 
@@ -33,6 +34,7 @@ struct Globals {
   char host[STRLEN];
   PortType port;
   char connected;
+  Map map;
 } globals;
 
 
@@ -53,7 +55,6 @@ clientInit(Client *C)
   }
   return 1;
 }
-
 
 static int
 update_event_handler(Proto_Session *s)
@@ -112,6 +113,10 @@ doRPCCmd(Client *C, char c)
       if (rc > 0) game_process_reply(C);
     }
     break;
+  case 'f':
+    printf("TIME TO PARTY!!!!\n");
+    rc = 1;
+    break;
   case 'm':
     scanf("%c", &c);
     rc = proto_client_move(C->ph, c);
@@ -129,14 +134,18 @@ doRPCCmd(Client *C, char c)
 }
 
 int
-doRPC(Client *C)
+doRPC(Client *C, char cmd)
 {
   int rc;
-  char c;
+  //  char c;
 
-  printf("enter (h|m<c>|g): ");
-  scanf("%c", &c);
-  rc=doRPCCmd(C,c);
+  /*
+    printf("enter (h|m<c>|g): ");
+    scanf("%c", &c);
+    rc=doRPCCmd(C,c);
+  */
+
+  rc=doRPCCmd(C,cmd);
 
   printf("doRPC: rc=0x%x\n", rc);
 
@@ -200,6 +209,7 @@ int
 doNumHome(){
   char c;
   int teamNum;
+  int rc;
 
   if((c=getchar())=='\n'){
     printf("Usage: \"numhome <1 or 2>\"\n");
@@ -207,8 +217,10 @@ doNumHome(){
   }
   putchar(c);
   
-  if(scanf("%d", &teamNum)==1 && (teamNum == 1 || teamNum == 2))
+  if(scanf("%d", &teamNum)==1 && (teamNum == 1 || teamNum == 2)){
     printf("number of home cells for team %d = ...", teamNum);
+    // rc = doRPC(C,'h');
+  }
   else{
     printf("Usage: \"numhome <1 or 2>\"\n");
     return 1;
@@ -228,31 +240,15 @@ doNumJail(){
   }
   putchar(c);
   
-  if(scanf("%d", &teamNum)==1 && (teamNum == 1 || teamNum == 2))
+  if(scanf("%d", &teamNum)==1 && (teamNum == 1 || teamNum == 2)){
     printf("Number of jail cells for team %d = ...", teamNum);
+    //rc = doRPC(C,'j');
+  }
   else{
     printf("Usage: \"numjail <1 or 2>\"\n");
     return 1;
   }
 
-  return 1;
-}
-
-int 
-doNumFloor(){
-  printf("flooring!");
-  return 1;
-}
-
-int 
-doNumWall(){
-  printf("walling!");
-  return 1;
-}
-
-int 
-doDim(){
-  printf("diming!");
   return 1;
 }
 
@@ -267,8 +263,10 @@ doCInfo(){
   }
   putchar(c);
 
-  if(scanf("%d,%d", &x, &y)==2)
+  if(scanf("%d,%d", &x, &y)==2){
     printf("Info for (%d,%d) = ...", x, y);
+    //rc = doRPC(C,'i');
+  }
   else{
     printf("Usage: \"cinfo <x,y>\"\n");
     return 1;
@@ -328,40 +326,36 @@ docmd(Client *C, char cmd)
   int rc = 1;
 
   switch (cmd) {
-  case 'c':
+  case 'c': //connect
     rc=doConnect(C);
     break;
-  case 'd':
+  case 'd': //disconnect
     rc=doDisconnect();
     break;
-  case 'w':
-    rc=doWhere();
+  case 'w': //where
+    rc=doWhere(); 
     break;
-  case 'q':
+  case 'q': //quit
     rc=-1;
     break;
-  case 'h':
-    rc = doNumHome();
+  case 'h': //numhome
+    rc=doNumHome();
     break;
-  case 'j':
-    rc = doNumJail();
+  case 'j': //numjail
+    rc=doNumJail();
     break;
-  case 'f':
-    rc = doNumFloor();
+  case 'f': //numfloor
+  case 'a': //numwall
+  case 'm': //dim
+    rc = doRPC(C,cmd);
     break;
-  case 'a':
-    rc = doNumWall();
-    break;
-  case 'm':
-    rc = doDim();
-    break;
-  case 'i':
+  case 'i': //cinfo
     rc = doCInfo();
     break;
-  case 'u':
+  case 'u': //dump
     rc = doDump();
     break;
-  case 'p':
+  case 'p': //help
     rc = doHelp();
     break;
   case '\n':

@@ -23,8 +23,7 @@
 #define OCCUPIED 1
 #define UNOCCUPIED 0
 
-
-typedef struct{
+typedef struct Map{
   int numhome1;
   int numhome2;
   int numwall;
@@ -35,18 +34,4 @@ typedef struct{
   char** maze;
 } Map;
 
-
-int map_dump(const char* mappath);
-
-
-int map_num_home(const char* mappath, int team);
-
-int map_num_jail(const char* mappath, int team);
-
-int map_num_wall(const char* mappath);
-
-int map_num_floor(const char* mappath);
-
-int map_dim(const char* mappath);
-
-int map_cinfo(const char* mappath, int x, int y);
+extern void load_map(Map* m);

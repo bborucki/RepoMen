@@ -50,8 +50,7 @@ proto_client_rpc_session(Proto_Client_Handle ch)
 }
 
 extern Proto_Session *
-proto_client_event_session(Proto_Client_Handle ch)
-{
+proto_client_event_session(Proto_Client_Handle ch){
   Proto_Client *c = ch;
   return &(c->event_session);
 }
@@ -85,8 +84,7 @@ proto_client_set_event_handler(Proto_Client_Handle ch, Proto_Msg_Types mt,
 }
 
 static int 
-proto_client_session_lost_default_hdlr(Proto_Session *s)
-{
+proto_client_session_lost_default_hdlr(Proto_Session *s){
   fprintf(stderr, "Session lost...:\n");
   proto_session_dump(s);
   return -1;
@@ -103,8 +101,7 @@ proto_client_event_null_handler(Proto_Session *s)
 }
 
 static void *
-proto_client_event_dispatcher(void * arg)
-{
+proto_client_event_dispatcher(void * arg){
   Proto_Client *c;
   Proto_Session *s;
   Proto_Msg_Types mt;
@@ -142,8 +139,7 @@ proto_client_event_dispatcher(void * arg)
 }
 
 extern int
-proto_client_init(Proto_Client_Handle *ch)
-{
+proto_client_init(Proto_Client_Handle *ch){
   Proto_Msg_Types mt;
   Proto_Client *c;
  
@@ -198,8 +194,7 @@ marshall_mtonly(Proto_Session *s, Proto_Msg_Types mt) {
 // all rpc's are assume to only reply only with a return code in the body
 // eg.  like the null_mes
 static int 
-do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt)
-{
+do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt){
   int rc;
   Proto_Session *s;
   Proto_Client *c = ch;
@@ -221,22 +216,25 @@ do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt)
   
   return rc;
 }
-extern int 
-proto_client_hello(Proto_Client_Handle ch)
-{
-  return do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_HELLO);  
+
+extern int
+proto_client_hello(Proto_Client_Handle ch){
+  return do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_HELLO);
 }
 
-extern int 
-proto_client_move(Proto_Client_Handle ch, char data)
-{
-  return do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_MOVE);  
+extern int
+proto_client_move(Proto_Client_Handle ch, char data){
+  return do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_MOVE);
 }
 
-extern int 
-proto_client_goodbye(Proto_Client_Handle ch)
-{
-  return do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_GOODBYE);  
+extern int
+proto_client_query(Proto_Client_Handle ch){
+  return do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_QUERY);
+}
+
+extern int
+proto_client_goodbye(Proto_Client_Handle ch){
+  return do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_GOODBYE);
 }
 
 

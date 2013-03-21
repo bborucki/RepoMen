@@ -12,10 +12,7 @@
 
 FILE *fp;
 
-
-
-
-typedef struct{
+typedef struct Cell{
   int type;
   int team;
   int occupied;
@@ -23,8 +20,7 @@ typedef struct{
   int y;
   int obj1;
   int obj2;
-} Cell;
-
+} cell;
 
 char** load_maze(char* mappath)
 {
@@ -53,11 +49,9 @@ Cell* make_cell(int ux, int uy)
   return c;
 }
 
-
 int get_cell_type(Map *m,int x, int y)
 {
   return m->maze[x-1][y-1];
-
 }
 
 int read_map(const char* mappath)

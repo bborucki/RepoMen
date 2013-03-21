@@ -110,29 +110,6 @@ shell(void *arg)
 }
 
 int
-main(int argc, char **argv)
-{ 
-  if (proto_server_init()<0) {
-    fprintf(stderr, "ERROR: failed to initialize proto_server subsystem\n");
-    exit(-1);
-  }
-
-  fprintf(stderr, "RPC Port: %d, Event Port: %d\n", proto_server_rpcport(), 
-	  proto_server_eventport());
-
-  if (proto_server_start_rpc_loop()<0) {
-    fprintf(stderr, "ERROR: failed to start rpc loop\n");
-    exit(-1);
-  }
-    
-  shell(NULL);
-
-  return 0;
-}
-
-
-
-int
 move_valid(int mv){
   mv--;
   if(gameboard[mv] <= '9'){
@@ -191,5 +168,26 @@ check_diagonals(){
   if(gameboard[2] == gameboard[4])
     if(gameboard[4] == gameboard[6])
       return 1;
+  return 0;
+}
+
+int
+main(int argc, char **argv)
+{ 
+  if (proto_server_init()<0) {
+    fprintf(stderr, "ERROR: failed to initialize proto_server subsystem\n");
+    exit(-1);
+  }
+
+  fprintf(stderr, "RPC Port: %d, Event Port: %d\n", proto_server_rpcport(), 
+	  proto_server_eventport());
+
+  if (proto_server_start_rpc_loop()<0) {
+    fprintf(stderr, "ERROR: failed to start rpc loop\n");
+    exit(-1);
+  }
+    
+  shell(NULL);
+
   return 0;
 }
