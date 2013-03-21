@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include <strings.h>
+#include <string.h>
 #include <errno.h>
 #include <pthread.h>
 #include <string.h>
@@ -22,13 +22,11 @@ typedef struct Cell{
   int obj2;
 } Cell;
 
-char** load_maze(char* mappath)
+char** load_maze()
 {
   char* buf = malloc(COLUMN_MAX);
   char** out = malloc(LINE_MAX);
   int i = 0;
-  if(!read_map(MAP_NAME))
-    fprintf(stderr, "error reading map at path %s\n", mappath); 
   while(fgets(buf,COLUMN_MAX,fp) != NULL){
     out[i] = strcpy(out[i],buf);
     i++;
@@ -56,8 +54,10 @@ int get_cell_type(Map *m,int x, int y)
 
 int read_map(const char* mappath)
 {
-  if((fp = fopen(mappath, "r")) == NULL)
+  if((fp = fopen(mappath, "r")) == NULL){
+    fprintf(stderr, "ERRNO: %d\n", errno);
     return 0;
+  }
   return 1;
 }
 
@@ -90,8 +90,7 @@ int map_dump(const char* mappath)
   return 1;
 }
 
-
-int map_num_home(const char* mappath, int team)
+int map_num_home(int team)
 {
   char* buf = malloc(LINE_MAX);
   int i;
@@ -101,11 +100,6 @@ int map_num_home(const char* mappath, int team)
     cap = 0;
   else
     cap = 1;
-
-  if(!read_map(mappath)){
-    fprintf(stderr,"could not read map at path %s",mappath);
-    return 0;
-  }
   
   while(fgets(buf,LINE_MAX,fp) != NULL){
     for(; buf != '\0'; buf++){
@@ -118,7 +112,7 @@ int map_num_home(const char* mappath, int team)
   return num;
 }
 
-int map_num_jail(const char* mappath, int team)
+int map_num_jail(int team)
 {
   char* buf = malloc(LINE_MAX);
   int i;
@@ -128,11 +122,6 @@ int map_num_jail(const char* mappath, int team)
     cap = 0;
   else
     cap = 1;
-
-  if(!read_map(mappath)){
-    fprintf(stderr,"could not read map at path %s",mappath);
-    return 0;
-  }
   
   while(fgets(buf,LINE_MAX,fp) != NULL){
     for(; buf != '\0'; buf++){
@@ -145,16 +134,10 @@ int map_num_jail(const char* mappath, int team)
   return num;
 }
 
-
-int map_num_wall(const char* mappath)
+int map_num_wall()
 {
   char* buf = malloc(LINE_MAX);
   int num = 0;
-  
-  if(!read_map(mappath)){
-    fprintf(stderr,"could not read map at path %s",mappath);
-    return 0;
-  }
   
   while(fgets(buf,LINE_MAX,fp) != NULL){
     for(; buf != '\0'; buf++){
@@ -165,15 +148,10 @@ int map_num_wall(const char* mappath)
   return num;
 }
 
-int map_num_floor(const char* mappath)
+int map_num_floor()
 {
   char* buf = malloc(LINE_MAX);
   int num = 0;
-  
-  if(!read_map(mappath)){
-    fprintf(stderr,"could not read map at path %s",mappath);
-    return 0;
-  }
   
   while(fgets(buf,LINE_MAX,fp) != NULL){
     for(; buf != '\0'; buf++){
@@ -187,18 +165,22 @@ int map_num_floor(const char* mappath)
   return num;
 }
 
-
-
-extern void load_map(Map* m)
+extern int
+load_map(Map* m)
 {
-  m->numhome1 = map_num_home(MAP_NAME, 1);
-  m->numhome2 = map_num_home(MAP_NAME, 2);
-  m->numwall = map_num_wall(MAP_NAME);
-  m->numfloor = map_num_floor(MAP_NAME);
-  m->numjail1 = map_num_jail(MAP_NAME, 1);
-  m->numjail2 = map_num_jail(MAP_NAME, 2);
+  if(!read_map(MAP_NAME)){
+    fprintf(stderr,"could not read map at path %s\n",MAP_NAME);
+    return 0;
+  }
+  m->numhome1 = map_num_home(1);
+  m->numhome2 = map_num_home(2);
+  m->numjail1 = map_num_jail(1);
+  m->numjail2 = map_num_jail(2);
+  m->numwall = map_num_wall();
+  m->numfloor = map_num_floor();
   m->dim = COLUMN_MAX;
-  m->maze = (char**)load_maze(MAP_NAME);
+  m->maze = (char**)load_maze();
+  return 1;
 }
 
 /*

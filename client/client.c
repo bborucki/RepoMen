@@ -74,7 +74,7 @@ startConnection(Client *C, char *host, PortType port, Proto_MT_Handler h)
       fprintf(stderr, "failed to connect\n");
       return -1;
     }
-    proto_session_set_data(proto_client_event_session(C->ph), C);
+   proto_session_set_data(proto_client_event_session(C->ph), C);
 #if 1
     if (h != NULL) {
       proto_client_set_event_handler(C->ph, PROTO_MT_EVENT_BASE_UPDATE, 
@@ -112,6 +112,10 @@ doRPCCmd(Client *C, char c)
       printf("hello: rc=%x\n", rc);
       if (rc > 0) game_process_reply(C);
     }
+    break;
+  case 'q':
+    printf("TIME TO QUERYYY!!!!\n");
+    rc = 1;
     break;
   case 'f':
     printf("TIME TO PARTY!!!!\n");
@@ -177,7 +181,6 @@ doConnect(Client *C){
   strncpy(globals.host, addr_port, strlen(addr_port));
   globals.port = atoi(ptr+sizeof(char));
 
-  // ok startup our connection to the server
   if (startConnection(C, globals.host, globals.port, update_event_handler)<0) {
     fprintf(stderr, "ERROR: startConnection failed\n");
     return -1;
@@ -185,6 +188,8 @@ doConnect(Client *C){
   else{
     printf("Connected.");
     globals.connected = 1;
+    doRPC(C,'q');
+
   }
   return 1;
 }

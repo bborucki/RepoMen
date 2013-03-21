@@ -19,7 +19,7 @@
 #define TEAM_1_MAX 100
 #define TEAM_2_MAX 200
 
-#define MAP_NAME "daGame.map"
+#define MAP_NAME "./daGame.map"
 #define OCCUPIED 1
 #define UNOCCUPIED 0
 
@@ -34,4 +34,4 @@ typedef struct Map{
   char** maze;
 } Map;
 
-extern void load_map(Map* m);
+extern int load_map(Map* m);

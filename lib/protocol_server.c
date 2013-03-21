@@ -334,7 +334,8 @@ proto_server_init(void)
   int i;
   int rc;
   Server_Map = (Map*)malloc(sizeof(Map));
-  load_map(Server_Map);
+  if(!load_map(Server_Map))
+    return -1;
   proto_session_init(&Proto_Server.EventSession);
 
   proto_server_set_session_lost_handler(proto_session_lost_default_handler);
