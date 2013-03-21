@@ -26,7 +26,7 @@
 #include <strings.h>
 #include <errno.h>
 #include <pthread.h>
-
+#include "map.h"
 #include "net.h"
 #include "protocol.h"
 #include "protocol_utils.h"
@@ -53,6 +53,10 @@ struct {
 				       PROTO_MT_REQ_BASE_RESERVED_FIRST-1];
 } Proto_Server;
 
+
+static Map* Server_Map;
+
+
 extern PortType proto_server_rpcport(void) { return Proto_Server.RPCPort; }
 extern PortType proto_server_eventport(void) { return Proto_Server.EventPort; }
 extern Proto_Session *
@@ -76,7 +80,6 @@ proto_server_set_req_handler(Proto_Msg_Types mt, Proto_MT_Handler h)
       mt<PROTO_MT_REQ_BASE_RESERVED_LAST) {
     i = mt - PROTO_MT_REQ_BASE_RESERVED_FIRST - 1;
     
-
     
     //    NYI;
    Proto_Server.base_req_handlers[i] = h;
@@ -303,12 +306,34 @@ proto_server_mt_null_handler(Proto_Session *s)
   return rc;
 }
 
+static int
+proto_server_query_handler(Proto_Session *s)
+{
+  int rc = 1;
+  Proto_Msg_Hdr h;
+  bzero(&h, sizeof(h));
+  h.pstate.v0 = (Proto_PV0)Server_Map->numhome1;
+  h.pstate.v1 = (Proto_PV1)Server_Map->numhome2;
+  h.pstate.v2 = (Proto_PV2)Server_Map->numjail1;
+  h.pstate.v3 = (Proto_PV3)Server_Map->numjail2;
+  h.gstate.v0 = (Proto_GV0)Server_Map->numwall;
+  h.gstate.v1 = (Proto_GV1)Server_Map->numfloor;
+  h.pstate.v2 = (Proto_GV2)Server_Map->dim;
+
+  proto_session_hdr_marshall(s, &h);
+  proto_session_body_marshall(s, 0xdeadbeef);
+  
+  rc = proto_session_send_msg(s,1);
+  
+  return rc;
+}
+
 extern int
 proto_server_init(void)
 {
   int i;
   int rc;
-
+  Server_Map = (Map*)malloc(sizeof(Map));
   proto_session_init(&Proto_Server.EventSession);
 
   proto_server_set_session_lost_handler(proto_session_lost_default_handler);
@@ -316,7 +341,10 @@ proto_server_init(void)
   for (i=PROTO_MT_REQ_BASE_RESERVED_FIRST+1; 
        i<PROTO_MT_REQ_BASE_RESERVED_LAST; i++) {
     //    NYI; //ADD CODE
-    proto_server_set_req_handler(i, proto_server_mt_null_handler);
+    if(i == PROTO_MT_REQ_BASE_QUERY)
+      proto_server_set_req_handler(i,proto_server_query_handler);
+    else
+      proto_server_set_req_handler(i, proto_server_mt_null_handler);
   }
   for (i=0; i<PROTO_SERVER_MAX_EVENT_SUBSCRIBERS; i++) {
     Proto_Server.EventSubscribers[i]=-1;

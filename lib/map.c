@@ -12,10 +12,6 @@
 
 FILE *fp;
 
-#define LINE_MAX  200
-#define COLUMN_MAX 200
-#define TEAM_1_MAX 100
-#define TEAM_2_MAX 200
 
 
 
@@ -29,17 +25,6 @@ typedef struct{
   int obj2;
 } Cell;
 
-typedef struct{
-  int home1;
-  int home2;
-  int numwall;
-  int numfloor;
-  int numjail1;
-  int numjail2;
-  int len;
-  int width;
-  char** maze;
-} Map;
 
 char** load_maze(char* mappath)
 {
@@ -212,14 +197,13 @@ int map_num_floor(const char* mappath)
 
 extern void load_map(Map* m)
 {
-  m->home1 = map_num_home(MAP_NAME, 1);
-  m->home2 = map_num_home(MAP_NAME, 2);
+  m->numhome1 = map_num_home(MAP_NAME, 1);
+  m->numhome2 = map_num_home(MAP_NAME, 2);
   m->numwall = map_num_wall(MAP_NAME);
   m->numfloor = map_num_floor(MAP_NAME);
   m->numjail1 = map_num_jail(MAP_NAME, 1);
   m->numjail2 = map_num_jail(MAP_NAME, 2);
-  m->width = LINE_MAX;
-  m->len = COLUMN_MAX;
+  m->dim = COLUMN_MAX;
   m->maze = (char**)load_maze(MAP_NAME);
 }
 
