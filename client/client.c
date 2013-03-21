@@ -32,6 +32,7 @@
 struct Globals {
   char host[STRLEN];
   PortType port;
+  char connected;
 } globals;
 
 
@@ -84,21 +85,6 @@ startConnection(Client *C, char *host, PortType port, Proto_MT_Handler h)
   return 0;
 }
 
-
-int
-prompt(int menu) 
-{
-  static char MenuString[] = "\nclient> ";
-  int ret;
-  int c=0;
-
-  if (menu) printf("%s", MenuString);
-  fflush(stdout);
-  c = getchar();
-  return c;
-}
-
-
 // FIXME:  this is uly maybe the speration of the proto_client code and
 //         the game code is dumb
 int
@@ -112,7 +98,6 @@ game_process_reply(Client *C)
 
   return 1;
 }
-
 
 int 
 doRPCCmd(Client *C, char c) 
@@ -158,6 +143,184 @@ doRPC(Client *C)
   return rc;
 }
 
+int
+doConnect(Client *C){
+  char addr_port[42];
+  char host[81];
+  int port;
+  char ch;
+  char *ptr;
+
+  if((ch=getchar())=='\n'){
+    printf("Failed to connect. Usage: \"connect <IP:PORT>\"\n");
+    return 1;
+  }
+  putchar(ch);
+  scanf("%s", addr_port);
+  
+  if((ptr = strpbrk(addr_port, ":"))==NULL){
+    printf("Failed to connect. Usage: \"connect <IP:PORT>\"\n");
+    return 1;
+  }
+  
+  *ptr = '\0';
+  
+  strncpy(globals.host, addr_port, strlen(addr_port));
+  globals.port = atoi(ptr+sizeof(char));
+
+  // ok startup our connection to the server
+  if (startConnection(C, globals.host, globals.port, update_event_handler)<0) {
+    fprintf(stderr, "ERROR: startConnection failed\n");
+    return -1;
+  }
+  else{
+    printf("Connected.");
+    globals.connected = 1;
+  }
+  return 1;
+}
+
+int
+doDisconnect(){
+  printf("Disconnecting...");
+  //call terminating function...whatever that is
+  return 1;
+}
+
+int
+doWhere(){
+  if(globals.connected)
+    printf("Connected to: %s:%d", globals.host, globals.port);
+  else
+    printf("Not Connected.");
+  return 1;
+}
+
+int 
+doNumHome(){
+  char c;
+  int teamNum;
+
+  if((c=getchar())=='\n'){
+    printf("Usage: \"numhome <1 or 2>\"\n");
+    return 1;
+  }
+  putchar(c);
+  
+  if(scanf("%d", &teamNum)==1 && (teamNum == 1 || teamNum == 2))
+    printf("number of home cells for team %d = ...", teamNum);
+  else{
+    printf("Usage: \"numhome <1 or 2>\"\n");
+    return 1;
+  }
+
+  return 1;
+}
+
+int 
+doNumJail(){
+  char c;
+  int teamNum;
+
+  if((c=getchar())=='\n'){
+    printf("Usage: \"numjail <1 or 2>\"\n");
+    return 1;
+  }
+  putchar(c);
+  
+  if(scanf("%d", &teamNum)==1 && (teamNum == 1 || teamNum == 2))
+    printf("Number of jail cells for team %d = ...", teamNum);
+  else{
+    printf("Usage: \"numjail <1 or 2>\"\n");
+    return 1;
+  }
+
+  return 1;
+}
+
+int 
+doNumFloor(){
+  printf("flooring!");
+  return 1;
+}
+
+int 
+doNumWall(){
+  printf("walling!");
+  return 1;
+}
+
+int 
+doDim(){
+  printf("diming!");
+  return 1;
+}
+
+int 
+doCInfo(){
+  char c;
+  int x,y;
+
+  if((c=getchar())=='\n'){
+    printf("Usage: \"cinfo <x,y>\"\n");
+    return 1;
+  }
+  putchar(c);
+
+  if(scanf("%d,%d", &x, &y)==2)
+    printf("Info for (%d,%d) = ...", x, y);
+  else{
+    printf("Usage: \"cinfo <x,y>\"\n");
+    return 1;
+  }
+    
+  return 1;
+}
+
+int 
+doDump(){
+  printf("dumping!");
+  return 1;
+}
+
+int
+doHelp(){
+  printf("Available commands: \n\tconnect <IP:PORT> \n\tdisconnect \n\twhere \n\tnumhome <1 or 2> \n\tnumjail <1 or 2> \n\tnumwall \n\tnumfloor \n\tdim \n\tcinfo <x,y> \n\tdump \n\tquit\n");
+
+  return 1;
+}
+
+char
+input2cmd(char* input){
+  int cmd=-1;
+ 
+  if(!strcmp(input, "connect"))
+    cmd = 'c';
+  else if(!strcmp(input, "disconnect"))
+    cmd = 'd';
+  else if(!strcmp(input, "where"))
+    cmd = 'w';
+  else if(!strcmp(input, "quit"))
+    cmd = 'q';
+  else if(!strcmp(input, "numhome"))
+    cmd = 'h';
+  else if(!strcmp(input, "numjail"))
+    cmd = 'j';
+  else if(!strcmp(input, "numfloor"))
+    cmd = 'f';
+  else if(!strcmp(input, "numwall"))
+    cmd = 'a';
+  else if(!strcmp(input, "dim"))
+    cmd = 'm';
+  else if(!strcmp(input, "cinfo"))
+    cmd = 'i';
+  else if(!strcmp(input, "dump"))
+    cmd = 'u';
+  else if(!strcmp(input, "help"))
+    cmd = 'p';
+    
+  return cmd;
+}
 
 int 
 docmd(Client *C, char cmd)
@@ -165,25 +328,76 @@ docmd(Client *C, char cmd)
   int rc = 1;
 
   switch (cmd) {
+  case 'c':
+    rc=doConnect(C);
+    break;
   case 'd':
-    proto_debug_on();
+    rc=doDisconnect();
     break;
-  case 'D':
-    proto_debug_off();
-    break;
-  case 'r':
-    rc = doRPC(C);
+  case 'w':
+    rc=doWhere();
     break;
   case 'q':
     rc=-1;
+    break;
+  case 'h':
+    rc = doNumHome();
+    break;
+  case 'j':
+    rc = doNumJail();
+    break;
+  case 'f':
+    rc = doNumFloor();
+    break;
+  case 'a':
+    rc = doNumWall();
+    break;
+  case 'm':
+    rc = doDim();
+    break;
+  case 'i':
+    rc = doCInfo();
+    break;
+  case 'u':
+    rc = doDump();
+    break;
+  case 'p':
+    rc = doHelp();
     break;
   case '\n':
     rc=1;
     break;
   default:
     printf("Unkown Command\n");
+    /*
+      case 'd':
+      proto_debug_on();
+      break;
+      case 'D':
+      proto_debug_off();
+      break;    
+      case 'r':
+      rc = doRPC(C);
+      break;
+    */
   }
   return rc;
+}
+
+int
+prompt(int menu) 
+{
+  static char MenuString[] = "\nclient> ";
+  int c=0;
+  char input[42];
+
+  if (menu) printf("%s", MenuString);
+  fflush(stdout);
+  scanf("%s", input);
+
+  c=input2cmd(input);
+
+  return c;
 }
 
 void *
@@ -205,63 +419,19 @@ shell(void *arg)
   return NULL;
 }
 
-void 
-usage(char *pgm)
-{
-  fprintf(stderr, "USAGE: %s <port|<<host port> [shell] [gui]>>\n"
-           "  port     : rpc port of a game server if this is only argument\n"
-           "             specified then host will default to localhost and\n"
-	   "             only the graphical user interface will be started\n"
-           "  host port: if both host and port are specifed then the game\n"
-	   "examples:\n" 
-           " %s 12345 : starts client connecting to localhost:12345\n"
-	  " %s localhost 12345 : starts client connecting to localhost:12345\n",
-	   pgm, pgm, pgm, pgm);
- 
-}
-
-void
-initGlobals(int argc, char **argv)
-{
-  bzero(&globals, sizeof(globals));
-
-  if (argc==1) {
-    usage(argv[0]);
-    exit(-1);
-  }
-
-  if (argc==2) {
-    strncpy(globals.host, "localhost", STRLEN);
-    globals.port = atoi(argv[1]);
-  }
-
-  if (argc>=3) {
-    strncpy(globals.host, argv[1], STRLEN);
-    globals.port = atoi(argv[2]);
-  }
-
-}
-
 int 
 main(int argc, char **argv)
 {
   Client c;
 
-  initGlobals(argc, argv);
+  bzero(&globals, sizeof(globals));
 
   if (clientInit(&c) < 0) {
     fprintf(stderr, "ERROR: clientInit failed\n");
     return -1;
   }    
 
-  // ok startup our connection to the server
-  if (startConnection(&c, globals.host, globals.port, update_event_handler)<0) {
-    fprintf(stderr, "ERROR: startConnection failed\n");
-    return -1;
-  }
-
   shell(&c);
 
   return 0;
 }
-
