@@ -45,6 +45,9 @@ proto_dump_mt(Proto_Msg_Types type)
   case PROTO_MT_REQ_BASE_MOVE: 
     fprintf(stderr, "PROTO_MT_REQ_BASE_MOVE");
     break;
+  case PROTO_MT_REQ_BASE_QUERY:
+    fprintf(stderr, "PROTO_MT_REQ_BASE_QUERY");    
+    break;
   case PROTO_MT_REQ_BASE_GOODBYE: 
     fprintf(stderr, "PROTO_MT_REQ_BASE_GOODBYE");
     break;

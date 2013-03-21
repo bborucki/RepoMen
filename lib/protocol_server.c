@@ -66,20 +66,17 @@ proto_server_event_session(void)
 }
 
 extern int
-proto_server_set_session_lost_handler(Proto_MT_Handler h)
-{
+proto_server_set_session_lost_handler(Proto_MT_Handler h){
   Proto_Server.session_lost_handler = h;
 }
 
 extern int
-proto_server_set_req_handler(Proto_Msg_Types mt, Proto_MT_Handler h)
-{
+proto_server_set_req_handler(Proto_Msg_Types mt, Proto_MT_Handler h){
   int i;
 
   if (mt>PROTO_MT_REQ_BASE_RESERVED_FIRST &&
       mt<PROTO_MT_REQ_BASE_RESERVED_LAST) {
     i = mt - PROTO_MT_REQ_BASE_RESERVED_FIRST - 1;
-    
     
     //    NYI;
    Proto_Server.base_req_handlers[i] = h;
@@ -90,10 +87,8 @@ proto_server_set_req_handler(Proto_Msg_Types mt, Proto_MT_Handler h)
   }
 }
 
-
 static int
-proto_server_record_event_subscriber(int fd, int *num)
-{
+proto_server_record_event_subscriber(int fd, int *num){
   int rc=-1;
 
   pthread_mutex_lock(&Proto_Server.EventSubscribersLock);
@@ -127,8 +122,7 @@ proto_server_record_event_subscriber(int fd, int *num)
 
 static
 void *
-proto_server_event_listen(void *arg)
-{
+proto_server_event_listen(void *arg){
   int fd = Proto_Server.EventListenFD;
   int connfd;
 
@@ -236,10 +230,8 @@ proto_server_req_dispatcher(void * arg)
   return NULL;
 }
 
-static
-void *
-proto_server_rpc_listen(void *arg)
-{
+static void *
+proto_server_rpc_listen(void *arg){
   int fd = Proto_Server.RPCListenFD;
   unsigned long connfd;
   pthread_t tid;
@@ -262,8 +254,7 @@ proto_server_rpc_listen(void *arg)
 }
 
 extern int
-proto_server_start_rpc_loop(void)
-{
+proto_server_start_rpc_loop(void){
   if (pthread_create(&(Proto_Server.RPCListenTid), NULL, 
 		     &proto_server_rpc_listen, NULL) !=0) {
     fprintf(stderr, 
@@ -275,16 +266,14 @@ proto_server_start_rpc_loop(void)
 }
 
 static int 
-proto_session_lost_default_handler(Proto_Session *s)
-{
+proto_session_lost_default_handler(Proto_Session *s){
   fprintf(stderr, "Session lost...:\n");
   proto_session_dump(s);
   return -1;
 }
 
 static int 
-proto_server_mt_null_handler(Proto_Session *s)
-{
+proto_server_mt_null_handler(Proto_Session *s){
   int rc=1;
   Proto_Msg_Hdr h;
   
@@ -307,8 +296,7 @@ proto_server_mt_null_handler(Proto_Session *s)
 }
 
 static int
-proto_server_query_handler(Proto_Session *s)
-{
+proto_server_query_handler(Proto_Session *s){
   int rc = 1;
   Proto_Msg_Hdr h;
   bzero(&h, sizeof(h));
@@ -329,13 +317,19 @@ proto_server_query_handler(Proto_Session *s)
 }
 
 extern int
-proto_server_init(void)
-{
+proto_server_init(void){
   int i;
   int rc;
   Server_Map = (Map*)malloc(sizeof(Map));
   if(!load_map(Server_Map))
     return -1;
+  printf("h1:%d\n", Server_Map->numhome1);
+  printf("h2:%d\n", Server_Map->numhome2);
+  printf("j1:%d\n", Server_Map->numjail1);
+  printf("j2:%d\n", Server_Map->numjail2);
+  printf("w :%d\n", Server_Map->numwall);
+  printf("f :%d\n", Server_Map->numfloor);
+  printf("d :%d\n", Server_Map->dim);
   proto_session_init(&Proto_Server.EventSession);
 
   proto_server_set_session_lost_handler(proto_session_lost_default_handler);
@@ -383,5 +377,4 @@ proto_server_init(void)
   }
 
   return 0;
-  
 }

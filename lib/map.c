@@ -88,21 +88,20 @@ int map_dump(const char* mappath){
 }
 
 int map_num_home(int team){
-  char* buf = malloc(LINE_MAX);
+  char buf[LINE_MAX];
   int i;
   int num = 0;
-  int cap;
+  char c = 'H';
+
   if(team == 1)
-    cap = 0;
-  else
-    cap = 1;
+    c = 'h';
   
   while(fgets(buf,LINE_MAX,fp) != NULL){
     for(i=0; i<LINE_MAX; i++){
-      if(cap && buf[i] == 'H')
+      if(buf[i] == c){
+	printf("%c", buf[i]);
 	num++;
-      else if(!cap && buf[i] == 'h')
-	num++;
+      }
     }  
   }
   return num;
