@@ -312,13 +312,13 @@ proto_server_query_handler(Proto_Session *s)
   int rc = 1;
   Proto_Msg_Hdr h;
   bzero(&h, sizeof(h));
-  h.pstate.v0 = (Proto_PV0)Server_Map->numhome1;
-  h.pstate.v1 = (Proto_PV1)Server_Map->numhome2;
-  h.pstate.v2 = (Proto_PV2)Server_Map->numjail1;
-  h.pstate.v3 = (Proto_PV3)Server_Map->numjail2;
-  h.gstate.v0 = (Proto_GV0)Server_Map->numwall;
-  h.gstate.v1 = (Proto_GV1)Server_Map->numfloor;
-  h.pstate.v2 = (Proto_GV2)Server_Map->dim;
+  h.pstate.v0.raw = Server_Map->numhome1;
+  h.pstate.v1.raw = Server_Map->numhome2;
+  h.pstate.v2.raw = Server_Map->numjail1;
+  h.pstate.v3.raw = Server_Map->numjail2;
+  h.gstate.v0.raw = Server_Map->numwall;
+  h.gstate.v1.raw = Server_Map->numfloor;
+  h.pstate.v2.raw = Server_Map->dim;
 
   proto_session_hdr_marshall(s, &h);
   proto_session_body_marshall(s, 0xdeadbeef);
@@ -334,6 +334,7 @@ proto_server_init(void)
   int i;
   int rc;
   Server_Map = (Map*)malloc(sizeof(Map));
+  map_load(Server_Map);
   proto_session_init(&Proto_Server.EventSession);
 
   proto_server_set_session_lost_handler(proto_session_lost_default_handler);
