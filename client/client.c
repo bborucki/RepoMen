@@ -114,8 +114,7 @@ doRPCCmd(Client *C, char c)
     }
     break;
   case 'q':
-    printf("TIME TO QUERYYY!!!!\n");
-    rc = 1;
+    rc = proto_client_query(C->ph);
     break;
   case 'f':
     printf("TIME TO PARTY!!!!\n");

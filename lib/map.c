@@ -47,13 +47,11 @@ Cell* make_cell(int ux, int uy)
   return c;
 }
 
-int get_cell_type(Map *m,int x, int y)
-{
+int get_cell_type(Map *m,int x, int y){
   return m->maze[x-1][y-1];
 }
 
-int read_map(const char* mappath)
-{
+int read_map(const char* mappath){
   if((fp = fopen(mappath, "r")) == NULL){
     fprintf(stderr, "ERRNO: %d\n", errno);
     return 0;
@@ -61,8 +59,7 @@ int read_map(const char* mappath)
   return 1;
 }
 
-int map_dump(const char* mappath)
-{
+int map_dump(const char* mappath){
   char* buf = malloc(LINE_MAX);
   char* out = malloc(LINE_MAX);
   int i,j;
@@ -90,8 +87,7 @@ int map_dump(const char* mappath)
   return 1;
 }
 
-int map_num_home(int team)
-{
+int map_num_home(int team){
   char* buf = malloc(LINE_MAX);
   int i;
   int num = 0;
@@ -102,18 +98,17 @@ int map_num_home(int team)
     cap = 1;
   
   while(fgets(buf,LINE_MAX,fp) != NULL){
-    for(; buf != '\0'; buf++){
-      if(cap && *buf == 'H')
+    for(i=0; i<LINE_MAX; i++){
+      if(cap && buf[i] == 'H')
 	num++;
-      else if(!cap && *buf == 'h')
+      else if(!cap && buf[i] == 'h')
 	num++;
     }  
   }
   return num;
 }
 
-int map_num_jail(int team)
-{
+int map_num_jail(int team){
   char* buf = malloc(LINE_MAX);
   int i;
   int num = 0;
@@ -124,10 +119,10 @@ int map_num_jail(int team)
     cap = 1;
   
   while(fgets(buf,LINE_MAX,fp) != NULL){
-    for(; buf != '\0'; buf++){
-      if(cap && *buf == 'J')
+    for(i=0; i<LINE_MAX; i++){
+      if(cap && buf[i] == 'J')
 	num++;
-      else if(!cap && *buf == 'j')
+      else if(!cap && buf[i] == 'j')
 	num++;
     }  
   }
@@ -138,10 +133,11 @@ int map_num_wall()
 {
   char* buf = malloc(LINE_MAX);
   int num = 0;
-  
+  int i;
+
   while(fgets(buf,LINE_MAX,fp) != NULL){
-    for(; buf != '\0'; buf++){
-	if(*buf == '#')
+    for(i=0; i<LINE_MAX; i++){
+	if(buf[i] == '#')
 	  num++;
     }
   }
@@ -152,11 +148,12 @@ int map_num_floor()
 {
   char* buf = malloc(LINE_MAX);
   int num = 0;
+  int i;
   
   while(fgets(buf,LINE_MAX,fp) != NULL){
-    for(; buf != '\0'; buf++){
-      if(*buf == ' ' || *buf == 'j' || *buf == 'J'||	\
-	   *buf == 'h' || *buf == 'H'){
+    for(i=0; i<LINE_MAX; i++){
+      if(buf[i] == ' ' || buf[i] == 'j' || buf[i] == 'J'||	\
+	   buf[i] == 'h' || buf[i] == 'H'){
 	  
 	  num++;
 	}
