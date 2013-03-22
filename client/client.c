@@ -25,6 +25,7 @@
 #include <string.h>
 #include "../lib/types.h"
 #include "../lib/protocol_client.h"
+#include "../lib/protocol_session.h"
 #include "../lib/protocol_utils.h"
 #include "../lib/map.h"
 
@@ -104,7 +105,7 @@ int
 doRPCCmd(Client *C, char c) 
 {
   int rc=-1;
-
+  Proto_Session *s;
   switch (c) {
   case 'h':  
     {
@@ -114,7 +115,19 @@ doRPCCmd(Client *C, char c)
     }
     break;
   case 'q':
+    printf("doing query\n");
     rc = proto_client_query(C->ph);
+    s = proto_client_rpc_session(C->ph);
+    
+    globals.map->numhome1 = s->rhdr.pstate.v0.raw;
+    globals.map->numhome2 = s->rhdr.pstate.v1.raw;
+    globals.map->numjail1 = s->rhdr.pstate.v2.raw;
+    globals.map->numjail2 = s->rhdr.pstate.v3.raw;
+    globals.map->numwall = s->rhdr.gstate.v0.raw;
+    globals.map->numfloor = s->rhdr.gstate.v1.raw;
+    globals.map->dim = s->rhdr.gstate.v2.raw;
+    //    globals.map->maze = 
+
     break;
   case 'f':
     printf("TIME TO PARTY!!!!\n");
@@ -179,6 +192,7 @@ doConnect(Client *C){
   
   strncpy(globals.host, addr_port, strlen(addr_port));
   globals.port = atoi(ptr+sizeof(char));
+  
 
   if (startConnection(C, globals.host, globals.port, update_event_handler)<0) {
     fprintf(stderr, "ERROR: startConnection failed\n");

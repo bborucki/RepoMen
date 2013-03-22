@@ -300,19 +300,27 @@ proto_server_mt_null_handler(Proto_Session *s){
 static int
 proto_server_query_handler(Proto_Session *s){
   int rc = 1;
+  int i,j,k;
+  char* buf;
   Proto_Msg_Hdr h;
   bzero(&h, sizeof(h));
+  printf("in query handler\n");
   h.pstate.v0.raw = Server_Map->numhome1;
   h.pstate.v1.raw = Server_Map->numhome2;
   h.pstate.v2.raw = Server_Map->numjail1;
   h.pstate.v3.raw = Server_Map->numjail2;
   h.gstate.v0.raw = Server_Map->numwall;
   h.gstate.v1.raw = Server_Map->numfloor;
-  h.pstate.v2.raw = Server_Map->dim;
+  h.gstate.v2.raw = Server_Map->dim;
 
   proto_session_hdr_marshall(s, &h);
-  //Need to figure a way to marshal char**
-  // proto_session_body_marshall_bytes(s,200*strlen(Server_Map->maze[0]), Server_Map->maze);
+  j = 0;
+  buf = malloc(PROTO_SESSION_BUF_SIZE);
+  for(i=0; Server_Map->maze[i] != NULL; i++){
+    for(k = 0; k<strlen(Server_Map->maze[i]); k++)
+      buf[j++] = Server_Map->maze[i][j];
+  }
+  proto_session_body_marshall_bytes(s, strlen(buf), buf);
   
   rc = proto_session_send_msg(s,1);
   
