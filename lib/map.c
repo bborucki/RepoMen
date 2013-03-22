@@ -12,26 +12,18 @@
 
 FILE *fp;
 
-typedef struct Cell{
-  int type;
-  int team;
-  int occupied;
-  int x;
-  int y;
-  int obj1;
-  int obj2;
-} Cell;
 
 char** load_maze()
 {
   char* buf = malloc(COLUMN_MAX);
-  char** out = malloc(MAX_LINE * sizeof(int));
-  int i = 0;
+  char** out = malloc(MAX_LINE*COLUMN_MAX);
+  int i,j;
   while(fgets(buf,COLUMN_MAX,fp) != NULL){
+    out[j] = malloc(strlen(buf));
     //    printf("in maze loop\n");
-    out[i] = malloc(MAX_LINE);
-    out[i] = strcpy(out[i],buf);
-    i++;
+    for(i=0;i<strlen(buf);i++)
+      out[j][i] = buf[i];
+    j++;
   }
   return out;
 }
@@ -50,7 +42,7 @@ Cell* make_cell(int ux, int uy)
 }
 
 int get_cell_type(Map *m,int x, int y){
-  return m->maze[x-1][y-1];
+  return m->maze[x][y];
 }
 
 int read_map(const char* mappath){

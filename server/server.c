@@ -28,8 +28,9 @@
 #include "../lib/types.h"
 #include "../lib/protocol_server.h"
 #include "../lib/protocol_utils.h"
+#include "../lib/map.h"
 
-char * gameboard = "123456789";
+
 
 int 
 doUpdateClients(void)
@@ -107,68 +108,6 @@ shell(void *arg)
   fprintf(stderr, "terminating\n");
   fflush(stdout);
   return NULL;
-}
-
-int
-move_valid(int mv){
-  mv--;
-  if(gameboard[mv] <= '9'){
-      return 1;
-  }
-  return -1;
-}
-
-int
-make_move(char c, int mv){
-  if(move_valid(mv)){
-    gameboard[mv] = c;
-  }
-  check_winner();
-}
-
-int
-check_winner(){
-  if(check_verticals())
-    return 1;
-  else if(check_horizontals())
-    return 1;
-  else if(check_diagonals())
-    return 1;
-  else
-    return 0;
-}
-
-int
-check_verticals(){
-  int i = 0;
-  for(i; i<3; i++){
-    if(gameboard[i] == gameboard[i+3])
-      if(gameboard[i+3] == gameboard[i+6])
-	return 1;
-  }
-  return 0;
-}
-
-int
-check_horizontals(){
-  int i = 0;
-  for(i; i<=6; i+= 3){
-    if(gameboard[i] == gameboard[i+1])
-      if(gameboard[i+1] == gameboard[i+2])
-	return 1;
-  }
-  return 0;
-}
-
-int
-check_diagonals(){
-  if(gameboard[0] == gameboard[4])
-    if(gameboard[8] == gameboard[4])
-      return 1;
-  if(gameboard[2] == gameboard[4])
-    if(gameboard[4] == gameboard[6])
-      return 1;
-  return 0;
 }
 
 int

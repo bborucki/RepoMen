@@ -23,6 +23,19 @@
 #define OCCUPIED 1
 #define UNOCCUPIED 0
 
+
+typedef struct Cell{
+  int type;
+  int team;
+  int occupied;
+  int x;
+  int y;
+  int obj1;
+  int obj2;
+} Cell;
+
+
+
 typedef struct Map{
   int numhome1;
   int numhome2;

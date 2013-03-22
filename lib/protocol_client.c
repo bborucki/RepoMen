@@ -208,7 +208,12 @@ do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt){
   rc = proto_session_rpc(s);
   
   if (rc==1) {
-    proto_session_body_unmarshall_int(s, 0, &rc);
+    if(mt == PROTO_MT_REQ_BASE_QUERY){
+      //FIX THIS makes no sense, copy the strings somehow.
+      proto_session_body_unmarshall_bytes(s,0,200*200, s->rbuf);
+      
+    } else
+      proto_session_body_unmarshall_int(s, 0, &rc);
   } else {
     c->session_lost_handler(s);
     //    NYI;// ADD CODE

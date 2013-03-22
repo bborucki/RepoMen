@@ -27,7 +27,6 @@
 #include "protocol_session.h"
 
 
-
 extern int proto_server_init(void);
 
 extern int proto_server_set_session_lost_handler(Proto_MT_Handler h);

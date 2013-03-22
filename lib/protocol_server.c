@@ -33,6 +33,7 @@
 #include "protocol_server.h"
 
 #define PROTO_SERVER_MAX_EVENT_SUBSCRIBERS 1024
+#define MAX_OBJECTS 404
 
 struct {
   FDType   RPCListenFD;
@@ -55,6 +56,7 @@ struct {
 
 
 static Map* Server_Map;
+Cell** objects;
 
 
 extern PortType proto_server_rpcport(void) { return Proto_Server.RPCPort; }
@@ -309,7 +311,8 @@ proto_server_query_handler(Proto_Session *s){
   h.pstate.v2.raw = Server_Map->dim;
 
   proto_session_hdr_marshall(s, &h);
-  proto_session_body_marshall_int(s, 0xdeadbeef);
+  //Need to figure a way to marshal char**
+  // proto_session_body_marshall_bytes(s,200*strlen(Server_Map->maze[0]), Server_Map->maze);
   
   rc = proto_session_send_msg(s,1);
   
@@ -321,6 +324,7 @@ proto_server_init(void){
   int i;
   int rc;
   Server_Map = (Map*)malloc(sizeof(Map));
+  objects = (Cell**)(malloc(MAX_OBJECTS*sizeof(int)));
   if(!load_map(Server_Map))
     return -1;
   printf("h1:%d\n", Server_Map->numhome1);

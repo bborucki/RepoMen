@@ -34,7 +34,7 @@ struct Globals {
   char host[STRLEN];
   PortType port;
   char connected;
-  Map map;
+  Map* map;
 } globals;
 
 
@@ -222,8 +222,11 @@ doNumHome(){
   putchar(c);
   
   if(scanf("%d", &teamNum)==1 && (teamNum == 1 || teamNum == 2)){
-    printf("number of home cells for team %d = ...", teamNum);
-    // rc = doRPC(C,'h');
+    printf("number of home cells for team %d = ", teamNum);
+    if(teamNum == 1)
+      printf("%d\n",globals.map->numhome1);
+    else
+      printf("%d\n",globals.map->numhome2);
   }
   else{
     printf("Usage: \"numhome <1 or 2>\"\n");
@@ -245,14 +248,36 @@ doNumJail(){
   putchar(c);
   
   if(scanf("%d", &teamNum)==1 && (teamNum == 1 || teamNum == 2)){
-    printf("Number of jail cells for team %d = ...", teamNum);
-    //rc = doRPC(C,'j');
+    printf("Number of jail cells for team %d = ", teamNum);
+    if(teamNum == 1)
+      printf("%d\n",globals.map->numjail1);
+    else
+      printf("%d\n",globals.map->numjail2);
+
   }
   else{
     printf("Usage: \"numjail <1 or 2>\"\n");
     return 1;
   }
 
+  return 1;
+}
+
+int
+doNumFloor(){
+  printf("Number of available floor cells = %d\n", globals.map->numfloor);
+  return 1;
+}
+
+int
+doNumWall(){
+ printf("Number of available floor cells = %d\n", globals.map->numwall);
+ return 1;
+}
+
+int
+doDim(){
+  printf("Dimensions of the maze are %d x %d\n", globals.map->dim,globals.map->dim);
   return 1;
 }
 
@@ -281,7 +306,10 @@ doCInfo(){
 
 int 
 doDump(){
+  int i;
   printf("dumping!");
+  for(i = 0; i<COLUMN_MAX; i++)
+    printf("%s",globals.map->maze[i]);
   return 1;
 }
 
@@ -349,9 +377,13 @@ docmd(Client *C, char cmd)
     rc=doNumJail();
     break;
   case 'f': //numfloor
+    rc = doNumFloor();
+    break;
   case 'a': //numwall
+    rc = doNumWall();
+    break;
   case 'm': //dim
-    rc = doRPC(C,cmd);
+    rc = doDim();
     break;
   case 'i': //cinfo
     rc = doCInfo();
