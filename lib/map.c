@@ -32,7 +32,7 @@ char** load_maze()
     out[i] = malloc(MAX_LINE);
     out[i] = strcpy(out[i],buf);
     i++;
-  }  
+  }
   return out;
 }
 
@@ -99,7 +99,6 @@ int map_num_home(char* buf, int team){
   
   for(i=0; i<MAX_LINE; i++){
     if(buf[i] == c){
-      printf("%c", buf[i]);
       num++;
     }
   }  
@@ -164,8 +163,7 @@ load_map(Map* m)
     return 0;
   }
   char* buf = malloc(MAX_LINE+1);
-  while(fgets(buf,COLUMN_MAX+1,fp) == NULL){
-    printf("in the loop\n");
+  while(fgets(buf,COLUMN_MAX+1,fp) != NULL){
     m->numhome1 += map_num_home(buf,1);
     m->numhome2 += map_num_home(buf,2);
     m->numjail1 += map_num_jail(buf,1);
@@ -197,18 +195,3 @@ Cell * map_cinfo(char* mappath, int x, int y)
   return make_cell(x, y);
 }
 */
-
-int
-main(int argc, char** argv)
-{
-  Map* m = malloc(sizeof(Map));
-  load_map(m);
-  printf("h1:%d\nh2:%d\nj1:%d\nj2:%d\nw:%d\nnf:%d\ndim:%d\n",
-	 m->numhome1,
-	 m->numhome2,
-	 m->numjail1,
-	 m->numjail2,
-	 m->numwall,
-	 m->numfloor,
-	 m->dim);
-}
