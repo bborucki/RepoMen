@@ -25,9 +25,11 @@ typedef struct Cell{
 char** load_maze()
 {
   char* buf = malloc(COLUMN_MAX);
-  char** out = malloc(LINE_MAX);
+  char** out = malloc(MAX_LINE * sizeof(int));
   int i = 0;
   while(fgets(buf,COLUMN_MAX,fp) != NULL){
+    //    printf("in maze loop\n");
+    out[i] = malloc(MAX_LINE);
     out[i] = strcpy(out[i],buf);
     i++;
   }  
@@ -60,14 +62,14 @@ int read_map(const char* mappath){
 }
 
 int map_dump(const char* mappath){
-  char* buf = malloc(LINE_MAX);
-  char* out = malloc(LINE_MAX);
+  char* buf = malloc(MAX_LINE);
+  char* out = malloc(MAX_LINE);
   int i,j;
   if(!read_map(mappath)){
     fprintf(stderr, "could not read map with path %s\n",mappath);
     return 0;
   }
-  while(fgets(buf,LINE_MAX, fp) != NULL){
+  while(fgets(buf,MAX_LINE, fp) != NULL){
     i = 0;
     /*
     while(i < TEAM_1_MAX){
@@ -87,8 +89,7 @@ int map_dump(const char* mappath){
   return 1;
 }
 
-int map_num_home(int team){
-  char buf[LINE_MAX];
+int map_num_home(char* buf, int team){
   int i;
   int num = 0;
   char c = 'H';
@@ -96,19 +97,17 @@ int map_num_home(int team){
   if(team == 1)
     c = 'h';
   
-  while(fgets(buf,LINE_MAX,fp) != NULL){
-    for(i=0; i<LINE_MAX; i++){
-      if(buf[i] == c){
-	printf("%c", buf[i]);
-	num++;
-      }
-    }  
-  }
+  for(i=0; i<MAX_LINE; i++){
+    if(buf[i] == c){
+      printf("%c", buf[i]);
+      num++;
+    }
+  }  
+  
   return num;
 }
 
-int map_num_jail(int team){
-  char* buf = malloc(LINE_MAX);
+int map_num_jail(char* buf, int team){
   int i;
   int num = 0;
   int cap;
@@ -117,46 +116,41 @@ int map_num_jail(int team){
   else
     cap = 1;
   
-  while(fgets(buf,LINE_MAX,fp) != NULL){
-    for(i=0; i<LINE_MAX; i++){
-      if(cap && buf[i] == 'J')
-	num++;
-      else if(!cap && buf[i] == 'j')
-	num++;
-    }  
-  }
+  for(i=0; i<MAX_LINE; i++){
+    if(cap && buf[i] == 'J')
+      num++;
+    else if(!cap && buf[i] == 'j')
+      num++;
+  }  
+
   return num;
 }
 
-int map_num_wall()
+int map_num_wall(char* buf)
 {
-  char* buf = malloc(LINE_MAX);
   int num = 0;
   int i;
 
-  while(fgets(buf,LINE_MAX,fp) != NULL){
-    for(i=0; i<LINE_MAX; i++){
-	if(buf[i] == '#')
-	  num++;
-    }
+  for(i=0; i<MAX_LINE; i++){
+    if(buf[i] == '#')
+      num++;
+
   }
   return num;
 }
 
-int map_num_floor()
+int map_num_floor(char* buf)
 {
-  char* buf = malloc(LINE_MAX);
   int num = 0;
   int i;
   
-  while(fgets(buf,LINE_MAX,fp) != NULL){
-    for(i=0; i<LINE_MAX; i++){
-      if(buf[i] == ' ' || buf[i] == 'j' || buf[i] == 'J'||	\
-	   buf[i] == 'h' || buf[i] == 'H'){
+  for(i=0; i<MAX_LINE; i++){
+    if(buf[i] == ' ' || buf[i] == 'j' || buf[i] == 'J'||	\
+       buf[i] == 'h' || buf[i] == 'H'){
 	  
-	  num++;
-	}
-    } 
+      num++;
+    }
+
   }
   return num;
 }
@@ -164,18 +158,30 @@ int map_num_floor()
 extern int
 load_map(Map* m)
 {
+  bzero(m,sizeof(m));
   if(!read_map(MAP_NAME)){
     fprintf(stderr,"could not read map at path %s\n",MAP_NAME);
     return 0;
   }
-  m->numhome1 = map_num_home(1);
-  m->numhome2 = map_num_home(2);
-  m->numjail1 = map_num_jail(1);
-  m->numjail2 = map_num_jail(2);
-  m->numwall = map_num_wall();
-  m->numfloor = map_num_floor();
+  char* buf = malloc(MAX_LINE+1);
+  while(fgets(buf,COLUMN_MAX+1,fp) == NULL){
+    printf("in the loop\n");
+    m->numhome1 += map_num_home(buf,1);
+    m->numhome2 += map_num_home(buf,2);
+    m->numjail1 += map_num_jail(buf,1);
+    m->numjail2 += map_num_jail(buf,2);
+    m->numwall +=  map_num_wall(buf);
+    m->numfloor += map_num_floor(buf);
+  }
+  fclose(fp);
   m->dim = COLUMN_MAX;
+  if(!read_map(MAP_NAME)){
+    fprintf(stderr,"could not read map at path %s\n",MAP_NAME);
+    return 0;
+  }
   m->maze = (char**)load_maze();
+  
+  fclose(fp);
   return 1;
 }
 
@@ -191,3 +197,18 @@ Cell * map_cinfo(char* mappath, int x, int y)
   return make_cell(x, y);
 }
 */
+
+int
+main(int argc, char** argv)
+{
+  Map* m = malloc(sizeof(Map));
+  load_map(m);
+  printf("h1:%d\nh2:%d\nj1:%d\nj2:%d\nw:%d\nnf:%d\ndim:%d\n",
+	 m->numhome1,
+	 m->numhome2,
+	 m->numjail1,
+	 m->numjail2,
+	 m->numwall,
+	 m->numfloor,
+	 m->dim);
+}

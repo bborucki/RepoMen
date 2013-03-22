@@ -14,7 +14,7 @@
 #define JAIL_2 3
 #define HOME_1 4
 #define HOME_2 5
-#define LINE_MAX  200
+#define MAX_LINE  200
 #define COLUMN_MAX 200
 #define TEAM_1_MAX 100
 #define TEAM_2_MAX 200
