@@ -320,6 +320,7 @@ proto_server_query_handler(Proto_Session *s){
     for(k = 0; k<strlen(Server_Map->maze[i]); k++)
       buf[j++] = Server_Map->maze[i][j];
   }
+  buf[j] = '\0';
   proto_session_body_marshall_bytes(s, strlen(buf), buf);
   
   rc = proto_session_send_msg(s,1);

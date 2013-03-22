@@ -212,6 +212,7 @@ do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt){
   if (rc==1) {
     if(mt == PROTO_MT_REQ_BASE_QUERY){
       //FIX THIS makes no sense, copy the strings somehow.
+      proto_session_hdr_unmarshall(s,&s->rhdr);
       proto_session_body_unmarshall_bytes(s,0,s->rlen,s->rbuf);
       
     } else

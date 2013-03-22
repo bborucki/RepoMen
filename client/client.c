@@ -118,7 +118,8 @@ doRPCCmd(Client *C, char c)
     printf("doing query\n");
     rc = proto_client_query(C->ph);
     s = proto_client_rpc_session(C->ph);
-    
+    globals.map = malloc(sizeof(Map));
+
     globals.map->numhome1 = s->rhdr.pstate.v0.raw;
     globals.map->numhome2 = s->rhdr.pstate.v1.raw;
     globals.map->numjail1 = s->rhdr.pstate.v2.raw;
