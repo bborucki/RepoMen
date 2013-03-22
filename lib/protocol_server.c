@@ -31,6 +31,7 @@
 #include "protocol.h"
 #include "protocol_utils.h"
 #include "protocol_server.h"
+#include "protocol_session.h"
 
 #define PROTO_SERVER_MAX_EVENT_SUBSCRIBERS 1024
 #define MAX_OBJECTS 404
@@ -302,18 +303,24 @@ proto_server_query_handler(Proto_Session *s){
   int rc = 1;
   int i,j,k;
   char* buf;
-  Proto_Msg_Hdr h;
-  bzero(&h, sizeof(h));
-  printf("in query handler\n");
-  h.pstate.v0.raw = Server_Map->numhome1;
-  h.pstate.v1.raw = Server_Map->numhome2;
-  h.pstate.v2.raw = Server_Map->numjail1;
-  h.pstate.v3.raw = Server_Map->numjail2;
-  h.gstate.v0.raw = Server_Map->numwall;
-  h.gstate.v1.raw = Server_Map->numfloor;
-  h.gstate.v2.raw = Server_Map->dim;
+  Proto_Msg_Hdr rh;
+  Proto_Msg_Hdr sh;
+  bzero(&sh, sizeof(sh));
 
-  proto_session_hdr_marshall(s, &h);
+  fprintf(stderr, "proto_server_mt_query_handler: invoked for session:\n");
+  proto_session_dump(s);
+  rh.type = proto_session_hdr_unmarshall_type(s);
+
+  sh.type = rh.type;
+  sh.pstate.v0.raw = Server_Map->numhome1;
+  sh.pstate.v1.raw = Server_Map->numhome2;
+  sh.pstate.v2.raw = Server_Map->numjail1;
+  sh.pstate.v3.raw = Server_Map->numjail2;
+  sh.gstate.v0.raw = Server_Map->numwall;
+  sh.gstate.v1.raw = Server_Map->numfloor;
+  sh.gstate.v2.raw = Server_Map->dim;
+
+  proto_session_hdr_marshall(s, &sh);
   j = 0;
   buf = malloc(PROTO_SESSION_BUF_SIZE);
   for(i=0; Server_Map->maze[i] != NULL; i++){
@@ -328,6 +335,61 @@ proto_server_query_handler(Proto_Session *s){
   return rc;
 }
 
+static int
+proto_server_cinfo_handler(Proto_Session *s){
+  int rc = 1;
+  int i,rx,ry;
+  Cell* cell;
+  Proto_Msg_Hdr sh;
+  Proto_Msg_Hdr rh;
+
+  bzero(&sh, sizeof(sh));
+  bzero(&rh, sizeof(rh));
+
+  fprintf(stderr, "proto_server_mt_cinfo_handler: invoked for session:\n");
+  proto_session_dump(s);
+
+  rh.type = proto_session_hdr_unmarshall_type(s);
+  proto_session_hdr_unmarshall(s, &rh);
+
+  rx = rh.pstate.v0.raw;
+  ry = rh.pstate.v1.raw;
+
+  sh.type = rh.type;
+ 
+  
+  for(i=0; i<MAX_OBJECTS; i++){
+    if(objects[i] != NULL){
+      if(objects[i]->x == rx && objects[i]->y == ry){
+	cell = objects[i];
+	break;
+      }
+      
+    }
+  }
+
+  if(i >= MAX_OBJECTS){
+    cell = make_cell(rx,ry);
+  }
+
+  sh.pstate.v0.raw = cell->type;
+  sh.pstate.v1.raw = cell->team;
+  sh.pstate.v2.raw = cell->occupied;
+  sh.pstate.v3.raw = cell->x;
+  sh.gstate.v0.raw = cell->y;
+  sh.gstate.v1.raw = cell->obj1;
+  sh.gstate.v2.raw = cell->obj2;
+
+  proto_session_hdr_marshall(s, &sh);
+
+  
+  rc = proto_session_send_msg(s,1);
+  
+  return rc;
+
+
+}
+
 extern int
 proto_server_init(void){
   int i;
@@ -336,13 +398,14 @@ proto_server_init(void){
   objects = (Cell**)(malloc(MAX_OBJECTS*sizeof(int)));
   if(!load_map(Server_Map))
     return -1;
-  printf("h1:%d\n", Server_Map->numhome1);
+  /*printf("h1:%d\n", Server_Map->numhome1);
   printf("h2:%d\n", Server_Map->numhome2);
   printf("j1:%d\n", Server_Map->numjail1);
   printf("j2:%d\n", Server_Map->numjail2);
   printf("w :%d\n", Server_Map->numwall);
   printf("f :%d\n", Server_Map->numfloor);
-  printf("d :%d\n", Server_Map->dim);
+  printf("d :%d\n", Server_Map->dim);*/
+
   proto_session_init(&Proto_Server.EventSession);
 
   proto_server_set_session_lost_handler(proto_session_lost_default_handler);
@@ -352,6 +415,8 @@ proto_server_init(void){
     //    NYI; //ADD CODE
     if(i == PROTO_MT_REQ_BASE_QUERY)
       proto_server_set_req_handler(i,proto_server_query_handler);
+    else if(i == PROTO_MT_REQ_BASE_CINFO)
+      proto_server_set_req_handler(i,proto_server_cinfo_handler);
     else
       proto_server_set_req_handler(i, proto_server_mt_null_handler);
   }

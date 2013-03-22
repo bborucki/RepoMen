@@ -48,3 +48,5 @@ typedef struct Map{
 } Map;
 
 extern int load_map(Map* m);
+
+extern Cell* make_cell(int ux, int uy);

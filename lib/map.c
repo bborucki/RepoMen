@@ -89,7 +89,7 @@ int map_num_home(char* buf, int team){
   if(team == 1)
     c = 'h';
   
-  for(i=0; i<MAX_LINE; i++){
+  for(i=0; i<strlen(buf); i++){
     if(buf[i] == c){
       num++;
     }
@@ -107,7 +107,7 @@ int map_num_jail(char* buf, int team){
   else
     cap = 1;
   
-  for(i=0; i<MAX_LINE; i++){
+  for(i=0; i<strlen(buf); i++){
     if(cap && buf[i] == 'J')
       num++;
     else if(!cap && buf[i] == 'j')
@@ -122,7 +122,7 @@ int map_num_wall(char* buf)
   int num = 0;
   int i;
 
-  for(i=0; i<MAX_LINE; i++){
+  for(i=0; i<strlen(buf); i++){
     if(buf[i] == '#')
       num++;
 
@@ -135,10 +135,9 @@ int map_num_floor(char* buf)
   int num = 0;
   int i;
   
-  for(i=0; i<MAX_LINE; i++){
-    if(buf[i] == ' ' || buf[i] == 'j' || buf[i] == 'J'||	\
+  for(i=0; i<strlen(buf); i++){
+    if(buf[i] == ' ' || buf[i] == 'j' || buf[i] == 'J'||\
        buf[i] == 'h' || buf[i] == 'H'){
-	  
       num++;
     }
 
@@ -155,7 +154,7 @@ load_map(Map* m)
     return 0;
   }
   char* buf = malloc(MAX_LINE+1);
-  while(fgets(buf,COLUMN_MAX+1,fp) != NULL){
+  while(fgets(buf,COLUMN_MAX,fp) != NULL){
     m->numhome1 += map_num_home(buf,1);
     m->numhome2 += map_num_home(buf,2);
     m->numjail1 += map_num_jail(buf,1);
