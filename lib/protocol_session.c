@@ -308,23 +308,18 @@ proto_session_send_msg(Proto_Session *s, int reset)
   return 1;
 }
 
-
 //Assuming that the calling function is responsible for unmarshalling
 //session passed to us is empty, need to fill it out, return < 0 when
 //nothing read/to read
 extern int
-proto_session_rcv_msg(Proto_Session *s)
-{
-  // clear rhdr and rlen
+proto_session_rcv_msg(Proto_Session *s){
   proto_session_reset_receive(s);
-
-  // read reply   //  NYI
 
   if(net_readn(s->fd, &(s->rhdr), sizeof(Proto_Msg_Hdr)) < 0)
     return -1;
   net_readn(s->fd, s->rbuf, ntohl(s->rhdr.blen));
 
-  if (proto_debug()) {
+  if (proto_debug()){
     fprintf(stderr, "%p: proto_session_rcv_msg: RCVED:\n", pthread_self());
     proto_session_dump(s);
   }
@@ -334,9 +329,8 @@ proto_session_rcv_msg(Proto_Session *s)
 extern int
 proto_session_rpc(Proto_Session *s)
 {
-  int rc;
+  int rc=0;
   
-  //NYI;
   proto_session_send_msg(s, 1);
   rc = proto_session_rcv_msg(s);
 

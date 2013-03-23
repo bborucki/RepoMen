@@ -32,8 +32,6 @@
 #include "protocol_client.h"
 #include "map.h"
 
-
-
 typedef struct {
   Proto_Session rpc_session;
   Proto_Session event_session;
@@ -201,14 +199,12 @@ do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt){
   Proto_Session *s;
   Proto_Client *c = ch;
 
-  //  NYI;// s = ADD CODE
   s = &(c->rpc_session);  
 
   marshall_mtonly(s, mt);
 
-  //  NYI;// 
   rc = proto_session_rpc(s);
- 
+
   if (rc==1) {
     if(mt == PROTO_MT_REQ_BASE_QUERY){
       //FIX THIS makes no sense, copy the strings somehow.
@@ -219,36 +215,49 @@ do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt){
       proto_session_body_unmarshall_int(s, 0, &rc);
   } else {
     c->session_lost_handler(s);
-    //    NYI;// ADD CODE
   }
-  
+
   return rc;
 }
 
 static int
 do_cinfo_rpc(Proto_Client_Handle ch, int x, int y, Proto_Msg_Types mt){
-  int rc;
+  int rc=0;
   Proto_Session *s;
   Proto_Client *c = ch;
   Proto_Msg_Hdr *hdr;
 
   s = &(c->rpc_session);  
 
+  //  printf("1\n");
+
   bzero(hdr, sizeof(Proto_Msg_Hdr));
+
+  //  printf("2\n");
 
   hdr->pstate.v0.raw=x;
   hdr->pstate.v1.raw=y;
 
+  //  printf("3\n");
+
   marshall_mtonly(s,mt);
   proto_session_hdr_marshall(s,hdr);
 
+  //  printf("4\n");
+  
   rc = proto_session_rpc(s);
   
+  //  printf("5\n");
+  
   if(rc==1){
-      proto_session_hdr_unmarshall(s,&s->rhdr);
-  } else 
+    proto_session_hdr_unmarshall(s,&s->rhdr);
+    printf("6\n");
+  }
+  else 
     c->session_lost_handler(s);
   
+  //  printf("7\n");
+
   return rc;
 }
 
@@ -264,15 +273,21 @@ proto_client_move(Proto_Client_Handle ch, char data){
 
 extern int
 proto_client_query(Proto_Client_Handle ch){
-  
   return do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_QUERY);
 }
 
 extern int
+proto_client_dump(Proto_Client_Handle ch){
+  return do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_DUMP);
+}
+
+extern int
 proto_client_cinfo(Proto_Client_Handle ch, int x, int y){
-  printf("In protocol client\n");
-  return do_cinfo_rpc(ch, x, y, PROTO_MT_REQ_BASE_CINFO);
-  return 1;
+  int rc=0;
+  //  printf("0\n");
+  rc = do_cinfo_rpc(ch, x, y, PROTO_MT_REQ_BASE_CINFO);
+  //  printf("8\n");
+  return rc;
 }
 
 extern int

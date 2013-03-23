@@ -135,6 +135,10 @@ doRPCCmd(Client *C, char c)
     break;
  case 'i':
     rc = proto_client_cinfo(C->ph, globals.x, globals.y);
+    printf("returned from rpc\n");
+    break;
+  case 'd':
+    rc = proto_client_dump(C->ph);
     break;
   case 'm':
     scanf("%c", &c);
@@ -210,10 +214,16 @@ doConnect(Client *C){
 }
 
 int
-doDisconnect(){
-  printf("Disconnecting...");
+doDisconnect(char cmd){
+
   //call terminating function...whatever that is
-  return 1;
+
+  if(cmd=='q'){
+    printf("Terminated.\n");
+    return -1;
+  }
+  printf("Disconnected");
+  return 1;  
 }
 
 int
@@ -346,12 +356,15 @@ doCInfo(Client *C){
 }
 
 int 
-doDump(){
-  int i;
-  printf("dumping!");
-  for(i = 0; i<COLUMN_MAX; i++)
-    printf("%s",globals.map->maze[i]);
-  return 1;
+doDump(Client *C){
+  int rc;
+
+  if((rc=doRPC(C,'d'))>0){
+    printf("Dump Successful");
+    return 1;
+  }
+
+  return rc;
 }
 
 int
@@ -399,40 +412,40 @@ docmd(Client *C, char cmd)
   int rc = 1;
 
   switch (cmd) {
-  case 'c': //connect
+  case 'c': 
     rc=doConnect(C);
     break;
-  case 'd': //disconnect
-    rc=doDisconnect();
+  case 'd': 
+    rc=doDisconnect(cmd);
     break;
-  case 'w': //where
+  case 'w': 
     rc=doWhere(); 
     break;
-  case 'q': //quit
-    rc=-1;
+  case 'q': 
+    rc=doDisconnect(cmd);
     break;
-  case 'h': //numhome
+  case 'h': 
     rc=doNumHome();
     break;
-  case 'j': //numjail
+  case 'j': 
     rc=doNumJail();
     break;
-  case 'f': //numfloor
+  case 'f': 
     rc = doNumFloor();
     break;
-  case 'a': //numwall
+  case 'a': 
     rc = doNumWall();
     break;
-  case 'm': //dim
+  case 'm': 
     rc = doDim();
     break;
-  case 'i': //cinfo
+  case 'i': 
     rc = doCInfo(C);
     break;
-  case 'u': //dump
-    rc = doDump();
+  case 'u': 
+    rc = doDump(C);
     break;
-  case 'p': //help
+  case 'p': 
     rc = doHelp();
     break;
   case '\n':
@@ -485,7 +498,6 @@ shell(void *arg)
     if (rc==1) menu=1; else menu=0;
   }
 
-  fprintf(stderr, "terminating\n");
   fflush(stdout);
   return NULL;
 }

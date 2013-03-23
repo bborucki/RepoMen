@@ -363,8 +363,7 @@ proto_server_cinfo_handler(Proto_Session *s){
       if(objects[i]->x == rx && objects[i]->y == ry){
 	cell = objects[i];
 	break;
-      }
-      
+      }      
     }
   }
 
@@ -381,13 +380,25 @@ proto_server_cinfo_handler(Proto_Session *s){
   sh.gstate.v2.raw = cell->obj2;
 
   proto_session_hdr_marshall(s, &sh);
-
   
   rc = proto_session_send_msg(s,1);
   
   return rc;
+}
 
+static int
+proto_server_dump_handler(Proto_Session *s){
+  Proto_Msg_Hdr h;
+  int i;
+  
+  for(i=0; i<COLUMN_MAX; i++)
+    printf("%s", Server_Map->maze[i]);
 
+  bzero(&h, sizeof(h));
+  h.type = PROTO_MT_REP_BASE_DUMP;
+  proto_session_hdr_marshall(s, &h);
+
+  return proto_session_send_msg(s,1);
 }
 
 extern int
@@ -415,6 +426,8 @@ proto_server_init(void){
     //    NYI; //ADD CODE
     if(i == PROTO_MT_REQ_BASE_QUERY)
       proto_server_set_req_handler(i,proto_server_query_handler);
+    else if(i == PROTO_MT_REQ_BASE_DUMP)
+      proto_server_set_req_handler(i,proto_server_dump_handler);
     else if(i == PROTO_MT_REQ_BASE_CINFO)
       proto_server_set_req_handler(i,proto_server_cinfo_handler);
     else
