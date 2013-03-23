@@ -233,9 +233,11 @@ do_cinfo_rpc(Proto_Client_Handle ch, int x, int y, Proto_Msg_Types mt){
 
   hdr->pstate.v0.raw=x;
   hdr->pstate.v1.raw=y;
+  hdr->type = mt;
 
-  marshall_mtonly(s,mt);
   proto_session_hdr_marshall(s,hdr);
+
+  proto_dump_msghdr(&(s->shdr));
 
   rc = proto_session_rpc(s);
   

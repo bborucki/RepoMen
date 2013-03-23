@@ -208,6 +208,7 @@ proto_server_req_dispatcher(void * arg)
   for (;;) {
     if (proto_session_rcv_msg(&s)==1) {
       mt = proto_session_hdr_unmarshall_type(&s);
+      printf("mt = %d\n", mt);
       i = mt - PROTO_MT_REQ_BASE_RESERVED_FIRST - 1;
       hdlr = Proto_Server.base_req_handlers[i];
       
@@ -238,7 +239,6 @@ proto_server_rpc_listen(void *arg){
   }
 
   for (;;) {
-    //    NYI; //connfd = ADD CODE
     connfd = net_accept(fd);
     if (connfd < 0) {
       fprintf(stderr, "Error: proto_server_rpc_listen accept failed (%d)\n", errno);
@@ -349,14 +349,21 @@ proto_server_cinfo_handler(Proto_Session *s){
   rx = rh.pstate.v0.raw;
   ry = rh.pstate.v1.raw; 
   
+  printf("moving to for loop\n");
+
   for(i=0; i<MAX_OBJECTS; i++){
+    printf("%d",i);
     if(objects[i] != NULL){
+      printf("derp");
       if(objects[i]->x == rx && objects[i]->y == ry){
+	printf("derp");
 	cell = objects[i];
 	break;
       }
     }
   }
+
+  printf("after for loop\n");
 
   if(i >= MAX_OBJECTS){
     cell = make_cell(rx,ry);
@@ -371,8 +378,12 @@ proto_server_cinfo_handler(Proto_Session *s){
   sh.gstate.v2.raw = cell->obj2;
 
   proto_session_hdr_marshall(s, &sh);
+
+  printf("sending cinfo\n");
   
   rc = proto_session_send_msg(s,1);
+
+  printf("sent cinfo\n");
   
   return rc;
 }
