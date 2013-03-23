@@ -160,13 +160,6 @@ int
 doRPC(Client *C, char cmd)
 {
   int rc;
-  //  char c;
-
-  /*
-    printf("enter (h|m<c>|g): ");
-    scanf("%c", &c);
-    rc=doRPCCmd(C,c);
-  */
 
   rc=doRPCCmd(C,cmd);
 
@@ -214,9 +207,12 @@ doConnect(Client *C){
 }
 
 int
-doDisconnect(char cmd){
+doDisconnect(Client *C, char cmd){
 
-  //call terminating function...whatever that is
+  //error checking?
+  doRPC(C,'g');
+
+  globals.connected = 0;
 
   if(cmd=='q'){
     printf("Terminated.\n");
@@ -416,13 +412,13 @@ docmd(Client *C, char cmd)
     rc=doConnect(C);
     break;
   case 'd': 
-    rc=doDisconnect(cmd);
+    rc=doDisconnect(C,cmd);
     break;
   case 'w': 
     rc=doWhere(); 
     break;
   case 'q': 
-    rc=doDisconnect(cmd);
+    rc=doDisconnect(C,cmd);
     break;
   case 'h': 
     rc=doNumHome();

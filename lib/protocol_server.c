@@ -40,7 +40,6 @@ struct {
   FDType   RPCListenFD;
   PortType RPCPort;
 
-
   FDType             EventListenFD;
   PortType           EventPort;
   pthread_t          EventListenTid;
@@ -59,7 +58,6 @@ struct {
 static Map* Server_Map;
 Cell** objects;
 
-
 extern PortType proto_server_rpcport(void) { return Proto_Server.RPCPort; }
 extern PortType proto_server_eventport(void) { return Proto_Server.EventPort; }
 extern Proto_Session *
@@ -76,14 +74,13 @@ proto_server_set_session_lost_handler(Proto_MT_Handler h){
 extern int
 proto_server_set_req_handler(Proto_Msg_Types mt, Proto_MT_Handler h){
   int i;
-
+  
   if (mt>PROTO_MT_REQ_BASE_RESERVED_FIRST &&
       mt<PROTO_MT_REQ_BASE_RESERVED_LAST) {
     i = mt - PROTO_MT_REQ_BASE_RESERVED_FIRST - 1;
     
-    //    NYI;
-   Proto_Server.base_req_handlers[i] = h;
-
+    Proto_Server.base_req_handlers[i] = h;
+    
     return 1;
   } else {
     return -1;
@@ -214,8 +211,6 @@ proto_server_req_dispatcher(void * arg)
       i = mt - PROTO_MT_REQ_BASE_RESERVED_FIRST - 1;
       hdlr = Proto_Server.base_req_handlers[i];
       
-      //      NYI;
-
       if (hdlr(&s)<0) goto leave;
     }
     else {
@@ -226,8 +221,6 @@ proto_server_req_dispatcher(void * arg)
 
  leave:
   Proto_Server.session_lost_handler;
-
-  // NYI;  //  Proto_Server.
 
   close(s.fd);
   return NULL;
@@ -309,9 +302,9 @@ proto_server_query_handler(Proto_Session *s){
 
   fprintf(stderr, "proto_server_mt_query_handler: invoked for session:\n");
   proto_session_dump(s);
-  rh.type = proto_session_hdr_unmarshall_type(s);
 
-  sh.type = rh.type;
+  sh.type = proto_session_hdr_unmarshall_type(s);
+  sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
   sh.pstate.v0.raw = Server_Map->numhome1;
   sh.pstate.v1.raw = Server_Map->numhome2;
   sh.pstate.v2.raw = Server_Map->numjail1;
@@ -349,21 +342,19 @@ proto_server_cinfo_handler(Proto_Session *s){
   fprintf(stderr, "proto_server_mt_cinfo_handler: invoked for session:\n");
   proto_session_dump(s);
 
-  rh.type = proto_session_hdr_unmarshall_type(s);
+  sh.type = proto_session_hdr_unmarshall_type(s);
+  sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
+
   proto_session_hdr_unmarshall(s, &rh);
-
   rx = rh.pstate.v0.raw;
-  ry = rh.pstate.v1.raw;
-
-  sh.type = rh.type;
- 
+  ry = rh.pstate.v1.raw; 
   
   for(i=0; i<MAX_OBJECTS; i++){
     if(objects[i] != NULL){
       if(objects[i]->x == rx && objects[i]->y == ry){
 	cell = objects[i];
 	break;
-      }      
+      }
     }
   }
 
@@ -401,6 +392,24 @@ proto_server_dump_handler(Proto_Session *s){
   return proto_session_send_msg(s,1);
 }
 
+//send back an ack reply then close session
+static int
+proto_server_goodbye_handler(Proto_Session *s){
+  Proto_Msg_Hdr h;
+  int rc;
+
+
+  bzero(&h, sizeof(h));
+  h.type = PROTO_MT_REP_BASE_GOODBYE;
+  proto_session_hdr_marshall(s, &h);
+
+  rc = proto_session_send_msg(s,1);
+
+  proto_session_lost_default_handler(s);
+
+  return rc;
+}
+
 extern int
 proto_server_init(void){
   int i;
@@ -430,6 +439,8 @@ proto_server_init(void){
       proto_server_set_req_handler(i,proto_server_dump_handler);
     else if(i == PROTO_MT_REQ_BASE_CINFO)
       proto_server_set_req_handler(i,proto_server_cinfo_handler);
+    else if(i == PROTO_MT_REQ_BASE_GOODBYE)
+      proto_server_set_req_handler(i,proto_server_goodbye_handler);
     else
       proto_server_set_req_handler(i, proto_server_mt_null_handler);
   }
