@@ -239,10 +239,8 @@ do_cinfo_rpc(Proto_Client_Handle ch, int x, int y, Proto_Msg_Types mt){
 
   rc = proto_session_rpc(s);
   
-  if(rc==1){
+  if(rc==1)
     proto_session_hdr_unmarshall(s,&s->rhdr);
-    printf("6\n");
-  }
   else 
     c->session_lost_handler(s);
 

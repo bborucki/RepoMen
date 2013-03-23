@@ -35,9 +35,10 @@ struct Globals {
   char host[STRLEN];
   PortType port;
   char connected;
-  Map* map;
+  Map *map;
   int x;
   int y;
+  Cell *cell;
 } globals;
 
 
@@ -129,13 +130,19 @@ doRPCCmd(Client *C, char c)
     //    globals.map->maze = 
 
     break;
-  case 'f':
-    printf("TIME TO PARTY!!!!\n");
-    rc = 1;
-    break;
  case 'i':
     rc = proto_client_cinfo(C->ph, globals.x, globals.y);
-    printf("returned from rpc\n");
+    s = proto_client_rpc_session(C->ph);
+    globals.cell = malloc(sizeof(Cell));    
+
+    globals.cell->type = s->rhdr.pstate.v0.raw;
+    globals.cell->team = s->rhdr.pstate.v1.raw;
+    globals.cell->occupied = s->rhdr.pstate.v2.raw;
+    globals.cell->x = s->rhdr.pstate.v3.raw;
+    globals.cell->y = s->rhdr.gstate.v0.raw;
+    globals.cell->obj1 = s->rhdr.gstate.v1.raw;
+    globals.cell->obj2 = s->rhdr.gstate.v2.raw;
+    
     break;
   case 'd':
     rc = proto_client_dump(C->ph);
@@ -201,7 +208,6 @@ doConnect(Client *C){
     printf("Connected.");
     globals.connected = 1;
     doRPC(C,'q');
-
   }
   return 1;
 }
@@ -342,10 +348,20 @@ doCInfo(Client *C){
     //      printf("Not Connected.");
     //      return 1;
     //    }
-    printf("Info for (%d,%d) = ...", x, y);
+
     globals.x = x;
     globals.y = y;
     rc = doRPC(C,'i');
+    printf("Info for (%d,%d) = \n", x, y);
+    printf("Type: %d\n", globals.cell->type);
+    printf("Team: %d\n", globals.cell->team);
+    printf("Occupied: %d\n", globals.cell->occupied);
+    printf("x: %d\n", globals.cell->x);
+    printf("y: %d\n", globals.cell->y);
+    printf("object1: %d\n", globals.cell->obj1);
+    printf("object2: %d\n", globals.cell->obj2);
+
+
   }
   else{
     printf("Usage: \"cinfo <x,y>\"\n");
