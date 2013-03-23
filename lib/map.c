@@ -12,7 +12,6 @@
 
 FILE *fp;
 
-
 char** load_maze()
 {
   char* buf = malloc(COLUMN_MAX);
@@ -20,7 +19,6 @@ char** load_maze()
   int i,j;
   while(fgets(buf,COLUMN_MAX,fp) != NULL){
     out[j] = malloc(strlen(buf));
-    //    printf("in maze loop\n");
     for(i=0;i<strlen(buf);i++)
       out[j][i] = buf[i];
     j++;
@@ -153,7 +151,14 @@ load_map(Map* m)
     fprintf(stderr,"could not read map at path %s\n",MAP_NAME);
     return 0;
   }
-  char* buf = malloc(MAX_LINE+1);
+  char buf[MAX_LINE+1];
+
+  bzero(buf, sizeof(buf));
+
+  fgets(buf,COLUMN_MAX,fp);
+  m->dim = strlen(buf)-1;
+  fputs(buf, fp);
+
   while(fgets(buf,COLUMN_MAX,fp) != NULL){
     m->numhome1 += map_num_home(buf,1);
     m->numhome2 += map_num_home(buf,2);
@@ -163,7 +168,7 @@ load_map(Map* m)
     m->numfloor += map_num_floor(buf);
   }
   fclose(fp);
-  m->dim = COLUMN_MAX;
+  //  m->dim = COLUMN_MAX;
   if(!read_map(MAP_NAME)){
     fprintf(stderr,"could not read map at path %s\n",MAP_NAME);
     return 0;

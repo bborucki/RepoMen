@@ -308,7 +308,7 @@ doNumWall(){
     printf("Not connected.");
     return 1;
   }    
- printf("Number of available floor cells = %d\n", globals.map->numwall);
+ printf("Number of available wall cells = %d\n", globals.map->numwall);
  return 1;
 }
 

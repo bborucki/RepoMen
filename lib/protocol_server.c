@@ -382,7 +382,7 @@ proto_server_dump_handler(Proto_Session *s){
   Proto_Msg_Hdr h;
   int i;
   
-  for(i=0; i<COLUMN_MAX; i++)
+  for(i=0; i<Server_Map->dim+1; i++)
     printf("%s", Server_Map->maze[i]);
 
   bzero(&h, sizeof(h));
