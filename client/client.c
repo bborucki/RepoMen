@@ -36,6 +36,8 @@ struct Globals {
   PortType port;
   char connected;
   Map* map;
+  int x;
+  int y;
 } globals;
 
 
@@ -65,7 +67,6 @@ update_event_handler(Proto_Session *s)
   fprintf(stderr, "%s: called", __func__);
   return 1;
 }
-
 
 int 
 startConnection(Client *C, char *host, PortType port, Proto_MT_Handler h)
@@ -107,19 +108,17 @@ doRPCCmd(Client *C, char c)
   int rc=-1;
   Proto_Session *s;
   switch (c) {
-  case 'h':  
-    {
-      rc = proto_client_hello(C->ph);
-      printf("hello: rc=%x\n", rc);
-      if (rc > 0) game_process_reply(C);
-    }
+  case 'h':
+    rc = proto_client_hello(C->ph);
+    printf("hello: rc=%x\n", rc);
+    if (rc > 0) game_process_reply(C);
     break;
   case 'q':
-    printf("doing query\n");
     rc = proto_client_query(C->ph);
     s = proto_client_rpc_session(C->ph);
     globals.map = malloc(sizeof(Map));
-
+    
+    //    func(&globals.map, s);
     globals.map->numhome1 = s->rhdr.pstate.v0.raw;
     globals.map->numhome2 = s->rhdr.pstate.v1.raw;
     globals.map->numjail1 = s->rhdr.pstate.v2.raw;
@@ -133,6 +132,9 @@ doRPCCmd(Client *C, char c)
   case 'f':
     printf("TIME TO PARTY!!!!\n");
     rc = 1;
+    break;
+ case 'i':
+    rc = proto_client_cinfo(C->ph, globals.x, globals.y);
     break;
   case 'm':
     scanf("%c", &c);
@@ -194,7 +196,6 @@ doConnect(Client *C){
   strncpy(globals.host, addr_port, strlen(addr_port));
   globals.port = atoi(ptr+sizeof(char));
   
-
   if (startConnection(C, globals.host, globals.port, update_event_handler)<0) {
     fprintf(stderr, "ERROR: startConnection failed\n");
     return -1;
@@ -233,10 +234,14 @@ doNumHome(){
   if((c=getchar())=='\n'){
     printf("Usage: \"numhome <1 or 2>\"\n");
     return 1;
-  }
+  }    
   putchar(c);
   
   if(scanf("%d", &teamNum)==1 && (teamNum == 1 || teamNum == 2)){
+    if(!globals.connected){
+      printf("Not Connected.");
+      return 1;
+    }
     printf("number of home cells for team %d = ", teamNum);
     if(teamNum == 1)
       printf("%d\n",globals.map->numhome1);
@@ -263,12 +268,15 @@ doNumJail(){
   putchar(c);
   
   if(scanf("%d", &teamNum)==1 && (teamNum == 1 || teamNum == 2)){
+    if(!globals.connected){
+      printf("Not Connected.");
+      return 1;
+    }
     printf("Number of jail cells for team %d = ", teamNum);
     if(teamNum == 1)
       printf("%d\n",globals.map->numjail1);
     else
       printf("%d\n",globals.map->numjail2);
-
   }
   else{
     printf("Usage: \"numjail <1 or 2>\"\n");
@@ -280,26 +288,38 @@ doNumJail(){
 
 int
 doNumFloor(){
+  if(!globals.connected){
+    printf("Not Connected.");
+    return 1;
+  }    
   printf("Number of available floor cells = %d\n", globals.map->numfloor);
   return 1;
 }
 
 int
 doNumWall(){
+  if(!globals.connected){
+    printf("Not connected.");
+    return 1;
+  }    
  printf("Number of available floor cells = %d\n", globals.map->numwall);
  return 1;
 }
 
 int
 doDim(){
+  if(!globals.connected){
+    printf("Not Connected.");
+    return 1;
+  }    
   printf("Dimensions of the maze are %d x %d\n", globals.map->dim,globals.map->dim);
   return 1;
 }
 
 int 
-doCInfo(){
+doCInfo(Client *C){
   char c;
-  int x,y;
+  int rc,x,y;
 
   if((c=getchar())=='\n'){
     printf("Usage: \"cinfo <x,y>\"\n");
@@ -308,8 +328,14 @@ doCInfo(){
   putchar(c);
 
   if(scanf("%d,%d", &x, &y)==2){
+    //    if(!globals.connected){
+    //      printf("Not Connected.");
+    //      return 1;
+    //    }
     printf("Info for (%d,%d) = ...", x, y);
-    //rc = doRPC(C,'i');
+    globals.x = x;
+    globals.y = y;
+    rc = doRPC(C,'i');
   }
   else{
     printf("Usage: \"cinfo <x,y>\"\n");
@@ -401,7 +427,7 @@ docmd(Client *C, char cmd)
     rc = doDim();
     break;
   case 'i': //cinfo
-    rc = doCInfo();
+    rc = doCInfo(C);
     break;
   case 'u': //dump
     rc = doDump();

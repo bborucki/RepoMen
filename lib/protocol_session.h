@@ -80,5 +80,4 @@ proto_session_get_data(Proto_Session *s) {
   return s->extra;
 }
 
-
 #endif

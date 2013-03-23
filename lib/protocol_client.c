@@ -208,7 +208,7 @@ do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt){
 
   //  NYI;// 
   rc = proto_session_rpc(s);
-  
+ 
   if (rc==1) {
     if(mt == PROTO_MT_REQ_BASE_QUERY){
       //FIX THIS makes no sense, copy the strings somehow.
@@ -221,6 +221,33 @@ do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt){
     c->session_lost_handler(s);
     //    NYI;// ADD CODE
   }
+  
+  return rc;
+}
+
+static int
+do_cinfo_rpc(Proto_Client_Handle ch, int x, int y, Proto_Msg_Types mt){
+  int rc;
+  Proto_Session *s;
+  Proto_Client *c = ch;
+  Proto_Msg_Hdr *hdr;
+
+  s = &(c->rpc_session);  
+
+  bzero(hdr, sizeof(Proto_Msg_Hdr));
+
+  hdr->pstate.v0.raw=x;
+  hdr->pstate.v1.raw=y;
+
+  marshall_mtonly(s,mt);
+  proto_session_hdr_marshall(s,hdr);
+
+  rc = proto_session_rpc(s);
+  
+  if(rc==1){
+      proto_session_hdr_unmarshall(s,&s->rhdr);
+  } else 
+    c->session_lost_handler(s);
   
   return rc;
 }
@@ -239,6 +266,13 @@ extern int
 proto_client_query(Proto_Client_Handle ch){
   
   return do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_QUERY);
+}
+
+extern int
+proto_client_cinfo(Proto_Client_Handle ch, int x, int y){
+  printf("In protocol client\n");
+  return do_cinfo_rpc(ch, x, y, PROTO_MT_REQ_BASE_CINFO);
+  return 1;
 }
 
 extern int
