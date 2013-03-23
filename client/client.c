@@ -151,7 +151,7 @@ doRPCCmd(Client *C, char c)
     printf("%s: unknown command %c\n", __func__, c);
   }
   // NULL MT OVERRIDE ;-)
-  printf("%s: rc=0x%x\n", __func__, rc);
+  //  printf("%s: rc=0x%x\n", __func__, rc);
   if (rc == 0xdeadbeef) rc=1;
   return rc;
 }
@@ -163,7 +163,7 @@ doRPC(Client *C, char cmd)
 
   rc=doRPCCmd(C,cmd);
 
-  printf("doRPC: rc=0x%x\n", rc);
+  //  printf("doRPC: rc=0x%x\n", rc);
 
   return rc;
 }
@@ -208,6 +208,10 @@ doConnect(Client *C){
 
 int
 doDisconnect(Client *C, char cmd){
+  if(cmd == 'q' && !globals.connected){
+    printf("Terminated.\n");
+    return -1;
+  }
 
   //error checking?
   doRPC(C,'g');
@@ -356,7 +360,7 @@ doDump(Client *C){
   int rc;
 
   if((rc=doRPC(C,'d'))>0){
-    printf("Dump Successful");
+    printf("Dump Successful\n");
     return 1;
   }
 

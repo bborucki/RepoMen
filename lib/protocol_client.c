@@ -225,29 +225,19 @@ do_cinfo_rpc(Proto_Client_Handle ch, int x, int y, Proto_Msg_Types mt){
   int rc=0;
   Proto_Session *s;
   Proto_Client *c = ch;
-  Proto_Msg_Hdr *hdr;
+  Proto_Msg_Hdr *hdr = malloc(sizeof(Proto_Msg_Hdr));
 
   s = &(c->rpc_session);  
 
-  //  printf("1\n");
-
   bzero(hdr, sizeof(Proto_Msg_Hdr));
-
-  //  printf("2\n");
 
   hdr->pstate.v0.raw=x;
   hdr->pstate.v1.raw=y;
 
-  //  printf("3\n");
-
   marshall_mtonly(s,mt);
   proto_session_hdr_marshall(s,hdr);
 
-  //  printf("4\n");
-  
   rc = proto_session_rpc(s);
-  
-  //  printf("5\n");
   
   if(rc==1){
     proto_session_hdr_unmarshall(s,&s->rhdr);
@@ -255,8 +245,6 @@ do_cinfo_rpc(Proto_Client_Handle ch, int x, int y, Proto_Msg_Types mt){
   }
   else 
     c->session_lost_handler(s);
-  
-  //  printf("7\n");
 
   return rc;
 }
@@ -284,9 +272,7 @@ proto_client_dump(Proto_Client_Handle ch){
 extern int
 proto_client_cinfo(Proto_Client_Handle ch, int x, int y){
   int rc=0;
-  //  printf("0\n");
   rc = do_cinfo_rpc(ch, x, y, PROTO_MT_REQ_BASE_CINFO);
-  //  printf("8\n");
   return rc;
 }
 

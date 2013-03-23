@@ -146,6 +146,7 @@ int map_num_floor(char* buf)
 extern int
 load_map(Map* m)
 {
+  char noDim = 1;
   bzero(m,sizeof(m));
   if(!read_map(MAP_NAME)){
     fprintf(stderr,"could not read map at path %s\n",MAP_NAME);
@@ -155,11 +156,11 @@ load_map(Map* m)
 
   bzero(buf, sizeof(buf));
 
-  fgets(buf,COLUMN_MAX,fp);
-  m->dim = strlen(buf)-1;
-  fputs(buf, fp);
-
   while(fgets(buf,COLUMN_MAX,fp) != NULL){
+    if(noDim){
+      m->dim = strlen(buf)-1;
+      noDim = 0;
+    }
     m->numhome1 += map_num_home(buf,1);
     m->numhome2 += map_num_home(buf,2);
     m->numjail1 += map_num_jail(buf,1);
