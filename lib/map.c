@@ -12,8 +12,8 @@
 
 FILE *fp;
 
-char** load_maze()
-{
+char**
+load_maze(){
   char* buf = malloc(COLUMN_MAX);
   char** out = malloc(MAX_LINE*COLUMN_MAX);
   int i,j;
@@ -26,24 +26,26 @@ char** load_maze()
   return out;
 }
 
-Cell* make_cell(int ux, int uy)
-{
-  Cell* c = (Cell*) malloc(sizeof(Cell));
+extern int 
+make_cell(Map *m, Cell *c, int ux, int uy){
   c->x = ux;
   c->y = uy;
   c->team = 0;
   c->occupied = UNOCCUPIED;
   c->obj1 = 0;
   c->obj2 = 0;
-  c->type = get_cell_type(ux,uy);
-  return c;
+  printf("getting cell type\n");
+  c->type = get_cell_type(m, ux,uy);
+  return 1;
 }
 
-int get_cell_type(Map *m,int x, int y){
+int 
+get_cell_type(Map *m,int x, int y){
   return m->maze[x][y];
 }
 
-int read_map(const char* mappath){
+int 
+read_map(const char* mappath){
   if((fp = fopen(mappath, "r")) == NULL){
     fprintf(stderr, "ERRNO: %d\n", errno);
     return 0;
@@ -51,10 +53,12 @@ int read_map(const char* mappath){
   return 1;
 }
 
-int map_dump(const char* mappath){
-  char* buf = malloc(MAX_LINE);
-  char* out = malloc(MAX_LINE);
+int 
+map_dump(const char* mappath){
   int i,j;
+  char *buf = (char *)malloc(MAX_LINE);
+  char *out = (char *)malloc(MAX_LINE);
+
   if(!read_map(mappath)){
     fprintf(stderr, "could not read map with path %s\n",mappath);
     return 0;
@@ -62,24 +66,25 @@ int map_dump(const char* mappath){
   while(fgets(buf,MAX_LINE, fp) != NULL){
     i = 0;
     /*
-    while(i < TEAM_1_MAX){
+      while(i < TEAM_1_MAX){
       //  NYI designate team color;
       
-    }
-    while(i >= TEAM_1_MAX && i < TEAM_2_MAX){
+      }
+      while(i >= TEAM_1_MAX && i < TEAM_2_MAX){
       //  NYI designate team color;
-    }
+      }
     */
     // this is temporary, but for now strcpy to out
     out = strcpy(out,buf);
-
+    
     printf("%s",out);
   }
   
   return 1;
 }
 
-int map_num_home(char* buf, int team){
+int 
+map_num_home(char* buf, int team){
   int i;
   int num = 0;
   char c = 'H';
@@ -87,59 +92,51 @@ int map_num_home(char* buf, int team){
   if(team == 1)
     c = 'h';
   
-  for(i=0; i<strlen(buf); i++){
-    if(buf[i] == c){
+  for(i=0; i<strlen(buf); i++)
+    if(buf[i] == c)
       num++;
-    }
-  }  
-  
+
   return num;
 }
 
-int map_num_jail(char* buf, int team){
+int
+map_num_jail(char* buf, int team){
   int i;
   int num = 0;
-  int cap;
+  char c = 'J';
+
   if(team == 1)
-    cap = 0;
-  else
-    cap = 1;
+    c = 'j';
   
-  for(i=0; i<strlen(buf); i++){
-    if(cap && buf[i] == 'J')
+  for(i=0; i<strlen(buf); i++)
+    if(buf[i] == c)
       num++;
-    else if(!cap && buf[i] == 'j')
-      num++;
-  }  
 
   return num;
 }
 
-int map_num_wall(char* buf)
-{
+int
+map_num_wall(char* buf){
   int num = 0;
   int i;
 
-  for(i=0; i<strlen(buf); i++){
+  for(i=0; i<strlen(buf); i++)
     if(buf[i] == '#')
       num++;
-
-  }
+  
   return num;
 }
-
-int map_num_floor(char* buf)
-{
+ 
+int
+map_num_floor(char* buf){
   int num = 0;
   int i;
   
-  for(i=0; i<strlen(buf); i++){
-    if(buf[i] == ' ' || buf[i] == 'j' || buf[i] == 'J'||\
-       buf[i] == 'h' || buf[i] == 'H'){
+  for(i=0; i<strlen(buf); i++)
+    if(buf[i] == ' ' || buf[i] == 'j' || buf[i] == 'J'||	\
+       buf[i] == 'h' || buf[i] == 'H')
       num++;
-    }
-
-  }
+  
   return num;
 }
 
@@ -169,11 +166,6 @@ load_map(Map* m)
     m->numfloor += map_num_floor(buf);
   }
   fclose(fp);
-  //  m->dim = COLUMN_MAX;
-  if(!read_map(MAP_NAME)){
-    fprintf(stderr,"could not read map at path %s\n",MAP_NAME);
-    return 0;
-  }
   m->maze = (char**)load_maze();
   
   fclose(fp);
@@ -181,14 +173,14 @@ load_map(Map* m)
 }
 
 /*
-extern
-Cell * map_cinfo(char* mappath, int x, int y)
-{
+  extern Cell*
+  map_cinfo(char* mappath, int x, int y)
+  {
   int i;
   for(i = 0; i<num_occupied; i++){
-    if((occupied_cells[i]->x) == x && (occupied_cells[i]->y == y))
-      return occupied_cells[i];
+  if((occupied_cells[i]->x) == x && (occupied_cells[i]->y == y))
+  return occupied_cells[i];
   }
   return make_cell(x, y);
-}
+  }
 */

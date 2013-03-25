@@ -34,8 +34,6 @@ typedef struct Cell{
   int obj2;
 } Cell;
 
-
-
 typedef struct Map{
   int numhome1;
   int numhome2;
@@ -49,4 +47,4 @@ typedef struct Map{
 
 extern int load_map(Map* m);
 
-extern Cell* make_cell(int ux, int uy);
+extern int make_cell(Map* m, Cell * c, int ux, int uy);

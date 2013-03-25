@@ -35,6 +35,7 @@
 
 #define PROTO_SERVER_MAX_EVENT_SUBSCRIBERS 1024
 #define MAX_OBJECTS 404
+#define object int
 
 struct {
   FDType   RPCListenFD;
@@ -56,7 +57,7 @@ struct {
 
 
 static Map* Server_Map;
-Cell** objects;
+Cell *objects[MAX_OBJECTS]; //an array of pointers to objects
 
 extern PortType proto_server_rpcport(void) { return Proto_Server.RPCPort; }
 extern PortType proto_server_eventport(void) { return Proto_Server.EventPort; }
@@ -332,7 +333,7 @@ static int
 proto_server_cinfo_handler(Proto_Session *s){
   int rc = 1;
   int i,rx,ry;
-  Cell* cell;
+  Cell *cell = malloc(sizeof(Cell));
   Proto_Msg_Hdr sh;
   Proto_Msg_Hdr rh;
 
@@ -348,26 +349,21 @@ proto_server_cinfo_handler(Proto_Session *s){
   proto_session_hdr_unmarshall(s, &rh);
   rx = rh.pstate.v0.raw;
   ry = rh.pstate.v1.raw; 
-  
-  printf("moving to for loop\n");
 
-  for(i=0; i<MAX_OBJECTS; i++){
-    printf("%d",i);
+  for(i=0; i<MAX_OBJECTS; i+=sizeof(object)){
     if(objects[i] != NULL){
-      printf("derp");
       if(objects[i]->x == rx && objects[i]->y == ry){
-	printf("derp");
 	cell = objects[i];
 	break;
       }
     }
   }
 
-  printf("after for loop\n");
-
   if(i >= MAX_OBJECTS){
-    cell = make_cell(rx,ry);
+    make_cell(Server_Map,cell,rx,ry);
   }
+
+  printf("after if\n");
 
   sh.pstate.v0.raw = cell->type;
   sh.pstate.v1.raw = cell->team;
@@ -426,7 +422,7 @@ proto_server_init(void){
   int i;
   int rc;
   Server_Map = (Map*)malloc(sizeof(Map));
-  objects = (Cell**)(malloc(MAX_OBJECTS*sizeof(int)));
+  bzero(objects, sizeof(objects));
   if(!load_map(Server_Map))
     return -1;
   /*printf("h1:%d\n", Server_Map->numhome1);
