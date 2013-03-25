@@ -121,8 +121,7 @@ proto_server_record_event_subscriber(int fd, int *num){
   return rc;
 }
 
-static
-void *
+static void *
 proto_server_event_listen(void *arg){
   int fd = Proto_Server.EventListenFD;
   int connfd;
@@ -154,8 +153,7 @@ proto_server_event_listen(void *arg){
 } 
 
 void
-proto_server_post_event(void) 
-{
+proto_server_post_event(void){
   int i;
   int num;
 
@@ -189,8 +187,7 @@ proto_server_post_event(void)
 
 
 static void *
-proto_server_req_dispatcher(void * arg)
-{
+proto_server_req_dispatcher(void * arg){
   Proto_Session s;
   Proto_Msg_Types mt;
   Proto_MT_Handler hdlr;
@@ -206,7 +203,7 @@ proto_server_req_dispatcher(void * arg)
   fprintf(stderr, "\nproto_req_dispatcher: %p: Started: fd=%d\n", 
 	  pthread_self(), s.fd);
 
-  for (;;) {
+  for (;;){
     if (proto_session_rcv_msg(&s)==1) {
       mt = proto_session_hdr_unmarshall_type(&s);
       printf("mt = %d\n", mt);

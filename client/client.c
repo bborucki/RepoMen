@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../lib/types.h"
+#include "../lib/utils.h"
 #include "../lib/protocol_client.h"
 #include "../lib/protocol_session.h"
 #include "../lib/protocol_utils.h"
@@ -352,8 +353,8 @@ doCInfo(Client *C){
     globals.x = x;
     globals.y = y;
     rc = doRPC(C,'i');
-    printf("Info for (%d,%d) = \n", x, y);
-    printf("Type: %d\n", globals.cell->type);
+    printf("Type: ");
+    print_cell_type(globals.cell->type);
     printf("Team: %d\n", globals.cell->team);
     printf("Occupied: %d\n", globals.cell->occupied);
     printf("x: %d\n", globals.cell->x);

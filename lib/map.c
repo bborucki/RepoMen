@@ -34,14 +34,15 @@ make_cell(Map *m, Cell *c, int ux, int uy){
   c->occupied = UNOCCUPIED;
   c->obj1 = 0;
   c->obj2 = 0;
-  printf("getting cell type\n");
   c->type = get_cell_type(m, ux,uy);
   return 1;
 }
 
 int 
 get_cell_type(Map *m,int x, int y){
+  printf("1\n");
   return m->maze[x][y];
+  printf("2\n");
 }
 
 int 
@@ -141,8 +142,7 @@ map_num_floor(char* buf){
 }
 
 extern int
-load_map(Map* m)
-{
+load_map(Map* m){
   char noDim = 1;
   bzero(m,sizeof(m));
   if(!read_map(MAP_NAME)){

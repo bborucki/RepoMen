@@ -1,3 +1,6 @@
+#ifndef __MAP_H__
+#define __MAP_H__
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -9,11 +12,16 @@
 #include "protocol_utils.h"
 #include "protocol_client.h"
 
-#define WALL 1
-#define JAIL_1 2
-#define JAIL_2 3
-#define HOME_1 4
-#define HOME_2 5
+typedef enum {
+
+  WALL,
+  JAIL_1,
+  JAIL_2,
+  HOME_1,
+  HOME_2
+
+} Cell_Types;
+
 #define MAX_LINE  200
 #define COLUMN_MAX 200
 #define TEAM_1_MAX 100
@@ -22,7 +30,6 @@
 #define MAP_NAME "./lib/daGame.map"
 #define OCCUPIED 1
 #define UNOCCUPIED 0
-
 
 typedef struct Cell{
   int type;
@@ -48,3 +55,5 @@ typedef struct Map{
 extern int load_map(Map* m);
 
 extern int make_cell(Map* m, Cell * c, int ux, int uy);
+
+#endif
