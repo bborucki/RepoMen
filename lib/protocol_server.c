@@ -207,7 +207,6 @@ proto_server_req_dispatcher(void * arg){
   for (;;){
     if (proto_session_rcv_msg(&s)==1) {
       mt = proto_session_hdr_unmarshall_type(&s);
-      printf("mt = %d\n", mt);
       i = mt - PROTO_MT_REQ_BASE_RESERVED_FIRST - 1;
       hdlr = Proto_Server.base_req_handlers[i];
       
@@ -363,8 +362,6 @@ proto_server_cinfo_handler(Proto_Session *s){
     make_cell(Server_Map,cell,rx,ry);
   }
 
-  printf("after if\n");
-
   sh.pstate.v0.raw = cell->type;
   sh.pstate.v1.raw = cell->team;
   sh.pstate.v2.raw = cell->occupied;
@@ -426,13 +423,6 @@ proto_server_init(void){
   bzero(objects, sizeof(objects));
   if(!map_init(Server_Map))
     return -1;
-  /*printf("h1:%d\n", Server_Map->numhome1);
-  printf("h2:%d\n", Server_Map->numhome2);
-  printf("j1:%d\n", Server_Map->numjail1);
-  printf("j2:%d\n", Server_Map->numjail2);
-  printf("w :%d\n", Server_Map->numwall);
-  printf("f :%d\n", Server_Map->numfloor);
-  printf("d :%d\n", Server_Map->dim);*/
 
   proto_session_init(&Proto_Server.EventSession);
 

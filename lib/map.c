@@ -31,32 +31,38 @@ get_cell_type(Map *m,int x, int y){
 }
 
 int 
-map_dump(const char* mappath){
+map_dump(Map *m){
   int i,j;
-  char *buf = (char *)malloc(MAX_LINE);
-  char *out = (char *)malloc(MAX_LINE);
+  int dim;
 
-  if(!read_map(mappath)){
-    fprintf(stderr, "could not read map with path %s\n",mappath);
-    return 0;
+  dim = m->maze->dim;
+
+  for(i=0; i<dim; i++){
+    for(j=0; j<dim; j++){
+      printf(m->maze->data[i*dim+j]);
+    }
+    printf("\n");
   }
-  while(fgets(buf,MAX_LINE, fp) != NULL){
+
+  /*
+    while(fgets(buf,MAX_LINE, fp) != NULL){
     i = 0;
-    /*
-      while(i < TEAM_1_MAX){
-      //  NYI designate team color;
-      
-      }
-      while(i >= TEAM_1_MAX && i < TEAM_2_MAX){
-      //  NYI designate team color;
-      }
-    */
+    
+    while(i < TEAM_1_MAX){
+    //  NYI designate team color;
+    
+    }
+    while(i >= TEAM_1_MAX && i < TEAM_2_MAX){
+    //  NYI designate team color;
+    }
+    
     // this is temporary, but for now strcpy to out
     out = strcpy(out,buf);
     
     printf("%s",out);
-  }
-  
+    }
+  */
+
   return 1;
 }
 
