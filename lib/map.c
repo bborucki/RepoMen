@@ -14,7 +14,6 @@ map_dump(Map *m){
     for(j=0; j<dim; j++){
       printf("%c", m->maze[i*dim+j]);
     }
-    //    printf("\n");
   }
   
   return 1;
@@ -67,11 +66,6 @@ map_fill(Map *m){
   m->numjail2 = numJail2;
   m->numwall  = numWall;
   m->numfloor = numFloor;
-
-  printf("numall: %d\n", numFloor+numWall);
-  printf("dim: %d\n", dim);
-  printf("sizeof char %d\n", sizeof(char));
-  printf("should malloc: %d\n", dim*dim*sizeof(char));
 }
 
 extern Map *
@@ -87,27 +81,20 @@ map_init(const char *path){
   if((fp = fopen(path, "r")) == NULL)
     return NULL;
 
-  while(fgets(buf, MAX_LINE, fp) != NULL){
+  while(fgets(buf, COLUMN_MAX, fp) != NULL){
     if(!dim){
       dim = strlen(buf);
       m->dim = dim;
       m->maze = (char *)malloc(sizeof(char)*dim*dim);
       bzero(m->maze, sizeof(char)*dim*dim);
-      //      printf("%s\n", buf);
     }
     strncpy(&(m->maze[i*dim]), buf, dim);
-    //    printf("%s", &(m->maze[i*dim]));
     i++;
   }
   
   //  map_dump(m);
   map_fill(m);
 
-  printf("closing file\n");
-
   fclose(fp);
-  
-  printf("closed file\n");
-
   return m;
 }
