@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "map.h"
+#include "cell.h"
 
 extern void
 print_cell_type (Cell_Types ct){

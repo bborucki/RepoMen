@@ -27,6 +27,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include "map.h"
+#include "cell.h"
 #include "net.h"
 #include "protocol.h"
 #include "protocol_utils.h"
@@ -385,8 +386,10 @@ proto_server_dump_handler(Proto_Session *s){
   Proto_Msg_Hdr h;
   int i;
   
-  for(i=0; i<Server_Map->dim+1; i++)
-    printf("%s", Server_Map->maze[i]);
+  map_dump(Server_Map);
+
+  //  for(i=0; i<Server_Map->dim+1; i++)
+  //    printf("%s", Server_Map->maze[i]);
 
   bzero(&h, sizeof(h));
   h.type = PROTO_MT_REP_BASE_DUMP;

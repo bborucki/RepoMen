@@ -102,20 +102,3 @@ map_init(const char *path){
 
   return m;
 }
-
-extern int
-cell_create(Map* m, Cell *c, int ux, int uy){
-  c->x = ux;
-  c->y = uy;
-  c->team = 0;
-  c->occupied = UNOCCUPIED;
-  c->obj1 = 0;
-  c->obj2 = 0;
-  c->type = cell_get_type(m, ux, uy);
-  return 1;
-}
-
-int
-cell_get_type(Map *m, int x, int y){
-  return (int)m->maze[x*m->dim+y];
-}

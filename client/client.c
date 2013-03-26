@@ -29,6 +29,7 @@
 #include "../lib/protocol_session.h"
 #include "../lib/protocol_utils.h"
 #include "../lib/map.h"
+#include "../lib/cell.h"
 
 #define STRLEN 81
 
