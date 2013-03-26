@@ -12,8 +12,8 @@ typedef struct Map{
   char *maze;
 } Map;
 
-#define MAX_LINE 200
-#define COLUMN_MAX 200
+#define MAX_LINE 201
+#define COLUMN_MAX 201
 #define TEAM_1_MAX 100
 #define TEAM_2_MAX 200
 

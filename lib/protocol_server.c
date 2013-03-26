@@ -420,13 +420,9 @@ extern int
 proto_server_init(void){
   int i;
   int rc;
-  //  Server_Map = (Map*)malloc(sizeof(Map));
   if((Server_Map = map_init(MAP_NAME)) == NULL)
     return -1;
-  //  printf("Server_Map: 0c%x\n", Server_Map);
   bzero(objects, sizeof(objects));
-  //  if(!map_init(Server_Map))
-  //    return -1;
 
   proto_session_init(&Proto_Server.EventSession);
 
