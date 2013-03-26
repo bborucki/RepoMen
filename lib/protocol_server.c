@@ -28,6 +28,7 @@
 #include <pthread.h>
 #include "map.h"
 #include "net.h"
+#include "maze.h"
 #include "protocol.h"
 #include "protocol_utils.h"
 #include "protocol_server.h"
@@ -314,10 +315,12 @@ proto_server_query_handler(Proto_Session *s){
   proto_session_hdr_marshall(s, &sh);
   j = 0;
   buf = malloc(PROTO_SESSION_BUF_SIZE);
-  for(i=0; Server_Map->maze[i] != NULL; i++){
-    for(k = 0; k<strlen(Server_Map->maze[i]); k++)
-      buf[j++] = Server_Map->maze[i][j];
+  /*
+  for(i=0; Server_Map->maze->data[i] != NULL; i++){
+    for(k = 0; k<strlen(Server_Map->maze->data[i]); k++)
+      buf[j++] = Server_Map->maze->data[i][j];
   }
+  */
   buf[j] = '\0';
   proto_session_body_marshall_bytes(s, strlen(buf), buf);
   
@@ -419,8 +422,9 @@ proto_server_init(void){
   int i;
   int rc;
   Server_Map = (Map*)malloc(sizeof(Map));
+  printf("Server_Map: 0c%x\n", Server_Map);
   bzero(objects, sizeof(objects));
-  if(!load_map(Server_Map))
+  if(!map_init(Server_Map))
     return -1;
   /*printf("h1:%d\n", Server_Map->numhome1);
   printf("h2:%d\n", Server_Map->numhome2);

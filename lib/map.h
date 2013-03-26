@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <string.h>
+#include "maze.h"
 #include "protocol.h"
 #include "protocol_utils.h"
 #include "protocol_client.h"
@@ -49,7 +50,7 @@ typedef struct Map{
   int numjail1;
   int numjail2;
   int dim;
-  char** maze;
+  Maze *maze;
 } Map;
 
 extern int load_map(Map* m);

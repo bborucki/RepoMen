@@ -43,8 +43,7 @@ typedef struct {
 } Proto_Client;
 
 extern Proto_Session *
-proto_client_rpc_session(Proto_Client_Handle ch)
-{
+proto_client_rpc_session(Proto_Client_Handle ch){
   Proto_Client *c = ch;
   return &(c->rpc_session);
 }
@@ -56,16 +55,14 @@ proto_client_event_session(Proto_Client_Handle ch){
 }
 
 extern int
-proto_client_set_session_lost_handler(Proto_Client_Handle ch, Proto_MT_Handler h)
-{
+proto_client_set_session_lost_handler(Proto_Client_Handle ch, Proto_MT_Handler h){
   Proto_Client *c = ch;
   c->session_lost_handler = h;
 }
 
 extern int
 proto_client_set_event_handler(Proto_Client_Handle ch, Proto_Msg_Types mt,
-			       Proto_MT_Handler h)
-{
+			       Proto_MT_Handler h){
   int i;
   Proto_Client *c = ch;
   
@@ -91,8 +88,7 @@ proto_client_session_lost_default_hdlr(Proto_Session *s){
 }
 
 static int 
-proto_client_event_null_handler(Proto_Session *s)
-{
+proto_client_event_null_handler(Proto_Session *s){
   fprintf(stderr, 
 	  "proto_client_event_null_handler: invoked for session:\n");
   proto_session_dump(s);
@@ -112,9 +108,6 @@ proto_client_event_dispatcher(void * arg){
 
   c = (Proto_Client *)arg;
   s = &(c->event_session);
-
-  //  NYI;//c = ADD CODE
-  //  NYI;//s = ADD CODE
 
   for (;;) {
     if (proto_session_rcv_msg(s)==1) {
@@ -153,8 +146,6 @@ proto_client_init(Proto_Client_Handle *ch){
   for (mt=PROTO_MT_EVENT_BASE_RESERVED_FIRST+1;
        mt<PROTO_MT_EVENT_BASE_RESERVED_LAST; mt++)
     proto_client_set_event_handler(c, mt, proto_client_event_null_handler);
-
-    // NYI; //ADD CODE
 
   *ch = c;
   return 1;

@@ -6,25 +6,12 @@
 #include <pthread.h>
 #include <string.h>
 #include "map.h"
+#include "maze.h"
 #include "protocol.h"
 #include "protocol_utils.h"
 #include "protocol_client.h"
 
 FILE *fp;
-
-char**
-load_maze(){
-  char* buf = malloc(COLUMN_MAX);
-  char** out = malloc(MAX_LINE*COLUMN_MAX);
-  int i,j;
-  while(fgets(buf,COLUMN_MAX,fp) != NULL){
-    out[j] = malloc(strlen(buf));
-    for(i=0;i<strlen(buf);i++)
-      out[j][i] = buf[i];
-    j++;
-  }
-  return out;
-}
 
 extern int 
 make_cell(Map *m, Cell *c, int ux, int uy){
@@ -40,18 +27,7 @@ make_cell(Map *m, Cell *c, int ux, int uy){
 
 int 
 get_cell_type(Map *m,int x, int y){
-  printf("1\n");
-  return m->maze[x][y];
-  printf("2\n");
-}
-
-int 
-read_map(const char* mappath){
-  if((fp = fopen(mappath, "r")) == NULL){
-    fprintf(stderr, "ERRNO: %d\n", errno);
-    return 0;
-  }
-  return 1;
+  return m->maze->data[x*m->maze->dim+y];
 }
 
 int 
@@ -84,91 +60,70 @@ map_dump(const char* mappath){
   return 1;
 }
 
-int 
-map_num_home(char* buf, int team){
-  int i;
-  int num = 0;
-  char c = 'H';
-
-  if(team == 1)
-    c = 'h';
-  
-  for(i=0; i<strlen(buf); i++)
-    if(buf[i] == c)
-      num++;
-
-  return num;
-}
-
 int
-map_num_jail(char* buf, int team){
-  int i;
-  int num = 0;
-  char c = 'J';
+map_fill(Map *m){
+  int i,j;
+  int numHome1, numHome2, numJail1, numJail2;
+  int numFloor, numWall;
+  int dim;
 
-  if(team == 1)
-    c = 'j';
-  
-  for(i=0; i<strlen(buf); i++)
-    if(buf[i] == c)
-      num++;
+  numHome1 = numHome2 = numJail1 = 0;
+  numJail2 = numFloor = numWall = 0;
 
-  return num;
-}
+  dim = m->maze->dim;
 
-int
-map_num_wall(char* buf){
-  int num = 0;
-  int i;
-
-  for(i=0; i<strlen(buf); i++)
-    if(buf[i] == '#')
-      num++;
+  for(i=0; i < dim; i++){
+    for(j=0; j < dim; j++){
+      switch(m->maze->data[i*dim+j]){
+      case '#':
+	numWall++;
+	break;
+      case ' ':
+	numFloor++;
+	break;
+      case 'h':
+	numHome1++;
+	numFloor++;
+	break;
+      case 'H':
+	numHome2++;
+	numFloor++;
+	break;
+      case 'j':
+	numJail1++;
+	numFloor++;
+	break;
+      case 'J':
+	numJail2++;
+	numFloor++;
+	break;
+      }
+    }
+  }
   
-  return num;
-}
- 
-int
-map_num_floor(char* buf){
-  int num = 0;
-  int i;
-  
-  for(i=0; i<strlen(buf); i++)
-    if(buf[i] == ' ' || buf[i] == 'j' || buf[i] == 'J'||	\
-       buf[i] == 'h' || buf[i] == 'H')
-      num++;
-  
-  return num;
+  m->numhome1 = numHome1;
+  m->numhome2 = numHome2;
+  m->numjail1 = numJail1;
+  m->numjail2 = numJail2;
+  m->numwall  = numWall;
+  m->numfloor = numFloor;
 }
 
 extern int
-load_map(Map* m){
-  char noDim = 1;
+map_init(Map* m){
   bzero(m,sizeof(m));
-  if(!read_map(MAP_NAME)){
-    fprintf(stderr,"could not read map at path %s\n",MAP_NAME);
-    return 0;
-  }
-  char buf[MAX_LINE+1];
+  m->maze = maze_init(MAP_NAME);
+  map_fill(m);
 
-  bzero(buf, sizeof(buf));
+  /*
+    printf("h1: %d\n", m->numhome1);
+    printf("h2: %d\n", m->numhome2);
+    printf("j1: %d\n", m->numjail1);
+    printf("j2: %d\n", m->numjail2);
+    printf("wl: %d\n", m->numwall);
+    printf("fl: %d\n", m->numfloor);
+  */
 
-  while(fgets(buf,COLUMN_MAX,fp) != NULL){
-    if(noDim){
-      m->dim = strlen(buf)-1;
-      noDim = 0;
-    }
-    m->numhome1 += map_num_home(buf,1);
-    m->numhome2 += map_num_home(buf,2);
-    m->numjail1 += map_num_jail(buf,1);
-    m->numjail2 += map_num_jail(buf,2);
-    m->numwall +=  map_num_wall(buf);
-    m->numfloor += map_num_floor(buf);
-  }
-  fclose(fp);
-  m->maze = (char**)load_maze();
-  
-  fclose(fp);
   return 1;
 }
 
