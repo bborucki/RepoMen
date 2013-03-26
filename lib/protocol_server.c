@@ -23,12 +23,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include <strings.h>
+#include <string.h>
 #include <errno.h>
 #include <pthread.h>
 #include "map.h"
 #include "net.h"
-#include "maze.h"
 #include "protocol.h"
 #include "protocol_utils.h"
 #include "protocol_server.h"
@@ -359,7 +358,7 @@ proto_server_cinfo_handler(Proto_Session *s){
   }
 
   if(i >= MAX_OBJECTS){
-    make_cell(Server_Map,cell,rx,ry);
+    cell_create(Server_Map,cell,rx,ry);
   }
 
   sh.pstate.v0.raw = cell->type;
@@ -418,11 +417,13 @@ extern int
 proto_server_init(void){
   int i;
   int rc;
-  Server_Map = (Map*)malloc(sizeof(Map));
-  printf("Server_Map: 0c%x\n", Server_Map);
-  bzero(objects, sizeof(objects));
-  if(!map_init(Server_Map))
+  //  Server_Map = (Map*)malloc(sizeof(Map));
+  if((Server_Map = map_init(MAP_NAME)) == NULL)
     return -1;
+  //  printf("Server_Map: 0c%x\n", Server_Map);
+  bzero(objects, sizeof(objects));
+  //  if(!map_init(Server_Map))
+  //    return -1;
 
   proto_session_init(&Proto_Server.EventSession);
 
