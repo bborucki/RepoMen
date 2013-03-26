@@ -6,11 +6,11 @@ Member 1 Brian Borucki bborucki@bu.edu
 Member 2 Drew Berry drewb19@bu.edu
 
 To build the system:
-run in bash: "make"
+run in bash: "make" from the Repomen/ directory
 
 To run the server:
-Navigate to /RepoMen/server and run in bash "./server.c"
+Navigate to RepoMen/ directory and run in bash "./server/server.c"
 
 To run the client:
-Navigate to /RepoMen/client and run in bash "./client.c"
+Navigate to RepoMen/ directory and run in bash "./client/client.c"
 The /client directory contains a README specific to this program. 
