@@ -1,0 +1,18 @@
+
+#ifndef __MAZE_H__
+#define __MAZE_H__
+
+typedef struct Maze{
+  int numhome1;
+  int numhome2;
+  int numjail1;
+  int numjail2;
+  int numwall;
+  int numfloor;
+  int dim;
+  char *maze;
+} Maze;
+
+extern Maze * maze_init(const char *path);
+
+#endif
