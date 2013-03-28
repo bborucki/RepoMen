@@ -84,10 +84,8 @@ static int
 proto_client_session_lost_default_hdlr(Proto_Session *s){
   fprintf(stderr, "Session lost...:\n");
   proto_session_dump(s);
-
-  //may want to also close event channel?
-
   net_close_socket(s->fd);
+
   return -1;
 }
 
@@ -209,6 +207,7 @@ do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt){
       proto_session_body_unmarshall_int(s, 0, &rc);
   } else {
     c->session_lost_handler(s);
+
   }
 
   return rc;
@@ -280,11 +279,13 @@ proto_client_goodbye(Proto_Client_Handle ch){
   Proto_Session *s;
   Proto_Client *c = ch;
 
-  s = &(c->rpc_session);
 
+  s = &(c->rpc_session);
   do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_GOODBYE);
   proto_client_session_lost_default_hdlr(s);
-  
+  s = &(c->event_session);
+  proto_client_session_lost_default_hdlr(s);
+
   return 1;
 }
 
