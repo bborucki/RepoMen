@@ -271,6 +271,26 @@ proto_session_body_unmarshall_cell(Proto_Session *s, int offset, Cell *c){
   return -1;
 }
 
+extern int
+proto_session_body_marshall_map(Proto_Session *s, Map *m){
+  if (s && ((s->slen + sizeof(Map)) < PROTO_SESSION_BUF_SIZE)){
+    memcpy(s->sbuf + s->slen, m, sizeof(Map));
+    s->slen += sizeof(Map);
+    return 1;
+  }
+  return -1;
+}
+
+extern int
+proto_session_body_unmarshall_map(Proto_Session *s, int offset, Map *m){
+  if (s && ((s->rlen - (offset + sizeof(Map)) >= 0))){
+      memcpy(m, s->rbuf + offset, sizeof(Map));
+      m->maze = NULL;
+      return offset + sizeof(Map);
+  }
+  return -1;
+}
+
 // rc < 0 on comm failures
 // rc == 1 indicates comm success
 // session passed to us contains header and body information,

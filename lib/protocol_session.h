@@ -70,6 +70,9 @@ extern int  proto_session_body_unmarshall_bytes(Proto_Session *s, int offset,
 extern int  proto_session_body_marshall_cell(Proto_Session *s, Cell *c);
 extern int  proto_session_body_unmarshall_cell(Proto_Session *s, int offset, 
 						Cell *c);
+extern int  proto_session_body_marshall_map(Proto_Session *s, Map *m);
+extern int  proto_session_body_unmarshall_map(Proto_Session *s, int offset, 
+						Map *m);
 extern int  proto_session_send_msg(Proto_Session *s, int reset);
 extern int  proto_session_rcv_msg(Proto_Session *s);
 extern int  proto_session_rpc(Proto_Session *s);
