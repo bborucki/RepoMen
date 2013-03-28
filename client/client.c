@@ -191,7 +191,12 @@ doConnect(Client *C){
     printf("Failed to connect. Usage: \"connect <IP:PORT>\"\n");
     return 1;
   }
-  
+
+  if(globals.connected){
+    printf("Already Connected.");
+    return 1;
+  }  
+
   *ptr = '\0';
   
   strncpy(globals.host, addr_port, strlen(addr_port));

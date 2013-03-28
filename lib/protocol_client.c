@@ -257,7 +257,11 @@ proto_client_query(Proto_Client_Handle ch){
 
 extern int
 proto_client_dump(Proto_Client_Handle ch){
-  return do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_DUMP);
+  int rc;
+
+  rc = do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_DUMP);
+
+  return rc;
 }
 
 extern int

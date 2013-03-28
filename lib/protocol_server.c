@@ -387,12 +387,10 @@ proto_server_dump_handler(Proto_Session *s){
   
   map_dump(Server_Map);
 
-  //  for(i=0; i<Server_Map->dim+1; i++)
-  //    printf("%s", Server_Map->maze[i]);
-
   bzero(&h, sizeof(h));
   h.type = PROTO_MT_REP_BASE_DUMP;
   proto_session_hdr_marshall(s, &h);
+  proto_session_body_marshall_int(s, 1);
 
   return proto_session_send_msg(s,1);
 }
