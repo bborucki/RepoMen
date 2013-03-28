@@ -361,13 +361,7 @@ proto_server_cinfo_handler(Proto_Session *s){
     cell_create(Server_Map,cell,rx,ry);
   }
 
-  sh.pstate.v0.raw = cell->type;
-  sh.pstate.v1.raw = cell->team;
-  sh.pstate.v2.raw = cell->occupied;
-  sh.pstate.v3.raw = cell->x;
-  sh.gstate.v0.raw = cell->y;
-  sh.gstate.v1.raw = cell->obj1;
-  sh.gstate.v2.raw = cell->obj2;
+  proto_session_body_marshall_cell(s, cell);
 
   proto_session_hdr_marshall(s, &sh);
 

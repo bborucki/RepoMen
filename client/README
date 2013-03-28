@@ -1,15 +1,19 @@
-To run:
-In BASH - "./client.c"
+Run from the top level directory with:
+"./client/client"
 
 To Use:
-There are 4 commands that the user may issue:
+Below are the available commands that may be used at the prompt:
 
- - verbose -used for debugging, allows the user to see the progress being
-   	   made by the program 
-
+ - help - displays the available commands
  - connect -used for connecting to a server. The syntax is "connect <IP:PORT>"
-
- - quit    -ends the program
-
- - send    -used to send a string to the server, which will echo the string
-   	   back. The syntax is "send <string>" 
+ - disconnect - gracefully ends the current connection
+ - where - displays the IP:PORT of the current connection
+ - dump - dumps the current map to the server's standard output
+ - cinfo <x,y> - retrieves and displays information about the cell of the
+   map at location x,y.
+ - numwall - displays the number of wall on the current map
+ - numfloor - displays the number of floor cells on the current map
+ - numhome <1 or 2> - displays the number of home cells for team 1 or 2
+ - numjail <1 or 2> - displays the number of jail cells for team 1 or 2
+ - dim - displays the dimensions of the current map
+ - quit - terminates the connection and ends the program

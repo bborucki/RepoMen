@@ -36,9 +36,9 @@ struct Globals {
   char host[STRLEN];
   PortType port;
   char connected;
-  Map *map;
   int x;
   int y;
+  Map *map;
   Cell *cell;
 } globals;
 
@@ -131,15 +131,7 @@ doRPCCmd(Client *C, char c)
     rc = proto_client_cinfo(C->ph, globals.x, globals.y);
     s = proto_client_rpc_session(C->ph);
     globals.cell = malloc(sizeof(Cell));
-
-    globals.cell->type = s->rhdr.pstate.v0.raw;
-    globals.cell->team = s->rhdr.pstate.v1.raw;
-    globals.cell->occupied = s->rhdr.pstate.v2.raw;
-    globals.cell->x = s->rhdr.pstate.v3.raw;
-    globals.cell->y = s->rhdr.gstate.v0.raw;
-    globals.cell->obj1 = s->rhdr.gstate.v1.raw;
-    globals.cell->obj2 = s->rhdr.gstate.v2.raw;
-    
+    proto_session_body_unmarshall_cell(s, 0, globals.cell);
     break;
   case 'd':
     rc = proto_client_dump(C->ph);
