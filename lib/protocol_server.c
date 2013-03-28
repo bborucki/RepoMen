@@ -291,9 +291,6 @@ proto_server_mt_null_handler(Proto_Session *s){
 static int
 proto_server_query_handler(Proto_Session *s){
   int rc = 1;
-  int i,j,k;
-  char* buf;
-  Proto_Msg_Hdr rh;
   Proto_Msg_Hdr sh;
   bzero(&sh, sizeof(sh));
 
@@ -306,17 +303,6 @@ proto_server_query_handler(Proto_Session *s){
   proto_session_hdr_marshall(s, &sh);
   proto_session_body_marshall_map(s,Server_Map);
 
-  j = 0;
-  buf = malloc(PROTO_SESSION_BUF_SIZE);
-  /*
-    for(i=0; Server_Map->maze->data[i] != NULL; i++){
-    for(k = 0; k<strlen(Server_Map->maze->data[i]); k++)
-    buf[j++] = Server_Map->maze->data[i][j];
-    }
-  */
-  buf[j] = '\0';
-  proto_session_body_marshall_bytes(s, strlen(buf), buf);
-  
   rc = proto_session_send_msg(s,1);
   
   return rc;

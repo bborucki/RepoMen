@@ -40,6 +40,7 @@ struct Globals {
   int y;
   Map *map;
   Cell *cell;
+  char debug;
 } globals;
 
 
@@ -383,6 +384,16 @@ doHelp(){
   return 1;
 }
 
+int
+doDebug(){
+  globals.debug = !globals.debug;
+  if(globals.debug)
+    printf("Debugging Mode: ON\n");
+  else
+    printf("Debugging Mode: OFF\n");
+  return 1;
+}
+
 char
 input2cmd(char* input){
   int cmd=-1;
@@ -409,6 +420,8 @@ input2cmd(char* input){
     cmd = 'i';
   else if(!strcmp(input, "dump"))
     cmd = 'u';
+  else if(!strcmp(input, "debug"))
+    cmd = 'b';
   else if(!strcmp(input, "help"))
     cmd = 'p';
     
@@ -454,6 +467,9 @@ docmd(Client *C, char cmd)
   case 'u': 
     rc = doDump(C);
     break;
+  case 'b': 
+    rc = doDebug();
+    break;
   case 'p': 
     rc = doHelp();
     break;
@@ -463,14 +479,6 @@ docmd(Client *C, char cmd)
     break;
   default:
     printf("Unkown Command\n");
-    /*
-      case 'd':
-      proto_debug_on();
-      break;
-      case 'D':
-      proto_debug_off();
-      break;    
-    */
   }
   return rc;
 }
