@@ -84,6 +84,7 @@ static int
 proto_client_session_lost_default_hdlr(Proto_Session *s){
   fprintf(stderr, "Session lost...:\n");
   proto_session_dump(s);
+  net_close_socket(s->fd);
   return -1;
 }
 
@@ -143,7 +144,7 @@ proto_client_init(Proto_Client_Handle *ch){
   proto_client_set_session_lost_handler(c, 
 			      	proto_client_session_lost_default_hdlr);
 
-  for (mt=PROTO_MT_EVENT_BASE_RESERVED_FIRST+1;
+ for (mt=PROTO_MT_EVENT_BASE_RESERVED_FIRST+1;
        mt<PROTO_MT_EVENT_BASE_RESERVED_LAST; mt++)
     proto_client_set_event_handler(c, mt, proto_client_event_null_handler);
 
@@ -152,8 +153,7 @@ proto_client_init(Proto_Client_Handle *ch){
 }
 
 int
-proto_client_connect(Proto_Client_Handle ch, char *host, PortType port)
-{
+proto_client_connect(Proto_Client_Handle ch, char *host, PortType port){
   Proto_Client *c = (Proto_Client *)ch;
 
   if (net_setup_connection(&(c->rpc_session.fd), host, port)<0) 
@@ -184,7 +184,7 @@ marshall_mtonly(Proto_Session *s, Proto_Msg_Types mt) {
 
 // all rpc's are assume to only reply only with a return code in the body
 // eg.  like the null_mes
-static int 
+static int
 do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt){
   int rc;
   Proto_Session *s;
@@ -224,11 +224,11 @@ do_cinfo_rpc(Proto_Client_Handle ch, int x, int y, Proto_Msg_Types mt){
 
   hdr->pstate.v0.raw=x;
   hdr->pstate.v1.raw=y;
-  hdr->type = mt;
+ hdr->type = mt;
 
   proto_session_hdr_marshall(s,hdr);
 
-  proto_dump_msghdr(&(s->shdr));
+  //  proto_dump_msghdr(&(s->shdr));
 
   rc = proto_session_rpc(s);
   
@@ -269,7 +269,18 @@ proto_client_cinfo(Proto_Client_Handle ch, int x, int y){
 
 extern int
 proto_client_goodbye(Proto_Client_Handle ch){
-  return do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_GOODBYE);
+  int rc;
+  Proto_Session *s;
+  Proto_Client *c = ch;
+
+  s = &(c->rpc_session);
+
+  //Politely tell server we're disconnecting
+  //Not expecting a reply back
+  do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_GOODBYE);
+  proto_client_session_lost_default_hdlr(s);
+  
+  return 1;
 }
 
 

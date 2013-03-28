@@ -217,7 +217,6 @@ proto_server_req_dispatcher(void * arg){
     }
   }
 
-
  leave:
   Proto_Server.session_lost_handler;
 
@@ -402,16 +401,13 @@ proto_server_dump_handler(Proto_Session *s){
 static int
 proto_server_goodbye_handler(Proto_Session *s){
   Proto_Msg_Hdr h;
-  int rc;
-
+  int rc=1;
 
   bzero(&h, sizeof(h));
   h.type = PROTO_MT_REP_BASE_GOODBYE;
   proto_session_hdr_marshall(s, &h);
 
   rc = proto_session_send_msg(s,1);
-
-  proto_session_lost_default_handler(s);
 
   return rc;
 }

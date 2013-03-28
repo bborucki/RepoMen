@@ -153,6 +153,11 @@ net_setup_connection(FDType *fd, char *host, PortType port)
     return 1;
 }
 
+extern int
+net_close_socket(FDType fd){
+  return shutdown(fd, 2);
+}
+
 /* FOLLOWING CODE COMES FROM THE UNP BOOK */
 
 /* Write "n" bytes to a descriptor. */

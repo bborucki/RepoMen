@@ -40,7 +40,12 @@ cell_print_type(Cell *c){
   case 'J':
     printf("Jail Team 2\n");
     break;
+  default:
+    printf("\n");
+    break;
   }
+
+
 
   return 1;
 }

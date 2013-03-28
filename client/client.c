@@ -24,7 +24,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../lib/types.h"
-//#include "../lib/utils.h"
 #include "../lib/protocol_client.h"
 #include "../lib/protocol_session.h"
 #include "../lib/protocol_utils.h"
@@ -50,11 +49,9 @@ typedef struct ClientState  {
 } Client;
 
 static int
-clientInit(Client *C)
-{
+clientInit(Client *C){
   bzero(C, sizeof(Client));
 
-  // initialize the client protocol subsystem
   if (proto_client_init(&(C->ph))<0) {
     fprintf(stderr, "client: main: ERROR initializing proto system\n");
     return -1;
@@ -63,8 +60,7 @@ clientInit(Client *C)
 }
 
 static int
-update_event_handler(Proto_Session *s)
-{
+update_event_handler(Proto_Session *s){
   Client *C = proto_session_get_data(s);
 
   fprintf(stderr, "%s: called", __func__);
@@ -72,8 +68,7 @@ update_event_handler(Proto_Session *s)
 }
 
 int 
-startConnection(Client *C, char *host, PortType port, Proto_MT_Handler h)
-{
+startConnection(Client *C, char *host, PortType port, Proto_MT_Handler h){
   if (globals.host[0]!=0 && globals.port!=0) {
     if (proto_client_connect(C->ph, host, port)!=0) {
       fprintf(stderr, "failed to connect\n");
@@ -135,7 +130,7 @@ doRPCCmd(Client *C, char c)
  case 'i':
     rc = proto_client_cinfo(C->ph, globals.x, globals.y);
     s = proto_client_rpc_session(C->ph);
-    globals.cell = malloc(sizeof(Cell));    
+    globals.cell = malloc(sizeof(Cell));
 
     globals.cell->type = s->rhdr.pstate.v0.raw;
     globals.cell->team = s->rhdr.pstate.v1.raw;
@@ -221,8 +216,12 @@ doDisconnect(Client *C, char cmd){
     return -1;
   }
 
-  //error checking?
-  doRPC(C,'g');
+  if(!globals.connected){
+    printf("Not Connected.");
+    return 1;
+  }
+
+  doRPC(C,'g'); //goodbye
 
   globals.connected = 0;
 
@@ -330,7 +329,7 @@ doDim(){
     printf("Not Connected.");
     return 1;
   }    
-  printf("Dimensions of the maze are %d x %d\n", globals.map->dim,globals.map->dim);
+  printf("Dimensions of the maze are %d x %d\n", globals.map->dim-1,globals.map->dim-1);
   return 1;
 }
 
@@ -346,10 +345,10 @@ doCInfo(Client *C){
   putchar(c);
 
   if(scanf("%d,%d", &x, &y)==2){
-    //    if(!globals.connected){
-    //      printf("Not Connected.");
-    //      return 1;
-    //    }
+    if(!globals.connected){
+      printf("Not Connected.");
+      return 1;
+    }        
 
     globals.x = x;
     globals.y = y;
@@ -377,6 +376,11 @@ int
 doDump(Client *C){
   int rc;
 
+  if(!globals.connected){
+    printf("Not Connected.");
+    return 1;
+  }
+  
   if((rc=doRPC(C,'d'))>0){
     printf("Dump Successful\n");
     return 1;
@@ -466,6 +470,7 @@ docmd(Client *C, char cmd)
   case 'p': 
     rc = doHelp();
     break;
+  case ' ':
   case '\n':
     rc=1;
     break;
