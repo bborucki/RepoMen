@@ -302,22 +302,17 @@ proto_server_query_handler(Proto_Session *s){
 
   sh.type = proto_session_hdr_unmarshall_type(s);
   sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
-  sh.pstate.v0.raw = Server_Map->numhome1;
-  sh.pstate.v1.raw = Server_Map->numhome2;
-  sh.pstate.v2.raw = Server_Map->numjail1;
-  sh.pstate.v3.raw = Server_Map->numjail2;
-  sh.gstate.v0.raw = Server_Map->numwall;
-  sh.gstate.v1.raw = Server_Map->numfloor;
-  sh.gstate.v2.raw = Server_Map->dim;
 
   proto_session_hdr_marshall(s, &sh);
+  proto_session_body_marshall_map(s,Server_Map);
+
   j = 0;
   buf = malloc(PROTO_SESSION_BUF_SIZE);
   /*
-  for(i=0; Server_Map->maze->data[i] != NULL; i++){
+    for(i=0; Server_Map->maze->data[i] != NULL; i++){
     for(k = 0; k<strlen(Server_Map->maze->data[i]); k++)
-      buf[j++] = Server_Map->maze->data[i][j];
-  }
+    buf[j++] = Server_Map->maze->data[i][j];
+    }
   */
   buf[j] = '\0';
   proto_session_body_marshall_bytes(s, strlen(buf), buf);

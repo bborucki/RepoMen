@@ -84,6 +84,9 @@ static int
 proto_client_session_lost_default_hdlr(Proto_Session *s){
   fprintf(stderr, "Session lost...:\n");
   proto_session_dump(s);
+
+  //may want to also close event channel?
+
   net_close_socket(s->fd);
   return -1;
 }
@@ -200,7 +203,7 @@ do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt){
     if(mt == PROTO_MT_REQ_BASE_QUERY){
       //FIX THIS makes no sense, copy the strings somehow.
       proto_session_hdr_unmarshall(s,&s->rhdr);
-      proto_session_body_unmarshall_bytes(s,0,s->rlen,s->rbuf);
+      //      proto_session_body_unmarshall_bytes(s,0,s->rlen,s->rbuf);
       
     } else
       proto_session_body_unmarshall_int(s, 0, &rc);
@@ -279,8 +282,6 @@ proto_client_goodbye(Proto_Client_Handle ch){
 
   s = &(c->rpc_session);
 
-  //Politely tell server we're disconnecting
-  //Not expecting a reply back
   do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_GOODBYE);
   proto_client_session_lost_default_hdlr(s);
   

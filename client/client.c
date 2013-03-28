@@ -115,19 +115,9 @@ doRPCCmd(Client *C, char c)
     rc = proto_client_query(C->ph);
     s = proto_client_rpc_session(C->ph);
     globals.map = malloc(sizeof(Map));
-    
-    //    func(&globals.map, s);
-    globals.map->numhome1 = s->rhdr.pstate.v0.raw;
-    globals.map->numhome2 = s->rhdr.pstate.v1.raw;
-    globals.map->numjail1 = s->rhdr.pstate.v2.raw;
-    globals.map->numjail2 = s->rhdr.pstate.v3.raw;
-    globals.map->numwall = s->rhdr.gstate.v0.raw;
-    globals.map->numfloor = s->rhdr.gstate.v1.raw;
-    globals.map->dim = s->rhdr.gstate.v2.raw;
-    //    globals.map->maze = 
-
+    proto_session_body_unmarshall_map(s,0,globals.map);
     break;
- case 'i':
+  case 'i':
     rc = proto_client_cinfo(C->ph, globals.x, globals.y);
     s = proto_client_rpc_session(C->ph);
     globals.cell = malloc(sizeof(Cell));
@@ -256,7 +246,7 @@ doNumHome(){
       printf("Not Connected.");
       return 1;
     }
-    printf("number of home cells for team %d = ", teamNum);
+    printf("Number of home cells for team %d = ", teamNum);
     if(teamNum == 1)
       printf("%d\n",globals.map->numhome1);
     else
@@ -480,9 +470,6 @@ docmd(Client *C, char cmd)
       case 'D':
       proto_debug_off();
       break;    
-      case 'r':
-      rc = doRPC(C);
-      break;
     */
   }
   return rc;
