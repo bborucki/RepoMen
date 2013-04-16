@@ -57,9 +57,6 @@ struct {
 } Proto_Server;
 
 
-static Map* Server_Map;
-Cell *objects[MAX_OBJECTS]; //an array of pointers to objects
-
 extern PortType proto_server_rpcport(void) { return Proto_Server.RPCPort; }
 extern PortType proto_server_eventport(void) { return Proto_Server.EventPort; }
 extern Proto_Session *

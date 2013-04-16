@@ -2,6 +2,15 @@
 #include "map.h"
 #include "cell.h"
 
+extern int
+player_create(Player* p, int playerid, int playerteam, Cell* cell){
+  p->id = playerid;
+  p->team = playerteam;
+  p->pcell = cell;
+  p->object = NONE;
+  p->state = SAFE;
+}
+
 int
 cell_get_type(Map *m, int x, int y){
   return (int)m->maze[x*m->dim+y];
