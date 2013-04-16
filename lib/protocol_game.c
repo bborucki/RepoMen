@@ -28,10 +28,16 @@ int numobjects;
 
 int
 move_valid(int x, int y, Player* player){
-  int i;
-  for(i = 0; i<numobjects; i++){
-    
+  if(x > MAX_LINE || y > COLUMN_MAX)
+    return 0;
 
+  if(objects[x][y] != NULL){
+    if(objects[x][y]->occupied == OCCUPIED)
+      return 0;
+    if(objects[x][y]-> type == IWALL)
+      return 0;
+    if(objects[x][y]-> type == WALL && player->object != SHOVEL)
+      return 0;
   }
 
 }

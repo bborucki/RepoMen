@@ -3,6 +3,8 @@
 
 #include "map.h"
 
+typedef enum {FLOOR, JAIL1, JAIL2, HOME1, HOME2, WALL, IWALL} cell_t;
+
 typedef enum {SAFE, JAILED, FREE} state_t;
 
 typedef enum {NONE, FLAG, SHOVEL} object_t;
@@ -12,7 +14,7 @@ typedef enum {RED, GREEN} team_t;
 
 
 typedef struct Cell{
-  int type;
+  cell_t type;
   team_t team;
   int occupied;
   int x;
@@ -29,8 +31,8 @@ typedef struct Player{
 } Player;
 
 
-#define OCCUPIED 1
-#define UNOCCUPIED 0
+#define OCCUPIED 0
+#define UNOCCUPIED 1
 
 extern int cell_create(Map *m, Cell *c, int x, int y);
 extern int cell_print_type(Cell *c);
