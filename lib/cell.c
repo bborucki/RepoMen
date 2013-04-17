@@ -7,23 +7,28 @@ player_create(Player* p, int playerid, int playerteam, Cell* cell){
   p->id = playerid;
   p->team = playerteam;
   p->pcell = cell;
-  p->object = NONE;
+  p->flag = NONE;
+  p->shovel = NONE;
   p->state = SAFE;
 }
 
 int
 cell_get_type(Map *m, int x, int y){
+  
   return (int)m->maze[x*m->dim+y];
+}
+
+int
+getTeam(int x, int y){
 }
 
 extern int
 cell_create(Map *m, Cell *c, int x, int y){
   c->x = x;
   c->y = y;
-  c->team = 0;
+  c->team = getTeam(x,y);
   c->occupied = UNOCCUPIED;
-  c->obj1 = 0;
-  c->obj2 = 0;
+  c->obj = NONE;
   c->type = cell_get_type(m,x,y);
   return 1;
 }

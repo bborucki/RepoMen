@@ -33,6 +33,7 @@
 #include "protocol_utils.h"
 #include "protocol_server.h"
 #include "protocol_session.h"
+#include "protocol_game.h"
 
 #define PROTO_SERVER_MAX_EVENT_SUBSCRIBERS 1024
 #define MAX_OBJECTS 404
@@ -307,7 +308,7 @@ proto_server_query_handler(Proto_Session *s){
 
 static int
 proto_server_cinfo_handler(Proto_Session *s){
-  int rc = 1;
+  /*  int rc = 1;
   int i,rx,ry;
   Cell *cell = malloc(sizeof(Cell));
   Proto_Msg_Hdr sh;
@@ -349,7 +350,7 @@ proto_server_cinfo_handler(Proto_Session *s){
 
   printf("sent cinfo\n");
   
-  return rc;
+  return rc;*/
 }
 
 static int

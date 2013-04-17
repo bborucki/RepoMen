@@ -347,8 +347,8 @@ doCInfo(Client *C){
     printf("Occupied: %d\n", globals.cell->occupied);
     printf("x: %d\n", globals.cell->x);
     printf("y: %d\n", globals.cell->y);
-    printf("object1: %d\n", globals.cell->obj1);
-    printf("object2: %d\n", globals.cell->obj2);
+    printf("object1: %d\n", globals.cell->obj);
+
 
 
   }
