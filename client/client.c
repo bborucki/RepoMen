@@ -344,12 +344,13 @@ doCInfo(Client *C){
     printf("Type: ");
     cell_print_type(globals.cell);
     printf("Team: %d\n", globals.cell->team);
-    printf("Occupied: %d\n", globals.cell->occupied);
+    if(globals.cell->player == NULL)
+      printf("Unoccupied\n");
+    else
+      printf("Occupied by player: %d\n", globals.cell->player->id);
     printf("x: %d\n", globals.cell->x);
     printf("y: %d\n", globals.cell->y);
     printf("object1: %d\n", globals.cell->obj);
-
-
 
   }
   else{

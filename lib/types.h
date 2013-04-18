@@ -27,5 +27,11 @@
 /* native word sized unsigned and signed values */
 typedef unsigned long uval;
 typedef long sval;
+typedef enum {TEAM1, TEAM2} team_t;
+typedef enum {NONE, FLAG, SHOVEL} object_t;
+
+typedef struct Player_ Player;
+typedef struct Cell_ Cell;
+
 
 #endif /* __DA_GAME_TYPES_H__ */

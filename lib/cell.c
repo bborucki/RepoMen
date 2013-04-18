@@ -1,35 +1,33 @@
 #include <stdio.h>
 #include "map.h"
 #include "cell.h"
-
-extern int
-player_create(Player* p, int playerid, int playerteam, Cell* cell){
-  p->id = playerid;
-  p->team = playerteam;
-  p->pcell = cell;
-  p->flag = NONE;
-  p->shovel = NONE;
-  p->state = SAFE;
-}
+#include "types.h"
+#include "player.h"
 
 int
 isMutable(Map* m, int x, int y){
-  if(x == LINE_MAX - 1 || x == 0 || y == COLUMN_MAX -1 ||
-     y == 0)
+  //slight performance optimizations
+  int dim = m->dim;
+  int w = x*dim+y;
+
+  //  LINE_MAX and COLUMN_MAX != maze dimensions
+  //  if(x == LINE_MAX - 1 || x == 0 || y == COLUMN_MAX -1 ||
+  //    y == 0)
+
+  if(x == dim-1 || x == 0 || y == dim-1 || y == 0)
     return 0;
-  else if(m->maze[x*((m->dim)-1)+y] == 'h' || 
-	  m->maze[x*((m->dim)+1)+y] == 'h' ||
-	  m->maze[x*((m->dim))+y-1] == 'h' ||
-	  m->maze[x*((m->dim))+y+1] == 'h' ||
-	  m->maze[x*((m->dim))+y-1] == 'j' ||
-	  m->maze[x*((m->dim))+y+1] == 'j' ||
-	  m->maze[x*((m->dim)-1)+y] == 'j' ||
-	  m->maze[x*((m->dim)+1)+y] == 'j'){
+  else if(m->maze[x*(dim-1)+y] == 'h' || 
+	  m->maze[x*(dim+1)+y] == 'h' ||
+	  m->maze[w-1] == 'h' ||
+	  m->maze[w+1] == 'h' ||
+	  m->maze[w-1] == 'j' ||
+	  m->maze[w+1] == 'j' ||
+	  m->maze[x*(dim-1)+y] == 'j' ||
+	  m->maze[x*(dim+1)+y] == 'j'){
     return 0;
   }
   return 1;
 }
-
 
 int
 cell_get_type(Map *m, int x, int y){
@@ -70,9 +68,10 @@ cell_create(Map *m, Cell *c, int x, int y){
   c->x = x;
   c->y = y;
   c->team = getTeam(x,y);
-  c->occupied = UNOCCUPIED;
+  c->player = NULL;
   c->obj = NONE;
   c->type = cell_get_type(m,x,y);
+  c->playerid = 0;
   return 1;
 }
 
@@ -101,8 +100,6 @@ cell_print_type(Cell *c){
     printf("\n");
     break;
   }
-
-
 
   return 1;
 }

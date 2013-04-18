@@ -40,7 +40,7 @@ move_valid(int x, int y, Player* player){
   }
   
   if(objects[x][y] != NULL){
-    if(objects[x][y]->occupied == OCCUPIED)
+    if(objects[x][y]->player != NULL)
       return taggable(x, y, player);
     if(objects[x][y]-> type == IWALL)
       return 0;
