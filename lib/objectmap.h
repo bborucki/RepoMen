@@ -9,16 +9,14 @@
 
 #define MAX_PLAYERS 198
 
-//define Player *Players[MAX_PLAYERS];
-
-typedef struct ObjectMap{
+struct ObjectMap_ {
   Cell **objects;
   int numPlayers;
   int dim;
-} ObjectMap;
+};
 
 extern ObjectMap * objectmap_create(Map *m);
-extern int objectmap_validate_move(int x, int y, Player *p, ObjectMap *o);
+extern int objectmap_validate_move(int x, int y, Player *p, ObjectMap *o, PlayerList *pl);
 extern int objectmap_is_taggable(int x, int y, Player *p, ObjectMap *o, PlayerList *pl);
 
 #endif

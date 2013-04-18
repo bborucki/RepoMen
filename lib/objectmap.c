@@ -23,7 +23,7 @@ objectmap_is_taggable(int x, int y, Player *p, ObjectMap *o, PlayerList *pl){
 }
 
 extern int
-objectmap_validate_move(int x, int y, Player *p, ObjectMap *o){
+objectmap_validate_move(int x, int y, Player *p, ObjectMap *o, PlayerList *pl){
   int idx, dim;
 
   dim = o->dim;
@@ -38,7 +38,7 @@ objectmap_validate_move(int x, int y, Player *p, ObjectMap *o){
 
   if(o->objects[idx] != NULL){
     if(o->objects[idx]->player != NULL)
-      return taggable(x,y,p);
+      return objectmap_is_taggable(x,y,p,o,pl);
     if(o->objects[idx]->type == IWALL)
       return 0;
     if(o->objects[idx]->type == WALL && p->shovel != SHOVEL)

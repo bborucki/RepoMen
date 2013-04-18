@@ -33,11 +33,15 @@
 #include "protocol_utils.h"
 #include "protocol_server.h"
 #include "protocol_session.h"
-#include "protocol_game.h"
+#include "objectmap.h"
+//#include "protocol_game.h"
 
 #define PROTO_SERVER_MAX_EVENT_SUBSCRIBERS 1024
 #define MAX_OBJECTS 404
 #define object int
+
+Map *Server_Map;
+ObjectMap *Server_ObjectMap; 
 
 struct {
   FDType   RPCListenFD;
@@ -389,7 +393,7 @@ proto_server_init(void){
   int rc;
   if((Server_Map = map_init(MAP_NAME)) == NULL)
     return -1;
-  bzero(objects, sizeof(objects));
+  Server_ObjectMap = objectmap_create(Server_Map);
 
   proto_session_init(&Proto_Server.EventSession);
 

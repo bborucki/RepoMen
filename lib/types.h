@@ -34,5 +34,7 @@ typedef enum {FLOOR, JAIL1, JAIL2, HOME1, HOME2, WALL, IWALL} cell_t;
 
 typedef struct Player_ Player;
 typedef struct Cell_ Cell;
+typedef struct ObjectMap_ ObjectMap;
+//typedef PlayerList_ PlayerList;
 
 #endif

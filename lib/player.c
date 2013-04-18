@@ -12,11 +12,11 @@ player_move(int x, int y, Player *p, ObjectMap *o, PlayerList *pl){
   int dim = o->dim;
   
   if(validate_move(x,y,p,o)){
-    if(objectmap_is_taggable(x,y,p)){
-      tagHandler(p,pl[o->objects[x*dim + y]->playerid]);
+    if(objectmap_is_taggable(x,y,p,o,pl)){
+      tagHandler(p,pl[o->objects[x*dim + y]->player->id]);
     }
-    player->pcell = o->objects[x*dim + y];
-    o->objects->playerid = player->id;
+    p->pcell = o->objects[x*dim + y];
+    o->objects[x*dim+y]->playerid = p->id;
     return 1;
   }
 

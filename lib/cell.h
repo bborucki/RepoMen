@@ -1,10 +1,10 @@
 #ifndef __CELL_H__
 #define __CELL_H__
 
+#include "objectmap.h"
 #include "map.h"
 #include "player.h"
 #include "types.h"
-#include "objectmap.h"
 
 struct Cell_ {
   cell_t type;
