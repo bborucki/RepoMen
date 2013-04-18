@@ -4,6 +4,7 @@
 #include "map.h"
 #include "player.h"
 #include "types.h"
+#include "objectmap.h"
 
 struct Cell_ {
   cell_t type;
