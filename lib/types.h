@@ -28,10 +28,11 @@
 typedef unsigned long uval;
 typedef long sval;
 typedef enum {TEAM1, TEAM2} team_t;
+typedef enum {SAFE, JAILED, FREE} state_t;
 typedef enum {NONE, FLAG, SHOVEL} object_t;
+typedef enum {FLOOR, JAIL1, JAIL2, HOME1, HOME2, WALL, IWALL} cell_t;
 
 typedef struct Player_ Player;
 typedef struct Cell_ Cell;
 
-
-#endif /* __DA_GAME_TYPES_H__ */
+#endif

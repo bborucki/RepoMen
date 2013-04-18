@@ -72,7 +72,7 @@ extern Map *
 map_init(const char *path){
   Map *m = (Map *)malloc(sizeof(Map));
   bzero(m, sizeof(Map));
-  char buf[COLUMN_MAX];
+  char buf[BUFF_SIZE];
   int dim = 0;
   int i = 0;
   FILE *fp;
@@ -81,8 +81,8 @@ map_init(const char *path){
   if((fp = fopen(path, "r")) == NULL)
     return NULL;
 
-  while(fgets(buf, COLUMN_MAX, fp) != NULL){
-    if(!dim){
+  while(fgets(buf, BUFF_SIZE, fp) != NULL){
+    if(!dim){ //if first iteration
       dim = strlen(buf);
       m->dim = dim;
       m->maze = (char *)malloc(sizeof(char)*dim*dim);
@@ -92,7 +92,6 @@ map_init(const char *path){
     i++;
   }
   
-  //  map_dump(m);
   map_fill(m);
 
   fclose(fp);

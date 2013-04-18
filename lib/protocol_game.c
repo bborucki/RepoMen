@@ -17,7 +17,6 @@
  * but 2d array of cell pointers seems to make sense.
  */
 
-
 int
 taggable(int x, int y, Player* tplayer){
   if(players[objects[x][y]->playerid] != NULL){
@@ -31,9 +30,10 @@ taggable(int x, int y, Player* tplayer){
 }
 
 int
-move_valid(int x, int y, Player* player){
+move_valid(int x, int y, Player *player, Map *m){
   x--; y--; //assumes offset for dimensions starting at 1
-  if(x > LINE_MAX || y > COLUMN_MAX)
+
+  if(x > m->dim || y > m->dim)
     return 0;
   if(player->state == JAILED){
     return 0;
@@ -51,16 +51,21 @@ move_valid(int x, int y, Player* player){
 }
 
 int
-objects_init(){
+objects_init(Map *m){
   int i;
   int j;
+  dim = m->dim;
 
-  for(i = 0; i<LINE_MAX; i++){
-    for(j = 0; j<COLUMN_MAX; j++){
+  objects = malloc(sizeof(Cell *)*dim*dim);
+
+  for(i = 0; i<dim; i++){
+    for(j = 0; j<dim; j++){
       objects[i][j] = (Cell*)malloc(sizeof(int));
       cell_create(Server_Map,objects[i][j], i,j);
     }
   }
+
+  return 0;
 }
 
 int
@@ -69,8 +74,8 @@ tagHandler(Player* tagger, Player* taggee){
 }
 
 int 
-make_move(int x, int y, Player* player){
-  if(move_valid(x,y,player)){
+make_move(int x, int y, Player *player, Map *m){
+  if(move_valid(x,y,player,m)){
     if(taggable(x,y,player)){
       tagHandler(player,players[objects[x][y]->playerid]);
     }

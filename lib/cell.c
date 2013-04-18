@@ -39,26 +39,24 @@ cell_get_type(Map *m, int x, int y){
       return WALL;
     else
       return IWALL;
-  case 'h':
-    if(x < COLUMN_MAX/2)
-      return HOME1;
-    else
-      return HOME2;
-  case 'j':
-    if(x < COLUMN_MAX/2)
-      return JAIL1;
-    else
-      return JAIL2;
   case ' ':
     return FLOOR;
+  case 'h':
+      return HOME1;
+  case 'H':
+      return HOME2;
+  case 'j':
+      return JAIL1;
+  case 'J':
+      return JAIL2;
   default:
     return -1;
   }
 }
 
 int
-getTeam(int x, int y){
-  if(x > COLUMN_MAX/2)
+getTeam(int x, int y, int dim){
+  if(x > dim/2) //may need to use floor() or ceil()
     return TEAM2;
   return TEAM1;
 }
@@ -67,7 +65,7 @@ extern int
 cell_create(Map *m, Cell *c, int x, int y){
   c->x = x;
   c->y = y;
-  c->team = getTeam(x,y);
+  c->team = getTeam(x,y,m->dim);
   c->player = NULL;
   c->obj = NONE;
   c->type = cell_get_type(m,x,y);

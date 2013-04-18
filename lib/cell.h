@@ -5,8 +5,6 @@
 #include "player.h"
 #include "types.h"
 
-typedef enum {FLOOR, JAIL1, JAIL2, HOME1, HOME2, WALL, IWALL} cell_t;
-
 struct Cell_ {
   cell_t type;
   team_t team;
