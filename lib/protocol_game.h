@@ -11,7 +11,7 @@
 
 
 static Map* Server_Map;
-Cell *objects[MAX_LINE][COLUMN_MAX]; //2d array of map
+Cell *objects[LINE_MAX][COLUMN_MAX]; //2d array of map
 Player *players[MAX_PLAYERS];
 int playernext;
 int numobjects;

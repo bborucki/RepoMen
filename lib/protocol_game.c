@@ -33,7 +33,7 @@ taggable(int x, int y, Player* tplayer){
 int
 move_valid(int x, int y, Player* player){
   x--; y--; //assumes offset for dimensions starting at 1
-  if(x > MAX_LINE || y > COLUMN_MAX)
+  if(x > LINE_MAX || y > COLUMN_MAX)
     return 0;
   if(player->state == JAILED){
     return 0;
@@ -51,8 +51,16 @@ move_valid(int x, int y, Player* player){
 }
 
 int
-initialize_map(){
+objects_init(){
+  int i;
+  int j;
 
+  for(i = 0; i<LINE_MAX; i++){
+    for(j = 0; j<COLUMN_MAX; j++){
+      objects[i][j] = (Cell*)malloc(sizeof(int));
+      cell_create(Server_Map,objects[i][j], i,j);
+    }
+  }
 }
 
 int

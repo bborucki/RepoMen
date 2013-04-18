@@ -13,13 +13,56 @@ player_create(Player* p, int playerid, int playerteam, Cell* cell){
 }
 
 int
+isMutable(Map* m, int x, int y){
+  if(x == LINE_MAX - 1 || x == 0 || y == COLUMN_MAX -1 ||
+     y == 0)
+    return 0;
+  else if(m->maze[x*((m->dim)-1)+y] == 'h' || 
+	  m->maze[x*((m->dim)+1)+y] == 'h' ||
+	  m->maze[x*((m->dim))+y-1] == 'h' ||
+	  m->maze[x*((m->dim))+y+1] == 'h' ||
+	  m->maze[x*((m->dim))+y-1] == 'j' ||
+	  m->maze[x*((m->dim))+y+1] == 'j' ||
+	  m->maze[x*((m->dim)-1)+y] == 'j' ||
+	  m->maze[x*((m->dim)+1)+y] == 'j'){
+    return 0;
+  }
+  return 1;
+}
+
+
+int
 cell_get_type(Map *m, int x, int y){
-  
-  return (int)m->maze[x*m->dim+y];
+  char c;
+  c = m->maze[x*(m->dim)+y];
+  switch(c){
+  case '#':
+    if(isMutable(m,x,y))
+      return WALL;
+    else
+      return IWALL;
+  case 'h':
+    if(x < COLUMN_MAX/2)
+      return HOME1;
+    else
+      return HOME2;
+  case 'j':
+    if(x < COLUMN_MAX/2)
+      return JAIL1;
+    else
+      return JAIL2;
+  case ' ':
+    return FLOOR;
+  default:
+    return -1;
+  }
 }
 
 int
 getTeam(int x, int y){
+  if(x > COLUMN_MAX/2)
+    return TEAM2;
+  return TEAM1;
 }
 
 extern int
