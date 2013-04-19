@@ -9,6 +9,9 @@ int
 player_drop_object(){}
 
 extern int
+player_do_tagged(){}
+
+extern int
 player_is_taggable(Player *tager, Player *tagee){
   if(tager->state != JAILED && tagee->state == FREE){
     if(tager->team == tagee->team)
@@ -28,6 +31,9 @@ player_move(int x, int y, Player *p, ObjectMap *o, Map *m){
     if(ret == 2)
       objectmap_tagHandler(p,otherPlayer);
     
+    //need to also change player state and check if 
+    //picking up flag or a shovel 
+
     objectmap_reset_cell(p->pcell->x,p->pcell->y, o, m);
     p->pcell = o->objects[x*dim + y];
     o->objects[x*dim+y]->player = p;
@@ -36,6 +42,9 @@ player_move(int x, int y, Player *p, ObjectMap *o, Map *m){
   
   return 0;
 }
+
+
+//Need to ensure that the cell gets into the objectmap
 
 extern int
 player_create(Player *p, int playerid, int playerteam, Cell *cell){

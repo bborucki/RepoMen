@@ -198,16 +198,12 @@ do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt){
   rc = proto_session_rpc(s);
 
   if (rc==1) {
-    if(mt == PROTO_MT_REQ_BASE_QUERY){
-      //FIX THIS makes no sense, copy the strings somehow.
+    if(mt == PROTO_MT_REQ_BASE_HELLO){
       proto_session_hdr_unmarshall(s,&s->rhdr);
-      //      proto_session_body_unmarshall_bytes(s,0,s->rlen,s->rbuf);
-      
     } else
       proto_session_body_unmarshall_int(s, 0, &rc);
   } else {
     c->session_lost_handler(s);
-
   }
 
   return rc;
@@ -253,11 +249,6 @@ proto_client_move(Proto_Client_Handle ch, char data){
 }
 
 extern int
-proto_client_query(Proto_Client_Handle ch){
-  return do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_QUERY);
-}
-
-extern int
 proto_client_dump(Proto_Client_Handle ch){
   int rc;
 
@@ -279,7 +270,6 @@ proto_client_goodbye(Proto_Client_Handle ch){
   Proto_Session *s;
   Proto_Client *c = ch;
 
-
   s = &(c->rpc_session);
   do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_GOODBYE);
   proto_client_session_lost_default_hdlr(s);
@@ -288,5 +278,3 @@ proto_client_goodbye(Proto_Client_Handle ch){
 
   return 1;
 }
-
-

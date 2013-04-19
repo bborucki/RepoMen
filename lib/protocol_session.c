@@ -32,6 +32,8 @@
 #include "protocol.h"
 #include "protocol_utils.h"
 #include "protocol_session.h"
+#include "objectmap.h"
+#include "player.h"
 
 extern void
 proto_session_dump(Proto_Session *s){
@@ -290,6 +292,28 @@ proto_session_body_unmarshall_map(Proto_Session *s, int offset, Map *m){
   }
   return -1;
 }
+
+/*
+extern int
+proto_session_body_marshall_objectmap(Proto_Session *s, ObjectMap *o){
+  if (s && ((s->slen + sizeof(ObjectMap)) < PROTO_SESSION_BUF_SIZE)){
+    memcpy(s->sbuf + s->slen, m, sizeof(Map));
+    s->slen += sizeof(Map);
+    return 1;
+  }
+  return -1;
+}
+
+extern int
+proto_session_body_unmarshall_objectmap(Proto_Session *s, int offset, ObjectMap *o){
+  if (s && ((s->rlen - (offset + sizeof(Map)) >= 0))){
+      memcpy(m, s->rbuf + offset, sizeof(Map));
+      m->maze = NULL;
+      return offset + sizeof(Map);
+  }
+  return -1;
+}
+*/
 
 // rc < 0 on comm failures
 // rc == 1 indicates comm success

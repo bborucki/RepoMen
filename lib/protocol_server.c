@@ -290,25 +290,49 @@ proto_server_mt_null_handler(Proto_Session *s){
   return rc;
 }
 
+
 static int
-proto_server_query_handler(Proto_Session *s){
+proto_server_hello_handler(Proto_Session *s){
   int rc = 1;
+  
   Proto_Msg_Hdr sh;
   bzero(&sh, sizeof(sh));
-
-  fprintf(stderr, "proto_server_mt_query_handler: invoked for session:\n");
+  
+  fprintf(stderr, "proto_server_mt_hello_handler: invoked for session:\n");
   proto_session_dump(s);
-
+  
   sh.type = proto_session_hdr_unmarshall_type(s);
   sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
-
+  
   proto_session_hdr_marshall(s, &sh);
   proto_session_body_marshall_map(s,Server_Map);
-
+  
   rc = proto_session_send_msg(s,1);
   
   return rc;
 }
+
+/*
+  static int
+  proto_server_query_handler(Proto_Session *s){
+  int rc = 1;
+  Proto_Msg_Hdr sh;
+  bzero(&sh, sizeof(sh));
+  
+  fprintf(stderr, "proto_server_mt_query_handler: invoked for session:\n");
+  proto_session_dump(s);
+  
+  sh.type = proto_session_hdr_unmarshall_type(s);
+  sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
+  
+  proto_session_hdr_marshall(s, &sh);
+  proto_session_body_marshall_map(s,Server_Map);
+  
+  rc = proto_session_send_msg(s,1);
+  
+  return rc;
+  }
+*/
 
 static int
 proto_server_cinfo_handler(Proto_Session *s){
@@ -401,9 +425,10 @@ proto_server_init(void){
 
   for (i=PROTO_MT_REQ_BASE_RESERVED_FIRST+1; 
        i<PROTO_MT_REQ_BASE_RESERVED_LAST; i++) {
-    //    NYI; //ADD CODE
-    if(i == PROTO_MT_REQ_BASE_QUERY)
-      proto_server_set_req_handler(i,proto_server_query_handler);
+    if(i == PROTO_MT_REQ_BASE_HELLO)
+      proto_server_set_req_handler(i,proto_server_hello_handler);
+    //    if(i == PROTO_MT_REQ_BASE_QUERY)
+    //      proto_server_set_req_handler(i,proto_server_query_handler);
     else if(i == PROTO_MT_REQ_BASE_DUMP)
       proto_server_set_req_handler(i,proto_server_dump_handler);
     else if(i == PROTO_MT_REQ_BASE_CINFO)

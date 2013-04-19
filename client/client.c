@@ -19,7 +19,6 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 * THE SOFTWARE.
 *****************************************************************************/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -29,6 +28,7 @@
 #include "../lib/protocol_utils.h"
 #include "../lib/map.h"
 #include "../lib/cell.h"
+#include "../lib/objectmap.h"
 
 #define STRLEN 81
 
@@ -39,6 +39,7 @@ struct Globals {
   int x;
   int y;
   Map *map;
+  ObjectMap *objmap;
   Cell *cell;
   char debug;
 } globals;
@@ -109,11 +110,6 @@ doRPCCmd(Client *C, char c)
   switch (c) {
   case 'h':
     rc = proto_client_hello(C->ph);
-    printf("hello: rc=%x\n", rc);
-    if (rc > 0) game_process_reply(C);
-    break;
-  case 'q':
-    rc = proto_client_query(C->ph);
     s = proto_client_rpc_session(C->ph);
     globals.map = malloc(sizeof(Map));
     proto_session_body_unmarshall_map(s,0,globals.map);
@@ -190,9 +186,9 @@ doConnect(Client *C){
     return -1;
   }
   else{
+    doRPC(C,'h');
     printf("Connected.");
     globals.connected = 1;
-    doRPC(C,'q');
   }
   return 1;
 }
