@@ -421,6 +421,8 @@ input2cmd(char* input){
     cmd = 'i';
   else if(!strcmp(input, "dump"))
     cmd = 'u';
+  else if(!strcmp(input, "move"))
+    cmd = 'v';
   else if(!strcmp(input, "debug"))
     cmd = 'b';
   else if(!strcmp(input, "help"))
@@ -467,6 +469,10 @@ docmd(Client *C, char cmd)
     break;
   case 'u': 
     rc = doDump(C);
+    break;
+  case 'v': 
+    printf("TIME TO MOVEEEEE!\n");
+    rc = 1;
     break;
   case 'b': 
     rc = doDebug();

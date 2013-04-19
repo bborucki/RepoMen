@@ -6,25 +6,22 @@
 #include "player.h"
 #include "playerlist.h"
 
-int
-objectmap_tag_handler(){}
-
 extern int
-objectmap_is_taggable(int x, int y, Player *p, ObjectMap *o, PlayerList *pl){
+objectmap_reset_cell(int x, int y, ObjectMap *o, Map *m){
   int dim = o->dim;
-
-  if(pl[o->objects[x*dim + y]->playerid] != NULL){
-    if(pl[o->objects[x*dim + y]->playerid]-> team == p->team){
-      return 0;
-    }
-    if(o->objects[x*dim + y]->team != pl[o->objects[x*dim+y]->playerid]->team)
-      return 1;
-  }  
+  cell_create(m,o->objects[x*dim + y], x, y);
+  return 0;
 }
 
 extern int
-objectmap_validate_move(int x, int y, Player *p, ObjectMap *o, PlayerList *pl){
+objectmap_tagHandler(Player *tager, Player *tagee){
+  return 0;
+}
+ 
+extern int
+objectmap_validate_move(int x, int y, Player *p, ObjectMap *o){
   int idx, dim;
+  Player *otherPlayer;
 
   dim = o->dim;
   x--; y--; //assumes offset for dimensions starting at 1
@@ -37,8 +34,8 @@ objectmap_validate_move(int x, int y, Player *p, ObjectMap *o, PlayerList *pl){
   idx = x*dim+y;
 
   if(o->objects[idx] != NULL){
-    if(o->objects[idx]->player != NULL)
-      return objectmap_is_taggable(x,y,p,o,pl);
+    if((otherPlayer = o->objects[idx]->player) != NULL)
+      return player_is_taggable(p,otherPlayer);
     if(o->objects[idx]->type == IWALL)
       return 0;
     if(o->objects[idx]->type == WALL && p->shovel != SHOVEL)

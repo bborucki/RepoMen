@@ -1,3 +1,4 @@
+#include <string.h>
 #include "player.h"
 #include "cell.h"
 #include "types.h"
@@ -8,18 +9,31 @@ int
 player_drop_object(){}
 
 extern int
-player_move(int x, int y, Player *p, ObjectMap *o, PlayerList *pl){
+player_is_taggable(Player *tager, Player *tagee){
+  if(tager->state != JAILED && tagee->state == FREE){
+    if(tager->team == tagee->team)
+      return 0;
+    return 2;
+  }
+  return 0;
+}
+
+extern int
+player_move(int x, int y, Player *p, ObjectMap *o, Map *m){
+  int ret = 0;
   int dim = o->dim;
-  
-  if(validate_move(x,y,p,o)){
-    if(objectmap_is_taggable(x,y,p,o,pl)){
-      tagHandler(p,pl[o->objects[x*dim + y]->player->id]);
-    }
+  Player *otherPlayer;
+
+  if((ret = objectmap_validate_move(x,y,p,o)) > 0){
+    if(ret == 2)
+      objectmap_tagHandler(p,otherPlayer);
+    
+    objectmap_reset_cell(p->pcell->x,p->pcell->y, o, m);
     p->pcell = o->objects[x*dim + y];
-    o->objects[x*dim+y]->playerid = p->id;
+    o->objects[x*dim+y]->player = p;
     return 1;
   }
-
+  
   return 0;
 }
 

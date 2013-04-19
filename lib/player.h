@@ -16,6 +16,7 @@ struct Player_ {
 };
 
 extern int player_create(Player *p, int playerid, int playerteam, Cell *cell);
-extern int player_move(int x, int y, Player *p, ObjectMap *o, PlayerList *pl);
+extern int player_move(int x, int y, Player *p, ObjectMap *o, Map *m);
+extern int player_is_taggable(Player *tager, Player *tagee);
 
 #endif
