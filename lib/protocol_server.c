@@ -306,6 +306,7 @@ proto_server_hello_handler(Proto_Session *s){
   
   proto_session_hdr_marshall(s, &sh);
   proto_session_body_marshall_map(s,Server_Map);
+  //  proto_session_body_marshall_objectmap(s,Server_Map);
   
   rc = proto_session_send_msg(s,1);
   

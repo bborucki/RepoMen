@@ -11,6 +11,7 @@
 
 struct ObjectMap_ {
   Cell **objects;
+  int numCells;
   int numPlayers;
   int dim;
 };
@@ -18,6 +19,6 @@ struct ObjectMap_ {
 extern ObjectMap * objectmap_create(Map *m);
 extern int objectmap_validate_move(int x, int y, Player *p, ObjectMap *o);
 extern int objectmap_tagHandler(Player *tager, Player *tagee);
-extern int objectmap_reset_cell(int x, int y, ObjectMap *o, Map *m);
+extern int objectmap_reset_cell(int x, int y, ObjectMap *o);
 
 #endif

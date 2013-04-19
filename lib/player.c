@@ -30,11 +30,14 @@ player_move(int x, int y, Player *p, ObjectMap *o, Map *m){
   if((ret = objectmap_validate_move(x,y,p,o)) > 0){
     if(ret == 2)
       objectmap_tagHandler(p,otherPlayer);
-    
-    //need to also change player state and check if 
-    //picking up flag or a shovel 
+    else{
+      cell_create(m,o->objects[x*dim+y],x,y);
+    }
 
-    objectmap_reset_cell(p->pcell->x,p->pcell->y, o, m);
+    //need to also change player state and check if 
+    //picking up flag or a shovel and check if digging
+
+    objectmap_remove_player(p->pcell->x,p->pcell->y, o);
     p->pcell = o->objects[x*dim + y];
     o->objects[x*dim+y]->player = p;
     return 1;
@@ -42,7 +45,6 @@ player_move(int x, int y, Player *p, ObjectMap *o, Map *m){
   
   return 0;
 }
-
 
 //Need to ensure that the cell gets into the objectmap
 
