@@ -310,8 +310,10 @@ proto_server_hello_handler(Proto_Session *s){
   
   sh.type = proto_session_hdr_unmarshall_type(s);
   sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
+
   player_find_empty_home(p,nextTeam);
   player_create(p,pidx, nextTeam, c);
+
   proto_session_hdr_marshall(s, &sh);
   proto_session_body_marshall_map(s,Server_Map);
   //  proto_session_body_marshall_objectmap(s,Server_Map);
@@ -482,6 +484,8 @@ proto_server_init(void){
     //      proto_server_set_req_handler(i,proto_server_query_handler);
     else if(i == PROTO_MT_REQ_BASE_DUMP)
       proto_server_set_req_handler(i,proto_server_dump_handler);
+    else if(i == PROTO_MT_REQ_BASE_MOVE)
+      proto_server_set_req_handler(i,proto_server_move_handler);
     else if(i == PROTO_MT_REQ_BASE_CINFO)
       proto_server_set_req_handler(i,proto_server_cinfo_handler);
     else if(i == PROTO_MT_REQ_BASE_GOODBYE)

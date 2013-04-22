@@ -12,13 +12,9 @@
 extern int
 objectmap_remove_player(int x, int y, ObjectMap *o){
   int idx = x*(o->dim)+y;
-  //only remove from objectmap if no items present
-  if(o->objects[idx]->obj == NONE){
-    free(o->objects[idx]);
-    o->objects[idx] = NULL;
-  }
+  o->objects[idx]->player = NULL;
 
-  return 0;
+  return 1;
 }
 
 extern int
@@ -32,7 +28,6 @@ objectmap_validate_move(int x, int y, Player *p, ObjectMap *o){
   Player *otherPlayer;
 
   dim = o->dim;
-  x--; y--; //assumes offset for dimensions starting at 1
   
   if(x > dim || y > dim)
     return 0;
@@ -86,38 +81,30 @@ objectmap_create(Map *m){
   idx = x*dim+y;
   o->objects[idx] = (Cell *)malloc(sizeof(Cell));
   cell_create(m,o->objects[idx], x, y);
-  //  if(o->objects[idx]->type == WALL || o->objects[idx]->type == IWALL){
-  //    objectmap_remove_player(x,y,o);
-  //  }
-  printf("x = %d, y = %d \n", x, y);
-  o->objects[idx]->obj = FLAG1;
 
+  // while wall or iwall, search for new rand cell, otherwise put it in that one
+  //  o->objects[idx]->obj = FLAG1;
+  //same for flag 2
   x = rand()%(dim/2)+dim/2;
   y = rand()%dim;
   idx = x*dim+y;
-  o->objects[x*dim + y] = (Cell *)malloc(sizeof(Cell));
-  cell_create(m,o->objects[x*dim + y], x, y);
+  // use logic for finding rand cell
   //  if(o->objects[idx]->type == WALL || o->objects[idx]->type == IWALL){
   //    objectmap_remove_player(x,y,o);
   //  }
-  printf("x = %d, y = %d \n", x, y);
-  o->objects[x*dim+y]->obj = FLAG2;
+  //  o->objects[x*dim+y]->obj = FLAG2;
   
   x = 109;
   y = 2;
   idx = x*dim+y;
   printf("x = %d, y = %d \n", x, y);
-  o->objects[x*dim + y] = (Cell *)malloc(sizeof(Cell));
-  cell_create(m,o->objects[x*dim + y], x, y);
-  o->objects[x*dim+y]->obj = SHOVEL1;
+  o->objects[idx]->obj = SHOVEL1;
 
   x = 109;
   y = 197;
   idx = x*dim+y;
   printf("x = %d, y = %d \n", x, y);
-  o->objects[x*dim + y] = (Cell *)malloc(sizeof(Cell));
-  cell_create(m,o->objects[x*dim + y], x, y);
-  o->objects[x*dim+y]->obj = SHOVEL2;
+  o->objects[idx]->obj = SHOVEL2;
 
   o->numCells = 4;
   o->numPlayers = 0;

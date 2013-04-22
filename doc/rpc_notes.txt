@@ -1,0 +1,36 @@
+move request:
+hdr.pstate.vo.raw playerid (pstate for all of these)
+hdr.v1.raw x
+hdr.v2.raw y
+
+reply for move request
+hdr.vo.raw playerid
+hdr.v1.raw x
+hdr.v2.raw y
+hdr.v3.raw 0 for invalid, 1 for valid, 2 for tagged
+
+pickup object
+hdr.vo.raw playerid
+hdr.v1.raw x
+hdr.v2.raw y
+
+pickup object reply
+hdr.vo.raw playerid
+hdr.v1.raw x
+hdr.v2.raw y
+hdr.v3.raw 0 for invalid, 1 for valid, 2 for tagged
+
+drop all objects
+hdr.vo.raw playerid
+hdr.v1.raw x
+hdr.v2.raw y
+
+drop all objects reply
+hdr.vo.raw playerid
+hdr.v1.raw x
+hdr.v2.raw y
+hdr.v3.raw 0 for invalid, 1 for valid, 2 for tagged
+
+
+setup event channel
+
