@@ -2,8 +2,9 @@
 #include <string.h>
 #include "player.h"
 
-extern PlayerList *
-playerlist_create(){
-  PlayerList *pl = (PlayerList *)malloc(sizeof(Player)*MAX_PLAYERS);
+extern int
+playerlist_create(PlayerList *pl){
+  pl = (PlayerList *)malloc(sizeof(int)*MAX_PLAYERS);
   bzero(pl, sizeof(pl));
+  return 1;
 }

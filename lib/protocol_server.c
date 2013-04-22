@@ -35,13 +35,18 @@
 #include "protocol_session.h"
 #include "objectmap.h"
 //#include "protocol_game.h"
+#include "player.h"
+#include "playerlist.h"
 
 #define PROTO_SERVER_MAX_EVENT_SUBSCRIBERS 1024
 #define MAX_OBJECTS 404
-#define object int
+
 
 Map *Server_Map;
 ObjectMap *Server_ObjectMap; 
+PlayerList *players;
+int pidx;
+team_t nextTeam;
 
 struct {
   FDType   RPCListenFD;
@@ -294,7 +299,9 @@ proto_server_mt_null_handler(Proto_Session *s){
 static int
 proto_server_hello_handler(Proto_Session *s){
   int rc = 1;
-  
+  Player* p;
+  Cell* c;
+
   Proto_Msg_Hdr sh;
   bzero(&sh, sizeof(sh));
   
@@ -303,7 +310,8 @@ proto_server_hello_handler(Proto_Session *s){
   
   sh.type = proto_session_hdr_unmarshall_type(s);
   sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
-  
+  player_find_empty_home(p,nextTeam);
+  player_create(p,pidx, nextTeam, c);
   proto_session_hdr_marshall(s, &sh);
   proto_session_body_marshall_map(s,Server_Map);
   //  proto_session_body_marshall_objectmap(s,Server_Map);
@@ -383,6 +391,45 @@ proto_server_cinfo_handler(Proto_Session *s){
 }
 
 static int
+proto_server_move_handler(Proto_Session *s){
+  int i,rx,ry,id,rc;
+  Cell *cell = malloc(sizeof(Cell));
+  Proto_Msg_Hdr sh;
+  Proto_Msg_Hdr rh;
+  Player* p;
+  bzero(&sh, sizeof(sh));
+  bzero(&rh, sizeof(rh));
+  
+  fprintf(stderr, "proto_server_mt_move_handler: invoked for session:\n");
+  proto_session_dump(s);
+
+  sh.type = proto_session_hdr_unmarshall_type(s);
+  sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
+
+  proto_session_hdr_unmarshall(s, &rh);
+  id = rh.pstate.v0.raw;
+  rx = rh.pstate.v1.raw;
+  ry = rh.pstate.v2.raw; 
+  p = players[id];
+  if(player_move(rx, ry,p,Server_ObjectMap, Server_Map)){
+    
+  }
+
+  proto_session_body_marshall_cell(s, cell);
+
+  proto_session_hdr_marshall(s, &sh);
+
+  printf("sending cinfo\n");
+  
+  rc = proto_session_send_msg(s,1);
+
+  printf("sent cinfo\n");
+  
+  return rc;
+
+}
+
+static int
 proto_server_dump_handler(Proto_Session *s){
   Proto_Msg_Hdr h;
   int i;
@@ -419,6 +466,9 @@ proto_server_init(void){
   if((Server_Map = map_init(MAP_NAME)) == NULL)
     return -1;
   Server_ObjectMap = objectmap_create(Server_Map);
+  playerlist_create(players);
+  pidx = 0;
+  nextTeam = TEAM1;
 
   proto_session_init(&Proto_Server.EventSession);
 

@@ -5,6 +5,16 @@
 #include "objectmap.h"
 #include "playerlist.h"
 
+extern int 
+player_find_empty_home(Player* p, team_t t){
+  if(t == TEAM1){
+    
+  }
+  else{
+
+  }
+  return 1;
+}
 int
 player_drop_object(){}
 
