@@ -79,8 +79,6 @@ objectmap_create(Map *m){
   x = rand()%(dim/2);
   y = rand()%dim;
   idx = x*dim+y;
-  o->objects[idx] = (Cell *)malloc(sizeof(Cell));
-  cell_create(m,o->objects[idx], x, y);
 
   // while wall or iwall, search for new rand cell, otherwise put it in that one
   //  o->objects[idx]->obj = FLAG1;

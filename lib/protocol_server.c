@@ -311,9 +311,15 @@ proto_server_hello_handler(Proto_Session *s){
   sh.type = proto_session_hdr_unmarshall_type(s);
   sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
 
-  player_find_empty_home(p,nextTeam);
+  player_find_empty_home(p,nextTeam, Server_ObjectMap);
   player_create(p,pidx, nextTeam, c);
-
+  
+  if(nextTeam == TEAM1)
+    nextTeam = TEAM2;
+  else
+    nextTeam = TEAM1;
+  pidx++;
+  
   proto_session_hdr_marshall(s, &sh);
   proto_session_body_marshall_map(s,Server_Map);
   //  proto_session_body_marshall_objectmap(s,Server_Map);
@@ -413,19 +419,27 @@ proto_server_move_handler(Proto_Session *s){
   rx = rh.pstate.v1.raw;
   ry = rh.pstate.v2.raw; 
   p = players[id];
+
   if(player_move(rx, ry,p,Server_ObjectMap, Server_Map)){
+    sh.pstate.v0.raw = p->id;
+    sh.pstate.v1.raw = p->pcell->x;
+    sh.pstate.v2.raw = p->pcell->y;
+    sh.pstate.v3.raw = 1;
+  }else{
+    sh.pstate.v0.raw = p->id;
+    sh.pstate.v1.raw = p->pcell->x;
+    sh.pstate.v2.raw = p->pcell->y;
+    sh.pstate.v3.raw = 0;
     
   }
 
-  proto_session_body_marshall_cell(s, cell);
-
   proto_session_hdr_marshall(s, &sh);
 
-  printf("sending cinfo\n");
+  printf("sending move\n");
   
   rc = proto_session_send_msg(s,1);
 
-  printf("sent cinfo\n");
+  printf("sent move\n");
   
   return rc;
 

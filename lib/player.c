@@ -6,14 +6,35 @@
 #include "playerlist.h"
 
 extern int 
-player_find_empty_home(Player* p, team_t t){
+player_find_empty_home(Player* p, team_t t, ObjectMap *o){
+  int x,y, idx;
   if(t == TEAM1){
-    
+    for(x = 91; x<=109; x++){
+      for(y = 2;y<=11; y++){
+	idx = x*(o->dim)+y;
+	if(o->objects[idx]->type == HOME1 && o->objects[idx]->player == NULL
+	   && o->objects[idx]->obj == NONE){
+	  p->pcell->x = x;
+	  p->pcell->y = y;
+	  return 1;
+	}
+      }
+    }
   }
   else{
-
+    for(x = 91; x<=109; x++){
+      for(y = 188;y<=197; y++){
+	idx = x*(o->dim)+y;
+	if(o->objects[idx]->type == HOME1 && o->objects[idx]->player == NULL
+	   && o->objects[idx]->obj == NONE){
+	  p->pcell->x = x;
+	  p->pcell->y = y;
+	  return 1;
+	}
+      }
+    }
   }
-  return 1;
+  return 0;
 }
 int
 player_drop_object(){}
