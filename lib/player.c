@@ -6,7 +6,7 @@
 #include "playerlist.h"
 
 extern int 
-player_find_empty_home(Player* p, team_t t, ObjectMap *o){
+player_find_empty_home(Player* p, team_t t, ObjectMap *o, int playerid){
   int x,y, idx;
   if(t == TEAM1){
     for(x = 91; x<=109; x++){
@@ -14,10 +14,18 @@ player_find_empty_home(Player* p, team_t t, ObjectMap *o){
 	idx = x*(o->dim)+y;
 	if(o->objects[idx]->type == HOME1 && o->objects[idx]->player == NULL
 	   && o->objects[idx]->obj == NONE){
+	  p->pcell = o->objects[idx];
 	  p->pcell->x = x;
 	  p->pcell->y = y;
+	  p->id = playerid;
+	  p->team = t;
+	  p->shovel = NONE;
+	  p->flag = NONE;
+	  p->state = SAFE;
+
 	  return 1;
-	}
+	
+}
       }
     }
   }
@@ -27,8 +35,14 @@ player_find_empty_home(Player* p, team_t t, ObjectMap *o){
 	idx = x*(o->dim)+y;
 	if(o->objects[idx]->type == HOME1 && o->objects[idx]->player == NULL
 	   && o->objects[idx]->obj == NONE){
+	  p->pcell = o->objects[idx];
 	  p->pcell->x = x;
 	  p->pcell->y = y;
+	  p->id = playerid;
+	  p->team = t;
+	  p->shovel = NONE;
+	  p->flag = NONE;
+	  p->state = SAFE;
 	  return 1;
 	}
       }
@@ -79,14 +93,3 @@ player_move(int x, int y, Player *p, ObjectMap *o, Map *m){
 
 //Need to ensure that the cell gets into the objectmap
 
-extern int
-player_create(Player *p, int playerid, int playerteam, Cell *cell){
-  p->id = playerid;
-  p->team = playerteam;
-  p->pcell = cell;
-  p->shovel = NONE;
-  p->flag = NONE;
-  p->state = SAFE;
-
-  return 0;
-}

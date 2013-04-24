@@ -15,8 +15,7 @@ struct Player_ {
   Cell *pcell;
 };
 
-extern int player_create(Player *p, int playerid, int playerteam, Cell *cell);
 extern int player_move(int x, int y, Player *p, ObjectMap *o, Map *m);
 extern int player_is_taggable(Player *tager, Player *tagee);
-extern int player_find_empty_home(Player* p, team_t t, ObjectMap *o);
+extern int player_find_empty_home(Player* p, team_t t, ObjectMap *o, int playerid);
 #endif

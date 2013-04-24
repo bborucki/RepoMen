@@ -311,9 +311,12 @@ proto_server_hello_handler(Proto_Session *s){
   sh.type = proto_session_hdr_unmarshall_type(s);
   sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
 
-  player_find_empty_home(p,nextTeam, Server_ObjectMap);
-  player_create(p,pidx, nextTeam, c);
-  
+  if(player_find_empty_home(p,nextTeam, Server_ObjectMap, pidx)){
+    sh.pstate.v0.raw = 1;
+    players[pidx] = p;
+  } else{
+    sh.pstate.v0.raw = 0;
+  }
   if(nextTeam == TEAM1)
     nextTeam = TEAM2;
   else
@@ -328,7 +331,6 @@ proto_server_hello_handler(Proto_Session *s){
   
   return rc;
 }
-
 /*
   static int
   proto_server_query_handler(Proto_Session *s){
@@ -479,10 +481,26 @@ extern int
 proto_server_init(void){
   int i;
   int rc;
+  int dim;
   if((Server_Map = map_init(MAP_NAME)) == NULL)
     return -1;
-  Server_ObjectMap = objectmap_create(Server_Map);
-  playerlist_create(players);
+  dim = Server_Map->dim;
+  Server_ObjectMap = (ObjectMap *)malloc(sizeof(ObjectMap));
+  bzero(Server_ObjectMap, sizeof(ObjectMap));
+
+  Server_ObjectMap->objects = (Cell **)malloc(sizeof(Cell *)*dim*dim);
+  if(Server_ObjectMap->objects == NULL){
+    fprintf(stderr, "Could not initiate objectmap\n");
+    return 0;
+  }
+  bzero(Server_ObjectMap->objects, sizeof(Server_ObjectMap->objects));
+
+  if(!objectmap_create(Server_Map, Server_ObjectMap)){
+    fprintf(stderr, "could not load map\n");
+    return -1;
+  }
+  players = (PlayerList *)malloc(sizeof(int)*MAX_PLAYERS);
+  bzero(players, sizeof(players));
   pidx = 0;
   nextTeam = TEAM1;
 

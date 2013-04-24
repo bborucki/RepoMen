@@ -47,28 +47,22 @@ objectmap_validate_move(int x, int y, Player *p, ObjectMap *o){
   return 1;
 }
 
-extern ObjectMap *
-objectmap_create(Map *m){
-  ObjectMap *o = (ObjectMap *)malloc(sizeof(ObjectMap));
+extern int
+objectmap_create(Map *m, ObjectMap *o){
   int seed;
   int idx;
   int i,j;
   int x,y;
   int dim = m->dim;
 
-  bzero(o, sizeof(ObjectMap));
-
-  o->objects = (Cell **)malloc(sizeof(Cell *)*dim*dim);
-  bzero(o->objects, sizeof(o->objects));
-
-  /*
-    for(i = 0; i < dim; i++){
+  
+  for(i = 0; i < dim; i++){
     for(j = 0; j < dim; j++){
-    o->objects[i*dim + j] = (Cell *)malloc(sizeof(Cell));
-    cell_create(m,o->objects[i*dim + j], i, j);
+      o->objects[i*dim + j] = (Cell *)malloc(sizeof(Cell));
+      cell_create(m,o->objects[i*dim + j], i, j);
     }
-    }
-  */  
+  }
+  
   
   seed = time(NULL);
   srand(seed);
@@ -108,5 +102,5 @@ objectmap_create(Map *m){
   o->numPlayers = 0;
   o->dim = dim;
   
-  return 0;
+  return 1;
 }
