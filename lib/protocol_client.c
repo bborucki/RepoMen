@@ -277,10 +277,9 @@ proto_client_hello(Proto_Client_Handle ch){
 
 extern int
 proto_client_move(Proto_Client_Handle ch, int x, int y, int playerid){
-  //int rc=0;
-  return do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_MOVE);
-  //  rc = do_move_rpc(ch, x, y, playerid, PROTO_MT_REQ_BASE_MOVE);
-  //return rc;
+  int rc=0;
+  rc = do_move_rpc(ch, x, y, playerid, PROTO_MT_REQ_BASE_MOVE);
+  return rc;
 }
 
 extern int

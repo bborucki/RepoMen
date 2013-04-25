@@ -127,6 +127,8 @@ doRPCCmd(Client *C, char c)
     break;
   case 'v':
     printf("doRPC going to proto_client_move\n");
+    globals.x = 42;
+    globals.y = 64;
     globals.playerid = 0; //take out
     rc = proto_client_move(C->ph, globals.x, globals.y, globals.playerid);
     /*

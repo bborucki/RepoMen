@@ -293,6 +293,26 @@ proto_session_body_unmarshall_map(Proto_Session *s, int offset, Map *m){
   return -1;
 }
 
+extern int
+proto_session_body_marshall_player(Proto_Session *s, Player *p){
+  if (s && ((s->slen + sizeof(Player)) < PROTO_SESSION_BUF_SIZE)){
+    memcpy(s->sbuf + s->slen, p, sizeof(Player));
+    s->slen += sizeof(Player);
+    return 1;
+  }
+  return -1;
+}
+
+extern int
+proto_session_body_unmarshall_player(Proto_Session *s, int offset, Player *p){
+  if (s && ((s->rlen - (offset + sizeof(Player)) >= 0))){
+      memcpy(p, s->rbuf + offset, sizeof(Player));
+      p->pcell = NULL;
+      return offset + sizeof(Player);
+  }
+  return -1;
+}
+
 /*
 extern int
 proto_session_body_marshall_objectmap(Proto_Session *s, ObjectMap *o){
