@@ -74,6 +74,12 @@ proto_server_event_session(void)
   return &Proto_Server.EventSession; 
 }
 
+extern ObjectMap *
+proto_server_objectmap(void) 
+{ 
+  return Server_ObjectMap; 
+}
+
 extern int
 proto_server_set_session_lost_handler(Proto_MT_Handler h){
   Proto_Server.session_lost_handler = h;
@@ -174,20 +180,20 @@ proto_server_post_event(void){
       num--;
       
       if (proto_session_send_msg(&(Proto_Server.EventSession),1)<0) {
-	//	NYI;
+
 	// must have lost an event connection
 	close(Proto_Server.EventSession.fd);
 	Proto_Server.EventSubscribers[i]=-1;
 	Proto_Server.EventNumSubscribers--;
-	NYI; //Proto_Server.ADD CODE
+	//	NYI; //Proto_Server.ADD CODE
+	//I Have no idea^^ -B 4/24/13
       } 
       // FIXME: add ack message here to ensure that game is updated 
       // correctly everywhere... at the risk of making server dependent
       // on client behaviour  (use time out to limit impact... drop
       // clients that misbehave but be carefull of introducing deadlocks
     }
-    i++;
-  }
+    i++;  }
   proto_session_reset_send(&Proto_Server.EventSession);
   pthread_mutex_unlock(&Proto_Server.EventSubscribersLock);
 }
@@ -374,7 +380,7 @@ proto_server_cinfo_handler(Proto_Session *s){
   bzero(&sh, sizeof(sh));
   bzero(&rh, sizeof(rh));
 
-  fprintf(stderr, "proto_server_mt_cinfo_handler: invoked for session:\n");
+  fprintf(stderr, "proto_server_cinfo_handler: invoked for session:\n");
   proto_session_dump(s);
 
   sh.type = proto_session_hdr_unmarshall_type(s);
@@ -420,7 +426,7 @@ proto_server_move_handler(Proto_Session *s){
   bzero(&sh, sizeof(sh));
   bzero(&rh, sizeof(rh));
   
-  fprintf(stderr, "proto_server_mt_move_handler: invoked for session:\n");
+  fprintf(stderr, "proto_server_move_handler: invoked for session:\n");
   proto_session_dump(s);
 
   sh.type = proto_session_hdr_unmarshall_type(s);

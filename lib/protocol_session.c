@@ -310,12 +310,16 @@ proto_session_body_unmarshall_player(Proto_Session *s, int offset, Player *p){
   return -1;
 }
 
-/*
 extern int
 proto_session_body_marshall_objectmap(Proto_Session *s, ObjectMap *o){
-  if (s && ((s->slen + sizeof(ObjectMap)) < PROTO_SESSION_BUF_SIZE)){
-    memcpy(s->sbuf + s->slen, m, sizeof(Map));
-    s->slen += sizeof(Map);
+  int dim = o->dim;
+
+  proto_session_body_marshall_int(s,dim);
+
+  if (s && ((s->slen + sizeof(ObjectMap) + sizeof(Cell)*dim*dim) < PROTO_SESSION_BUF_SIZE)){
+    memcpy(s->sbuf + s->slen, o, sizeof(ObjectMap));
+    memcpy(s->sbuf + s->slen + sizeof(ObjectMap), o->objects, sizeof(Cell)*dim*dim);
+    s->slen += (sizeof(ObjectMap) + sizeof(Cell)*dim*dim);
     return 1;
   }
   return -1;
@@ -323,14 +327,17 @@ proto_session_body_marshall_objectmap(Proto_Session *s, ObjectMap *o){
 
 extern int
 proto_session_body_unmarshall_objectmap(Proto_Session *s, int offset, ObjectMap *o){
-  if (s && ((s->rlen - (offset + sizeof(Map)) >= 0))){
-      memcpy(m, s->rbuf + offset, sizeof(Map));
-      m->maze = NULL;
-      return offset + sizeof(Map);
+  int dim;
+
+  offset = proto_session_body_unmarshall_int(s,offset,&dim);
+
+  if (s && ((s->rlen - (offset + sizeof(ObjectMap) + sizeof(Cell)*dim*dim) >= 0))){
+      memcpy(o, s->rbuf + offset, sizeof(ObjectMap));
+      memcpy(o->objects, s->rbuf + offset+ sizeof(ObjectMap), sizeof(Cell)*dim*dim);
+      return offset + sizeof(Map) + sizeof(Cell)*dim*dim;
   }
   return -1;
 }
-*/
 
 // rc < 0 on comm failures
 // rc == 1 indicates comm success

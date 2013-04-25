@@ -71,7 +71,6 @@ proto_client_set_event_handler(Proto_Client_Handle ch, Proto_Msg_Types mt,
     
     i=mt - PROTO_MT_EVENT_BASE_RESERVED_FIRST - 1;
     
-    //NYI;
     c->base_event_handlers[i] = h;
     
     return 1;
@@ -116,9 +115,10 @@ proto_client_event_dispatcher(void * arg){
       mt = proto_session_hdr_unmarshall_type(s);
       if (mt > PROTO_MT_EVENT_BASE_RESERVED_FIRST && 
 	  mt < PROTO_MT_EVENT_BASE_RESERVED_LAST) {
+
 	i = mt - PROTO_MT_EVENT_BASE_RESERVED_FIRST - 1;	
 	hdlr = c->base_event_handlers[i];
-	//	NYI;//ADD CODE
+
 	if (hdlr(s)<0) goto leave;
       }
     } else {

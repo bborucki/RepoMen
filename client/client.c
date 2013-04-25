@@ -72,7 +72,15 @@ clientInit(Client *C){
 
 static int
 update_event_handler(Proto_Session *s){
+  //  Proto_Msg_Hdr rhdr;
+  
   Client *C = proto_session_get_data(s);
+
+  proto_session_dump(s);
+
+  //  proto_session_dump(C->ph->event_session);
+
+  //  proto_session_hdr_unmarsahll(C->eventsession, &rh);
 
   fprintf(stderr, "%s: called", __func__);
   return 1;
@@ -97,7 +105,7 @@ startConnection(Client *C, char *host, PortType port, Proto_MT_Handler h){
   return 0;
 }
 
-// FIXME:  this is uly maybe the speration of the proto_client code and
+// FIXME:  this is ugly maybe the speration of the proto_client code and
 //         the game code is dumb
 int
 game_process_reply(Client *C)

@@ -77,6 +77,9 @@ extern int  proto_session_body_unmarshall_player(Proto_Session *s, int offset,
 extern int  proto_session_body_marshall_map(Proto_Session *s, Map *m);
 extern int  proto_session_body_unmarshall_map(Proto_Session *s, int offset, 
 						Map *m);
+extern int  proto_session_body_marshall_objectmap(Proto_Session *s, ObjectMap *o);
+extern int  proto_session_body_unmarshall_objectmap(Proto_Session *s, int offset, 
+						ObjectMap *o);
 extern int  proto_session_send_msg(Proto_Session *s, int reset);
 extern int  proto_session_rcv_msg(Proto_Session *s);
 extern int  proto_session_rpc(Proto_Session *s);
