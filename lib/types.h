@@ -31,6 +31,7 @@ typedef enum {TEAM1, TEAM2} team_t;
 typedef enum {SAFE, JAILED, FREE} state_t;
 typedef enum {NONE, FLAG1, FLAG2, SHOVEL1, SHOVEL2} object_t;
 typedef enum {FLOOR, JAIL1, JAIL2, HOME1, HOME2, WALL, IWALL} cell_t;
+typedef enum {UP, DOWN, LEFT, RIGHT} dir_t;
 
 typedef struct Player_ Player;
 typedef struct Cell_ Cell;

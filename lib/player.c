@@ -67,24 +67,40 @@ player_is_taggable(Player *tager, Player *tagee){
 }
 
 extern int
-player_move(int x, int y, Player *p, ObjectMap *o, Map *m){
+player_move(dir_t dir, Player *p, ObjectMap *o, Map *m){
   int ret = 0;
   int dim = o->dim;
   Player *otherPlayer;
+  int x,y,nx,ny;
+  
+  x = p->pcell->x;
+  y = p->pcell->y;
+  
+  if(dir == UP){
+    nx = x-1;
+    ny = y;
+  }else if(dir == DOWN){
+    nx = x+1;
+    ny = y;
+  }else if(dir == LEFT){
+    nx = x;
+    ny = y-1;
+  }else{
+    nx = x;
+    ny = y+1;
+  }
 
-  if((ret = objectmap_validate_move(x,y,p,o)) > 0){
+  if((ret = objectmap_validate_move(nx,ny,p,o)) > 0){
     if(ret == 2)
       objectmap_tagHandler(p,otherPlayer);
-    else{
-      cell_create(m,o->objects[x*dim+y],x,y);
-    }
 
+    //took out the cell_create (I think this was old...) -chris
     //need to also change player state and check if 
     //picking up flag or a shovel and check if digging
 
     objectmap_remove_player(p->pcell->x,p->pcell->y, o);
-    p->pcell = o->objects[x*dim + y];
-    o->objects[x*dim+y]->player = p;
+    p->pcell = o->objects[nx*dim + ny];
+    o->objects[nx*dim+ny]->player = p;
     return 1;
   }
   

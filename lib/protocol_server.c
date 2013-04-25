@@ -419,6 +419,7 @@ proto_server_cinfo_handler(Proto_Session *s){
 static int
 proto_server_move_handler(Proto_Session *s){
   int i,rx,ry,id,rc;
+  dir_t dir;
   Cell *cell = malloc(sizeof(Cell));
   Proto_Msg_Hdr sh;
   Proto_Msg_Hdr rh;
@@ -434,11 +435,11 @@ proto_server_move_handler(Proto_Session *s){
 
   proto_session_hdr_unmarshall(s, &rh);
   id = rh.pstate.v0.raw;
-  rx = rh.pstate.v1.raw;
-  ry = rh.pstate.v2.raw; 
+  dir = rh.pstate.v1.raw;
   p = players[id];
 
-  if(player_move(rx, ry,p,Server_ObjectMap, Server_Map)){
+
+  if(player_move(dir,p,Server_ObjectMap, Server_Map)){
     sh.pstate.v0.raw = p->id;
     sh.pstate.v1.raw = p->pcell->x;
     sh.pstate.v2.raw = p->pcell->y;

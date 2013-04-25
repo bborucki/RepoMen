@@ -1,7 +1,6 @@
-move request:
-hdr.pstate.vo.raw playerid (pstate for all of these)
-hdr.v1.raw x
-hdr.v2.raw y
+new move protocol:
+pstate.v0.raw = id;
+pstate.v1.raw = 1(up) 2(right) 3(down) 4(left)...?
 
 reply for move request
 hdr.vo.raw playerid
