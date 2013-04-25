@@ -319,7 +319,7 @@ proto_server_hello_handler(Proto_Session *s){
     sh.pstate.v1.raw = p->pcell->x;
     sh.pstate.v2.raw = p->pcell->y;
     players[pidx] = p;
-    proto_session_marshall_player(s,p);
+    proto_session_body_marshall_player(s,p);
     proto_session_body_marshall_map(s,Server_Map);
   } else{
     sh.pstate.v0.raw = 0;

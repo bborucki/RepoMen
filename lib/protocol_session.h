@@ -48,6 +48,7 @@ extern void proto_session_init(Proto_Session *s);
 extern void proto_session_reset_send(Proto_Session *s);
 extern void proto_session_reset_receive(Proto_Session *s);
 
+extern void proto_session_hdr_unmarshall_pstate(Proto_Session *s, Proto_Player_State *ps);
 extern void proto_session_hdr_marshall(Proto_Session *s, Proto_Msg_Hdr *h);
 extern Proto_Msg_Types proto_session_hdr_unmarshall_type(Proto_Session *s);
 extern void proto_session_hdr_unmarshall(Proto_Session *s, Proto_Msg_Hdr *h);
@@ -70,6 +71,9 @@ extern int  proto_session_body_unmarshall_bytes(Proto_Session *s, int offset,
 extern int  proto_session_body_marshall_cell(Proto_Session *s, Cell *c);
 extern int  proto_session_body_unmarshall_cell(Proto_Session *s, int offset, 
 						Cell *c);
+extern int  proto_session_body_marshall_player(Proto_Session *s, Player *p);
+extern int  proto_session_body_unmarshall_player(Proto_Session *s, int offset, 
+						Player *p);
 extern int  proto_session_body_marshall_map(Proto_Session *s, Map *m);
 extern int  proto_session_body_unmarshall_map(Proto_Session *s, int offset, 
 						Map *m);

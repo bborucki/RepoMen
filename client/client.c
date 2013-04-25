@@ -39,11 +39,11 @@ struct Globals {
   int x;
   int y;
   Map *map;
-  ObjectMap *objmap;
+  //  ObjectMap *objmap;
   Cell *cell;
   char debug;
   char mv;
-  int playerid;
+  Player *player;
 } globals;
 
 typedef struct ClientState  {
@@ -54,6 +54,14 @@ typedef struct ClientState  {
 static int
 clientInit(Client *C){
   bzero(C, sizeof(Client));
+
+  globals.player = (Player *)malloc(sizeof(Player));
+  globals.map = (Map *)malloc(sizeof(Map));
+  globals.cell = (Cell *)malloc(sizeof(Cell));
+
+  bzero(globals.player,sizeof(globals.player));
+  bzero(globals.map,sizeof(globals.map));
+  bzero(globals.cell,sizeof(globals.cell));
 
   if (proto_client_init(&(C->ph))<0) {
     fprintf(stderr, "client: main: ERROR initializing proto system\n");
@@ -106,36 +114,35 @@ game_process_reply(Client *C)
 int 
 doRPCCmd(Client *C, char c) 
 {
+  Proto_Player_State *ps;
   int rc=-1;
   Proto_Session *s;
   switch (c) {
   case 'h':
     rc = proto_client_hello(C->ph);
     s = proto_client_rpc_session(C->ph);
-    globals.map = malloc(sizeof(Map));
-    proto_session_body_unmarshall_map(s,0,globals.map);
-    //unmarshall & check at success bit
-    //unmarshall and store player id
-    //same for location
+    proto_session_hdr_unmarshall_pstate(s,ps);
+    if(ps->v0.raw){
+      globals.x = ps->v1.raw;
+      globals.y = ps->v2.raw;
+      proto_session_body_unmarshall_player(s, 0, globals.player);
+      proto_session_body_unmarshall_map(s,sizeof(Player),globals.map);
+    }
     break;
   case 'i':
     rc = proto_client_cinfo(C->ph, globals.x, globals.y);
     s = proto_client_rpc_session(C->ph);
-    globals.cell = malloc(sizeof(Cell));
-    bzero(globals.cell,sizeof(globals.cell));
     proto_session_body_unmarshall_cell(s, 0, globals.cell);
     break;
   case 'v':
     printf("doRPC going to proto_client_move\n");
     globals.x = 42;
     globals.y = 64;
-    globals.playerid = 0; //take out
-    rc = proto_client_move(C->ph, globals.x, globals.y, globals.playerid);
+    //    globals.playerid = 0; //take out
+    //    rc = proto_client_move(C->ph, globals.x, globals.y, globals.playerid);
     /*
-    rc = proto_client_cinfo(C->ph, globals.x, globals.y);
-    s = proto_client_rpc_session(C->ph);
-    globals.cell = malloc(sizeof(Cell));
-    proto_session_body_unmarshall_cell(s, 0, globals.cell);
+      s = proto_client_rpc_session(C->ph);
+      proto_session_body_unmarshall_player(s, 0, globals.player);
     */
     break;
   case 'd':

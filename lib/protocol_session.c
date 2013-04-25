@@ -82,7 +82,7 @@ proto_session_hdr_marshall_pstate(Proto_Session *s, Proto_Player_State *ps){
     //    NYI;
 }
 
-static void
+extern void
 proto_session_hdr_unmarshall_pstate(Proto_Session *s, Proto_Player_State *ps){
   ps->v0.raw  = ntohl(s->rhdr.pstate.v0.raw);
   ps->v1.raw  = ntohl(s->rhdr.pstate.v1.raw);
