@@ -187,6 +187,7 @@ proto_server_post_event(void){
 	Proto_Server.EventNumSubscribers--;
 	//	NYI; //Proto_Server.ADD CODE
 	//I Have no idea^^ -B 4/24/13
+	// may have to issue a remove player for this subscriber...-chris 4/24/13
       } 
       // FIXME: add ack message here to ensure that game is updated 
       // correctly everywhere... at the risk of making server dependent
@@ -426,6 +427,7 @@ proto_server_move_handler(Proto_Session *s){
   Player* p;
   bzero(&sh, sizeof(sh));
   bzero(&rh, sizeof(rh));
+  Proto_Session *us;
   
   fprintf(stderr, "proto_server_move_handler: invoked for session:\n");
   proto_session_dump(s);
@@ -460,6 +462,13 @@ proto_server_move_handler(Proto_Session *s){
 
   printf("sent move\n");
   
+  us = proto_server_event_session();
+  sh.type = PROTO_MT_EVENT_BASE_UPDATE;
+  proto_session_hdr_marshall(us,&sh);
+  proto_server_post_event();// I think this should work, if we just update the clients
+                            //with the player that changed.
+  
+
   return rc;
 
 }
