@@ -34,7 +34,6 @@
 #include "protocol_server.h"
 #include "protocol_session.h"
 #include "objectmap.h"
-//#include "protocol_game.h"
 #include "player.h"
 #include "playerlist.h"
 
@@ -143,7 +142,7 @@ proto_server_event_listen(void *arg){
     connfd = net_accept(fd);
     if (connfd < 0) {
       fprintf(stderr, "Error: EventListen accept failed (%d)\n", errno);
-    } else {
+   } else {
       int i;
       fprintf(stderr, "EventListen: connfd=%d -> ", connfd);
       
@@ -200,6 +199,7 @@ proto_server_req_dispatcher(void * arg){
   Proto_Msg_Types mt;
   Proto_MT_Handler hdlr;
   int i;
+  int ret;
   unsigned long arg_value = (unsigned long) arg;
   
   pthread_detach(pthread_self());
@@ -216,8 +216,10 @@ proto_server_req_dispatcher(void * arg){
       mt = proto_session_hdr_unmarshall_type(&s);
       i = mt - PROTO_MT_REQ_BASE_RESERVED_FIRST - 1;
       hdlr = Proto_Server.base_req_handlers[i];
-      
-      if (hdlr(&s)<0) goto leave;
+
+      ret = hdlr(&s);
+
+      if (ret<0) goto leave;
     }
     else {
       goto leave;
@@ -243,7 +245,7 @@ proto_server_rpc_listen(void *arg){
   }
 
   for (;;) {
-    connfd = net_accept(fd);
+    connfd = net_accept(fd); //not accepting new rpc requests
     if (connfd < 0) {
       fprintf(stderr, "Error: proto_server_rpc_listen accept failed (%d)\n", errno);
     } else {
@@ -300,9 +302,10 @@ static int
 proto_server_hello_handler(Proto_Session *s){
   int rc = 1;
   Player* p;
-  Cell* c;
-
   Proto_Msg_Hdr sh;
+
+  p = (Player *)malloc(sizeof(Player));
+  bzero(p, sizeof(p));
   bzero(&sh, sizeof(sh));
   
   fprintf(stderr, "proto_server_mt_hello_handler: invoked for session:\n");
@@ -325,7 +328,6 @@ proto_server_hello_handler(Proto_Session *s){
   
   proto_session_hdr_marshall(s, &sh);
   proto_session_body_marshall_map(s,Server_Map);
-  //  proto_session_body_marshall_objectmap(s,Server_Map);
   
   rc = proto_session_send_msg(s,1);
   
@@ -355,6 +357,9 @@ proto_server_hello_handler(Proto_Session *s){
 
 static int
 proto_server_cinfo_handler(Proto_Session *s){
+
+  fprintf(stderr, "proto_server_mt_cinfo_handler: invoked for session:\n");
+
   /*  int rc = 1;
   int i,rx,ry;
   Cell *cell = malloc(sizeof(Cell));
@@ -512,12 +517,12 @@ proto_server_init(void){
        i<PROTO_MT_REQ_BASE_RESERVED_LAST; i++) {
     if(i == PROTO_MT_REQ_BASE_HELLO)
       proto_server_set_req_handler(i,proto_server_hello_handler);
+    else if(i == PROTO_MT_REQ_BASE_MOVE)
+      proto_server_set_req_handler(i,proto_server_move_handler);
     //    if(i == PROTO_MT_REQ_BASE_QUERY)
     //      proto_server_set_req_handler(i,proto_server_query_handler);
     else if(i == PROTO_MT_REQ_BASE_DUMP)
       proto_server_set_req_handler(i,proto_server_dump_handler);
-    else if(i == PROTO_MT_REQ_BASE_MOVE)
-      proto_server_set_req_handler(i,proto_server_move_handler);
     else if(i == PROTO_MT_REQ_BASE_CINFO)
       proto_server_set_req_handler(i,proto_server_cinfo_handler);
     else if(i == PROTO_MT_REQ_BASE_GOODBYE)

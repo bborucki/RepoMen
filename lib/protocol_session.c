@@ -346,6 +346,7 @@ proto_session_rcv_msg(Proto_Session *s){
 
   if(net_readn(s->fd, &(s->rhdr), sizeof(Proto_Msg_Hdr)) < 0)
     return -1;
+
   net_readn(s->fd, s->rbuf, ntohl(s->rhdr.blen));
 
   if (proto_debug()){

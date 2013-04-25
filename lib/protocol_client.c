@@ -210,6 +210,36 @@ do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt){
 }
 
 static int
+do_move_rpc(Proto_Client_Handle ch, int x, int y, int playerid, Proto_Msg_Types mt){
+  int rc=0;
+  Proto_Session *s;
+  Proto_Client *c = ch;
+  Proto_Msg_Hdr *hdr = malloc(sizeof(Proto_Msg_Hdr));
+
+  s = &(c->rpc_session);  
+
+  bzero(hdr, sizeof(Proto_Msg_Hdr));
+
+  hdr->pstate.v0.raw=playerid;
+  hdr->pstate.v1.raw=x;
+  hdr->pstate.v2.raw=y;
+  hdr->type = mt;
+
+  proto_session_hdr_marshall(s,hdr);
+
+  rc = proto_session_rpc(s);
+
+  printf("%d", rc);
+
+  if(rc==1)
+    proto_session_hdr_unmarshall(s,&s->rhdr);
+  else 
+    c->session_lost_handler(s);
+
+  return rc;
+}
+
+static int
 do_cinfo_rpc(Proto_Client_Handle ch, int x, int y, Proto_Msg_Types mt){
   int rc=0;
   Proto_Session *s;
@@ -222,16 +252,18 @@ do_cinfo_rpc(Proto_Client_Handle ch, int x, int y, Proto_Msg_Types mt){
 
   hdr->pstate.v0.raw=x;
   hdr->pstate.v1.raw=y;
- hdr->type = mt;
+  hdr->type = mt;
 
   proto_session_hdr_marshall(s,hdr);
 
-  //  proto_dump_msghdr(&(s->shdr));
+  proto_dump_msghdr(&(s->shdr));
 
   rc = proto_session_rpc(s);
   
-  if(rc==1)
+  if(rc==1){
     proto_session_hdr_unmarshall(s,&s->rhdr);
+    proto_dump_msghdr(&(s->rhdr));
+  }
   else 
     c->session_lost_handler(s);
 
@@ -244,8 +276,11 @@ proto_client_hello(Proto_Client_Handle ch){
 }
 
 extern int
-proto_client_move(Proto_Client_Handle ch, char data){
+proto_client_move(Proto_Client_Handle ch, int x, int y, int playerid){
+  //int rc=0;
   return do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_MOVE);
+  //  rc = do_move_rpc(ch, x, y, playerid, PROTO_MT_REQ_BASE_MOVE);
+  //return rc;
 }
 
 extern int

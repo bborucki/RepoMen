@@ -7,10 +7,10 @@
 
 extern int 
 player_find_empty_home(Player* p, team_t t, ObjectMap *o, int playerid){
-  int x,y, idx;
+  int x,y,idx;
   if(t == TEAM1){
     for(x = 91; x<=109; x++){
-      for(y = 2;y<=11; y++){
+      for(y = 2; y<=11; y++){
 	idx = x*(o->dim)+y;
 	if(o->objects[idx]->type == HOME1 && o->objects[idx]->player == NULL
 	   && o->objects[idx]->obj == NONE){
@@ -24,8 +24,7 @@ player_find_empty_home(Player* p, team_t t, ObjectMap *o, int playerid){
 	  p->state = SAFE;
 
 	  return 1;
-	
-}
+	}
       }
     }
   }
@@ -33,7 +32,7 @@ player_find_empty_home(Player* p, team_t t, ObjectMap *o, int playerid){
     for(x = 91; x<=109; x++){
       for(y = 188;y<=197; y++){
 	idx = x*(o->dim)+y;
-	if(o->objects[idx]->type == HOME1 && o->objects[idx]->player == NULL
+	if(o->objects[idx]->type == HOME2 && o->objects[idx]->player == NULL
 	   && o->objects[idx]->obj == NONE){
 	  p->pcell = o->objects[idx];
 	  p->pcell->x = x;

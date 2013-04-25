@@ -42,8 +42,9 @@ struct Globals {
   ObjectMap *objmap;
   Cell *cell;
   char debug;
+  char mv;
+  int playerid;
 } globals;
-
 
 typedef struct ClientState  {
   int data;
@@ -113,19 +114,30 @@ doRPCCmd(Client *C, char c)
     s = proto_client_rpc_session(C->ph);
     globals.map = malloc(sizeof(Map));
     proto_session_body_unmarshall_map(s,0,globals.map);
+    //unmarshall & check at success bit
+    //unmarshall and store player id
+    //same for location
     break;
   case 'i':
     rc = proto_client_cinfo(C->ph, globals.x, globals.y);
     s = proto_client_rpc_session(C->ph);
     globals.cell = malloc(sizeof(Cell));
+    bzero(globals.cell,sizeof(globals.cell));
     proto_session_body_unmarshall_cell(s, 0, globals.cell);
+    break;
+  case 'v':
+    printf("doRPC going to proto_client_move\n");
+    globals.playerid = 0; //take out
+    rc = proto_client_move(C->ph, globals.x, globals.y, globals.playerid);
+    /*
+    rc = proto_client_cinfo(C->ph, globals.x, globals.y);
+    s = proto_client_rpc_session(C->ph);
+    globals.cell = malloc(sizeof(Cell));
+    proto_session_body_unmarshall_cell(s, 0, globals.cell);
+    */
     break;
   case 'd':
     rc = proto_client_dump(C->ph);
-    break;
-  case 'm':
-    scanf("%c", &c);
-    rc = proto_client_move(C->ph, c);
     break;
   case 'g':
     rc = proto_client_goodbye(C->ph);
@@ -148,6 +160,30 @@ doRPC(Client *C, char cmd)
 
   //  printf("doRPC: rc=0x%x\n", rc);
 
+  return rc;
+}
+
+int
+doMove(Client *C){
+  int rc;
+  char ch;
+
+  if(!globals.connected){
+    printf("Not Connected.");
+    return 1;
+  }
+
+  if((ch=getchar())=='\n'){
+    printf("Failed to move, usage move [1,2,3,4]\n");
+    return 1;
+  }
+
+  putchar(ch);
+  scanf("%c", &ch);
+
+  globals.mv = ch;
+  
+  rc = doRPC(C, 'v');
   return rc;
 }
 
@@ -339,7 +375,7 @@ doCInfo(Client *C){
     rc = doRPC(C,'i');
     printf("Type: ");
     cell_print_type(globals.cell);
-    printf("Team: %d\n", globals.cell->team);
+    printf("Team: %d\n", globals.cell->team); //FIX ME
     if(globals.cell->player == NULL)
       printf("Unoccupied\n");
     else
@@ -467,7 +503,8 @@ docmd(Client *C, char cmd)
     rc = doDump(C);
     break;
   case 'v': 
-    printf("TIME TO MOVEEEEE!\n");
+    //    printf("TIME TO MOVEEEEE!\n");
+    rc = doMove(C);
     rc = 1;
     break;
   case 'b': 
