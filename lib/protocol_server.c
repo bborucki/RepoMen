@@ -316,7 +316,11 @@ proto_server_hello_handler(Proto_Session *s){
 
   if(player_find_empty_home(p,nextTeam, Server_ObjectMap, pidx)){
     sh.pstate.v0.raw = 1;
+    sh.pstate.v1.raw = p->pcell->x;
+    sh.pstate.v2.raw = p->pcell->y;
     players[pidx] = p;
+    proto_session_marshall_player(s,p);
+    proto_session_body_marshall_map(s,Server_Map);
   } else{
     sh.pstate.v0.raw = 0;
   }
@@ -327,7 +331,6 @@ proto_server_hello_handler(Proto_Session *s){
   pidx++;
   
   proto_session_hdr_marshall(s, &sh);
-  proto_session_body_marshall_map(s,Server_Map);
   
   rc = proto_session_send_msg(s,1);
   
