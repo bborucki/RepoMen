@@ -316,6 +316,8 @@ proto_server_hello_handler(Proto_Session *s){
 
   if(player_find_empty_home(p,nextTeam, Server_ObjectMap, pidx)){
     sh.pstate.v0.raw = 1;
+    printf("x = %d\n", p->pcell->x);
+    printf("y = %d\n", p->pcell->y);
     sh.pstate.v1.raw = p->pcell->x;
     sh.pstate.v2.raw = p->pcell->y;
     players[pidx] = p;

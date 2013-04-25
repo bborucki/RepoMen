@@ -79,7 +79,6 @@ proto_session_hdr_marshall_pstate(Proto_Session *s, Proto_Player_State *ps){
     s->shdr.pstate.v1.raw  = htonl(ps->v1.raw);
     s->shdr.pstate.v2.raw  = htonl(ps->v2.raw);
     s->shdr.pstate.v3.raw  = htonl(ps->v3.raw);
-    //    NYI;
 }
 
 extern void
@@ -88,8 +87,6 @@ proto_session_hdr_unmarshall_pstate(Proto_Session *s, Proto_Player_State *ps){
   ps->v1.raw  = ntohl(s->rhdr.pstate.v1.raw);
   ps->v2.raw  = ntohl(s->rhdr.pstate.v2.raw);
   ps->v3.raw  = ntohl(s->rhdr.pstate.v3.raw);
-  //  ps = &(s->rhdr.pstate);  
-  //  NYI;
 }
 
 static void

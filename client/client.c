@@ -114,17 +114,17 @@ game_process_reply(Client *C)
 int 
 doRPCCmd(Client *C, char c) 
 {
-  Proto_Player_State *ps;
+  Proto_Msg_Hdr hdr;
   int rc=-1;
   Proto_Session *s;
   switch (c) {
   case 'h':
     rc = proto_client_hello(C->ph);
     s = proto_client_rpc_session(C->ph);
-    proto_session_hdr_unmarshall_pstate(s,ps);
-    if(ps->v0.raw){
-      globals.x = ps->v1.raw;
-      globals.y = ps->v2.raw;
+    //proto_session_hdr_unmarshall(s,&hdr);
+    if(s->rhdr.pstate.v0.raw){
+      globals.x = s->rhdr.pstate.v1.raw;
+      globals.y = s->rhdr.pstate.v2.raw;
       proto_session_body_unmarshall_player(s, 0, globals.player);
       proto_session_body_unmarshall_map(s,sizeof(Player),globals.map);
     }
@@ -233,6 +233,12 @@ doConnect(Client *C){
   else{
     doRPC(C,'h');
     printf("Connected.");
+    printf("\n");
+    printf("x: %d\n", globals.x);
+    printf("y: %d\n", globals.y);
+    printf("state: %d\n", globals.player->state);
+    printf("team: %d\n", globals.player->team);
+    printf("id: %d\n", globals.player->id);
     globals.connected = 1;
   }
   return 1;
