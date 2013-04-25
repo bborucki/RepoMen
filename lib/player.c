@@ -22,7 +22,7 @@ player_find_empty_home(Player* p, team_t t, ObjectMap *o, int playerid){
 	  p->shovel = NONE;
 	  p->flag = NONE;
 	  p->state = SAFE;
-
+	  o->objects[idx]->player = p;
 	  return 1;
 	}
       }
@@ -42,6 +42,7 @@ player_find_empty_home(Player* p, team_t t, ObjectMap *o, int playerid){
 	  p->shovel = NONE;
 	  p->flag = NONE;
 	  p->state = SAFE;
+	  o->objects[idx]->player = p;
 	  return 1;
 	}
       }
