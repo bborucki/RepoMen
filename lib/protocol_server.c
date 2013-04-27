@@ -316,20 +316,21 @@ proto_server_hello_handler(Proto_Session *s){
   bzero(&sh, sizeof(sh));
   
   fprintf(stderr, "proto_server_mt_hello_handler: invoked for session:\n");
-  proto_session_dump(s);
+  proto_dump_msghdr(&(s->rhdr));
   
   sh.type = proto_session_hdr_unmarshall_type(s);
   sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
 
   if(player_find_empty_home(p,nextTeam, Server_ObjectMap, pidx)){
     sh.pstate.v0.raw = 1;
-    printf("x = %d\n", p->pcell->x);
-    printf("y = %d\n", p->pcell->y);
     sh.pstate.v1.raw = p->pcell->x;
     sh.pstate.v2.raw = p->pcell->y;
     players[pidx] = p;
     proto_session_body_marshall_player(s,p);
     proto_session_body_marshall_map(s,Server_Map);
+    printf("New player joining:\n");
+    printf("Location: %d,%d\n", p->pcell->x, p->pcell->y);
+    player_dump(p);
   } else{
     sh.pstate.v0.raw = 0;
   }
@@ -341,6 +342,7 @@ proto_server_hello_handler(Proto_Session *s){
   
   proto_session_hdr_marshall(s, &sh);
   
+  proto_dump_msghdr(&(s->shdr));
   rc = proto_session_send_msg(s,1);
   
   return rc;
@@ -440,34 +442,34 @@ proto_server_move_handler(Proto_Session *s){
   dir = rh.pstate.v1.raw;
   p = players[id];
 
-
-  if(player_move(dir,p,Server_ObjectMap, Server_Map)){
-    sh.pstate.v0.raw = p->id;
-    sh.pstate.v1.raw = p->pcell->x;
-    sh.pstate.v2.raw = p->pcell->y;
+  printf("id = %d", id);
+  printf("dir = %d", dir);
+  
+  sh.pstate.v0.raw = p->id;
+  sh.pstate.v1.raw = p->pcell->x;
+  sh.pstate.v2.raw = p->pcell->y;
+  if(player_move(dir,p,Server_ObjectMap, Server_Map))
     sh.pstate.v3.raw = 1;
-  }else{
-    sh.pstate.v0.raw = p->id;
-    sh.pstate.v1.raw = p->pcell->x;
-    sh.pstate.v2.raw = p->pcell->y;
-    sh.pstate.v3.raw = 0;
-    
-  }
+  else
+    sh.pstate.v3.raw = 0;    
 
   proto_session_hdr_marshall(s, &sh);
 
   printf("sending move\n");
+
+  proto_session_dump(s);
   
   rc = proto_session_send_msg(s,1);
 
   printf("sent move\n");
-  
+
+  /*
   us = proto_server_event_session();
   sh.type = PROTO_MT_EVENT_BASE_UPDATE;
   proto_session_hdr_marshall(us,&sh);
   proto_server_post_event();// I think this should work, if we just update the clients
                             //with the player that changed.
-  
+			    */
 
   return rc;
 

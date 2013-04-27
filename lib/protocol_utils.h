@@ -22,7 +22,14 @@
 * THE SOFTWARE.
 *****************************************************************************/
 
+#include "types.h"
+
 extern int PROTO_DEBUG;
+
+extern void dump_team(team_t team);
+extern void dump_state(state_t state);
+extern void dump_object(object_t object);
+extern void dump_cell_type(cell_t cellt);
 
 extern void proto_dump_mt(Proto_Msg_Types type);
 extern void proto_dump_pstate(Proto_Player_State *ps);

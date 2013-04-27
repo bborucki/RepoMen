@@ -43,7 +43,7 @@ extern int proto_client_set_event_handler(Proto_Client_Handle ch,
 
 // client side protocol rpc's
 extern int proto_client_hello(Proto_Client_Handle ch);
-extern int proto_client_move(Proto_Client_Handle ch, int x, int y, int playerid);
+extern int proto_client_move(Proto_Client_Handle ch, int playerid, int mv);
 extern int proto_client_query(Proto_Client_Handle ch);
 extern int proto_client_cinfo(Proto_Client_Handle ch, int x, int y);
 extern int proto_client_goodbye(Proto_Client_Handle ch);

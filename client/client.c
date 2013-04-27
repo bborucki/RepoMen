@@ -124,6 +124,8 @@ doRPCCmd(Client *C, char c)
 {
   Proto_Msg_Hdr hdr;
   int rc=-1;
+  int x,y;
+
   Proto_Session *s;
   switch (c) {
   case 'h':
@@ -144,10 +146,19 @@ doRPCCmd(Client *C, char c)
     break;
   case 'v':
     printf("doRPC going to proto_client_move\n");
-    globals.x = 42;
-    globals.y = 64;
-    //    globals.playerid = 0; //take out
-    //    rc = proto_client_move(C->ph, globals.x, globals.y, globals.playerid);
+    printf("id = %d\n", globals.player->id);
+    printf("mv = %d\n", globals.mv);
+
+    rc = proto_client_move(C->ph, globals.player->id, globals.mv);
+    printf("rc = %d\n", rc);
+    //    proto_session_hdr_unmarshall(s,&hdr);
+    //    proto_dump_msghdr(&hdr);
+    if(s->rhdr.pstate.v3.raw > 0 && s->rhdr.pstate.v0.raw == globals.player->id)
+      {
+	globals.x = s->rhdr.pstate.v1.raw;
+	globals.y = s->rhdr.pstate.v2.raw;
+      }
+    
     /*
       s = proto_client_rpc_session(C->ph);
       proto_session_body_unmarshall_player(s, 0, globals.player);
@@ -198,9 +209,12 @@ doMove(Client *C){
   putchar(ch);
   scanf("%c", &ch);
 
-  globals.mv = ch;
+  globals.mv = atoi(&ch);
   
   rc = doRPC(C, 'v');
+  printf("x = %d",globals.x);
+  printf("y = %d",globals.y);
+
   return rc;
 }
 
@@ -242,11 +256,8 @@ doConnect(Client *C){
     doRPC(C,'h');
     printf("Connected.");
     printf("\n");
-    printf("x: %d\n", globals.x);
-    printf("y: %d\n", globals.y);
-    printf("state: %d\n", globals.player->state);
-    printf("team: %d\n", globals.player->team);
-    printf("id: %d\n", globals.player->id);
+    printf("Location: %d,%d\n", globals.x, globals.y);
+    player_dump(globals.player);
     globals.connected = 1;
   }
   return 1;

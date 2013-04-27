@@ -28,9 +28,92 @@
 
 #include "protocol.h"
 #include "protocol_utils.h"
-
+#include "types.h"
 
 int PROTO_DEBUG=0;
+
+extern void
+dump_team(team_t team){
+  switch (team) {
+  case TEAM1:
+    printf("Team 1\n");
+    break;
+  case TEAM2:
+    printf("Team 2\n");
+    break;
+  default:
+    printf("UNKNOWN=%d", team);
+  }
+}
+
+extern void
+dump_state(state_t state){
+  switch (state) {
+  case SAFE:
+    printf("State: safe\n");
+    break;
+  case JAILED:
+    printf("State: jailed\n");
+    break;
+  case FREE:
+    printf("State: free\n");
+    break;
+  default:
+    printf("UNKNOWN=%d", state);
+  }
+}
+
+extern void
+dump_object(object_t object){
+  switch (object) {
+  case NONE:
+    printf("No object\n");
+    break;
+  case FLAG1:
+    printf("Flag 1\n");
+    break;
+  case FLAG2:
+    printf("Flag 2\n");
+    break;
+  case SHOVEL1:
+    printf("Shovel 1\n");
+    break;
+  case SHOVEL2:
+    printf("Shovel 2\n");
+    break;
+  default:
+    printf("UNKNOWN=%d", object);
+}
+}
+
+extern void
+dump_cell_type(cell_t cellt){
+ switch(cellt){
+  case FLOOR:
+    printf("Floor Cell\n");
+    break;
+  case JAIL1:
+    printf("Jail Cell, Team 1\n");
+    break;
+  case JAIL2:
+    printf("Jail Cell, Team 2\n");
+    break;
+  case HOME1:
+    printf("Home Cell, Team 2\n");
+    break;
+  case HOME2:
+    printf("Home Cell, Team 2\n");
+    break;
+  case WALL:
+    printf("Wall Cell\n");
+    break;
+  case IWALL:
+    printf("Immutable wall Cell\n");
+    break;
+  default:
+    printf("UNKNOWN=%d", cellt);
+ }
+}
 
 extern void
 proto_dump_mt(Proto_Msg_Types type)
@@ -91,7 +174,7 @@ proto_dump_mt(Proto_Msg_Types type)
     fprintf(stderr, "UNKNOWN=%d", type);
   }
 }
- 
+
 extern void
 proto_dump_pstate(Proto_Player_State *ps)
 {

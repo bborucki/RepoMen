@@ -4,6 +4,16 @@
 #include "types.h"
 #include "objectmap.h"
 #include "playerlist.h"
+#include <stdio.h>
+
+extern void
+player_dump(Player *p){
+  printf("ID = %d\n", p->id);
+  dump_team(p->team);
+  dump_state(p->state);
+  dump_object(p->shovel);
+  dump_object(p->flag);
+}
 
 extern int 
 player_find_empty_home(Player* p, team_t t, ObjectMap *o, int playerid){
