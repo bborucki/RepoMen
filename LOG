@@ -69,3 +69,23 @@ large display.  We imported the new code into our repo and replaced all
 cases of "ADD CODE" with "NYI" and wrote a macro, placed in protocol.h,
 which will allow us to trace the execution and implement the necessary
 functions.
+
+--------------------------------------------
+Sat Apr 27 12:58:45 EST 2013
+
+Implemented move rpc functionality.  In the mean time I've commented out
+the update portion server side while handling moves, because it was causing
+the client to hang (the handler isn't fully implemented for this purpose
+yet). So right now a player can connect, and issue move RPC's, which go to
+the server, are checked for validity, and the client changes its own state
+based off of the move_rep(ly) message from the server.  Along the way I
+also implemented dump_player, dump_team, and verbose methods like that to
+make debugging and printed output easier to handle/read.  Hopefully once
+the back end is all set, implementing the GUI shouldn't take too long.
+
+I'm going to start work on the update channel, and figuring out if we want
+the player making the move to update it's view of the world (including it's
+own position) with the info in the move_reply or the update from the
+server. Then I'll start looking at what happens when multiple players join
+and attempt to move.
+    -Brian
