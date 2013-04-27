@@ -144,7 +144,6 @@ proto_server_event_listen(void *arg){
   }
 
   for (;;) {
-    //    NYI; //connfd = ADD CODE
     connfd = net_accept(fd);
     if (connfd < 0) {
       fprintf(stderr, "Error: EventListen accept failed (%d)\n", errno);

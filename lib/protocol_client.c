@@ -105,8 +105,36 @@ proto_client_event_server_quit_handler(Proto_Session *s){
 }
 
 static int 
+proto_client_event_player_quit_handler(Proto_Session *s){
+  printf("proto_client_event_player_quit_handler invoked!\n");  
+
+  return 1;
+}
+
+static int 
 proto_client_event_move_handler(Proto_Session *s){
   printf("proto_client_event_move_handler invoked!\n");  
+
+  return 1;
+}
+
+static int 
+proto_client_event_pickup_handler(Proto_Session *s){
+  printf("proto_client_event_pickup_handler invoked!\n");  
+
+  return 1;
+}
+
+static int 
+proto_client_event_drop_handler(Proto_Session *s){
+  printf("proto_client_event_drop_handler invoked!\n");  
+
+  return 1;
+}
+
+static int 
+proto_client_event_win_handler(Proto_Session *s){
+  printf("proto_client_event_win_handler invoked!\n");  
 
   return 1;
 }
@@ -137,8 +165,6 @@ proto_client_event_dispatcher(void * arg){
       }
     } else {
       c->session_lost_handler;
-      //      NYI;// ADD CODE
-      
       goto leave;
     }
   }
@@ -163,8 +189,16 @@ proto_client_init(Proto_Client_Handle *ch){
        mt<PROTO_MT_EVENT_BASE_RESERVED_LAST; mt++){
     if(mt == PROTO_MT_EVENT_BASE_MOVE)
       proto_client_set_event_handler(c, mt, proto_client_event_move_handler);
+    else if(mt == PROTO_MT_EVENT_BASE_PICKUP)
+      proto_client_set_event_handler(c, mt, proto_client_event_pickup_handler);
+    else if(mt == PROTO_MT_EVENT_BASE_DROP)
+      proto_client_set_event_handler(c, mt, proto_client_event_drop_handler);
+    else if(mt == PROTO_MT_EVENT_BASE_WIN)
+      proto_client_set_event_handler(c, mt, proto_client_event_win_handler);
     else if(mt == PROTO_MT_EVENT_BASE_SERVER_QUIT)
       proto_client_set_event_handler(c, mt, proto_client_event_server_quit_handler);
+    else if(mt == PROTO_MT_EVENT_BASE_PLAYER_QUIT)
+      proto_client_set_event_handler(c, mt, proto_client_event_player_quit_handler);
     else
       proto_client_set_event_handler(c, mt, proto_client_event_null_handler);
   }

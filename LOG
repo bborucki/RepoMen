@@ -74,7 +74,7 @@ functions.
 Sat Apr 27
     -Brian
 
-1:00 pm
+1 pm
 Implemented move rpc functionality.  In the mean time I've commented out
 the update portion server side while handling moves, because it was causing
 the client to hang (the handler isn't fully implemented for this purpose
@@ -91,9 +91,16 @@ own position) with the info in the move_reply or the update from the
 server. Then I'll start looking at what happens when multiple players join
 and attempt to move.
 
-2:00 pm
+2 pm
 Working on the event channel.  The server now send out a quit event telling
 its clients that its quitting for more graceful disconnect events, but
 still needs to be implemented client side, as does the move update.  May
 also want to consider drop/pickup/win updates as well.  Trying to clean up
 clutter in the code for readability.
+
+5 pm
+Adding in more event message types (player-quit/drop/pickup/etc) to protocol.h and hooking up
+corresponding handlers in the client, though they do nothing more than
+declare themselves. Need to figure out how the game state is to be stored
+server side, when and how it will be transfered to the client, and when and
+how the client's version will be changed.

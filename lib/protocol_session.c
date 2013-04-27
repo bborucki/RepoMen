@@ -94,10 +94,6 @@ proto_session_hdr_marshall_gstate(Proto_Session *s, Proto_Game_State *gs){
   s->shdr.gstate.v0.raw  = htonl(gs->v0.raw);
   s->shdr.gstate.v1.raw  = htonl(gs->v1.raw);
   s->shdr.gstate.v2.raw  = htonl(gs->v2.raw);
-
-  //    gs = &(s->rhdr.gstate);  
-
-    //  NYI;
 }
 
 static void
