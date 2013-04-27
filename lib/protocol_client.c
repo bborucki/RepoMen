@@ -230,7 +230,7 @@ do_move_rpc(Proto_Client_Handle ch, int playerid, int dir, Proto_Msg_Types mt){
 
   if(rc==1){
     proto_session_hdr_unmarshall(s,&s->rhdr);
-    proto_dump_msghdr(&(s->rhdr));
+    //    proto_dump_msghdr(&(s->rhdr));
   }
   else 
     c->session_lost_handler(s);

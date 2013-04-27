@@ -431,8 +431,8 @@ proto_server_move_handler(Proto_Session *s){
   bzero(&rh, sizeof(rh));
   Proto_Session *us;
   
-  fprintf(stderr, "proto_server_move_handler: invoked for session:\n");
-  proto_session_dump(s);
+  //  fprintf(stderr, "proto_server_move_handler: invoked for session:\n");
+  //  proto_session_dump(s);
 
   sh.type = proto_session_hdr_unmarshall_type(s);
   sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
@@ -441,27 +441,27 @@ proto_server_move_handler(Proto_Session *s){
   id = rh.pstate.v0.raw;
   dir = rh.pstate.v1.raw;
   p = players[id];
-
-  printf("id = %d", id);
-  printf("dir = %d", dir);
   
+  if(player_move(dir,p,Server_ObjectMap, Server_Map)){
+    sh.pstate.v3.raw = 1;
+    printf("Player %d is moving to (%d,%d)\n",id,p->pcell->x,p->pcell->y);
+  }  else{
+    sh.pstate.v3.raw = 0;    
+    printf("Player %d attemped an invalid move\n",id);
+  }
   sh.pstate.v0.raw = p->id;
   sh.pstate.v1.raw = p->pcell->x;
   sh.pstate.v2.raw = p->pcell->y;
-  if(player_move(dir,p,Server_ObjectMap, Server_Map))
-    sh.pstate.v3.raw = 1;
-  else
-    sh.pstate.v3.raw = 0;    
 
   proto_session_hdr_marshall(s, &sh);
 
-  printf("sending move\n");
+  //  printf("sending move\n");
 
-  proto_session_dump(s);
+  //  proto_session_dump(s);
   
   rc = proto_session_send_msg(s,1);
 
-  printf("sent move\n");
+  //  printf("sent move\n");
 
   /*
   us = proto_server_event_session();

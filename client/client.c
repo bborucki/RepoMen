@@ -131,7 +131,7 @@ doRPCCmd(Client *C, char c)
   case 'h':
     rc = proto_client_hello(C->ph);
     s = proto_client_rpc_session(C->ph);
-    //proto_session_hdr_unmarshall(s,&hdr);
+    proto_session_hdr_unmarshall(s,&hdr);
     if(s->rhdr.pstate.v0.raw){
       globals.x = s->rhdr.pstate.v1.raw;
       globals.y = s->rhdr.pstate.v2.raw;
@@ -145,24 +145,19 @@ doRPCCmd(Client *C, char c)
     proto_session_body_unmarshall_cell(s, 0, globals.cell);
     break;
   case 'v':
-    printf("doRPC going to proto_client_move\n");
-    printf("id = %d\n", globals.player->id);
-    printf("mv = %d\n", globals.mv);
-
     rc = proto_client_move(C->ph, globals.player->id, globals.mv);
-    printf("rc = %d\n", rc);
-    //    proto_session_hdr_unmarshall(s,&hdr);
-    //    proto_dump_msghdr(&hdr);
-    if(s->rhdr.pstate.v3.raw > 0 && s->rhdr.pstate.v0.raw == globals.player->id)
-      {
+    s = proto_client_rpc_session(C->ph);
+    //    printf("rc = %d\n", rc);
+    if(s->rhdr.pstate.v3.raw > 0){
+      if(s->rhdr.pstate.v0.raw == globals.player->id){
 	globals.x = s->rhdr.pstate.v1.raw;
 	globals.y = s->rhdr.pstate.v2.raw;
+	printf("Now at (%d,%d)\n", globals.x, globals.y);
       }
-    
-    /*
-      s = proto_client_rpc_session(C->ph);
-      proto_session_body_unmarshall_player(s, 0, globals.player);
-    */
+    }
+    else{
+      printf("Invalid move\n");
+    }
     break;
   case 'd':
     rc = proto_client_dump(C->ph);
@@ -212,8 +207,6 @@ doMove(Client *C){
   globals.mv = atoi(&ch);
   
   rc = doRPC(C, 'v');
-  printf("x = %d",globals.x);
-  printf("y = %d",globals.y);
 
   return rc;
 }
@@ -256,7 +249,7 @@ doConnect(Client *C){
     doRPC(C,'h');
     printf("Connected.");
     printf("\n");
-    printf("Location: %d,%d\n", globals.x, globals.y);
+    printf("Location: (%d,%d)\n", globals.x, globals.y);
     player_dump(globals.player);
     globals.connected = 1;
   }
@@ -265,6 +258,12 @@ doConnect(Client *C){
 
 int
 doDisconnect(Client *C, char cmd){
+  Proto_Session *rpc;
+  Proto_Session *event;
+
+  rpc = proto_client_rpc_session(C->ph);
+  event = proto_client_event_session(C->ph);
+  
   if(cmd == 'q' && !globals.connected){
     printf("Terminated.\n");
     return -1;
@@ -276,6 +275,9 @@ doDisconnect(Client *C, char cmd){
   }
 
   doRPC(C,'g'); //goodbye
+
+  net_close_socket(rpc->fd);
+  net_close_socket(event->fd);
 
   globals.connected = 0;
 
