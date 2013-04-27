@@ -30,6 +30,22 @@
 #include "../lib/protocol_utils.h"
 #include "../lib/map.h"
 
+int
+doQuitClients(void){
+  Proto_Session *s;
+  Proto_Msg_Hdr hdr;
+  s = proto_server_event_session();
+  bzero(&(hdr), sizeof(hdr));
+
+  hdr.type = PROTO_MT_EVENT_BASE_SERVER_QUIT;
+  proto_session_hdr_marshall(s, &hdr);
+  fprintf(stderr, "\nServer telling clients it's quitting:\n");
+  proto_session_dump(s);
+
+  proto_server_post_event();
+  return -1;
+}
+
 int 
 doUpdateClients(void)
 {
@@ -71,7 +87,7 @@ docmd(char cmd)
     rc = doUpdateClients();
     break;
   case 'q':
-    rc=-1;
+    rc = doQuitClients();
     break;
   case '\n':
   case ' ':

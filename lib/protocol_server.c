@@ -454,23 +454,16 @@ proto_server_move_handler(Proto_Session *s){
   sh.pstate.v2.raw = p->pcell->y;
 
   proto_session_hdr_marshall(s, &sh);
-
-  //  printf("sending move\n");
-
-  //  proto_session_dump(s);
   
   rc = proto_session_send_msg(s,1);
-
-  //  printf("sent move\n");
-
-  /*
+  
   us = proto_server_event_session();
-  sh.type = PROTO_MT_EVENT_BASE_UPDATE;
+  sh.type = PROTO_MT_EVENT_BASE_MOVE;
   proto_session_hdr_marshall(us,&sh);
-  proto_server_post_event();// I think this should work, if we just update the clients
-                            //with the player that changed.
-			    */
-
+  proto_server_post_event();
+  // I think this should work, if we just update the clients
+  //with the player that changed.
+  
   return rc;
 
 }

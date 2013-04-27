@@ -72,16 +72,12 @@ clientInit(Client *C){
 
 static int
 update_event_handler(Proto_Session *s){
-  //  Proto_Msg_Hdr rhdr;
-  
-  Client *C = proto_session_get_data(s);
-
-  proto_session_dump(s);
-
+  //  Client *C = proto_session_get_data(s);
+  //  proto_session_dump(s);
   //  proto_session_dump(C->ph->event_session);
-
   //  proto_session_hdr_unmarsahll(C->eventsession, &rh);
 
+  printf("Update from the server!\n");  
   fprintf(stderr, "%s: called", __func__);
   return 1;
 }
@@ -105,22 +101,8 @@ startConnection(Client *C, char *host, PortType port, Proto_MT_Handler h){
   return 0;
 }
 
-// FIXME:  this is ugly maybe the speration of the proto_client code and
-//         the game code is dumb
-int
-game_process_reply(Client *C)
-{
-  Proto_Session *s;
-
-  s = proto_client_rpc_session(C->ph);
-
-  fprintf(stderr, "%s: do something %p\n", __func__, s);
-
-  return 1;
-}
-
 int 
-doRPCCmd(Client *C, char c) 
+doRPC(Client *C, char c) 
 {
   Proto_Msg_Hdr hdr;
   int rc=-1;
@@ -153,6 +135,9 @@ doRPCCmd(Client *C, char c)
 	globals.x = s->rhdr.pstate.v1.raw;
 	globals.y = s->rhdr.pstate.v2.raw;
 	printf("Now at (%d,%d)\n", globals.x, globals.y);
+
+	//insert way of waiting for a server move update
+	//hmmmm
       }
     }
     else{
@@ -168,27 +153,13 @@ doRPCCmd(Client *C, char c)
   default:
     printf("%s: unknown command %c\n", __func__, c);
   }
-  // NULL MT OVERRIDE ;-)
-  //  printf("%s: rc=0x%x\n", __func__, rc);
   if (rc == 0xdeadbeef) rc=1;
   return rc;
 }
 
 int
-doRPC(Client *C, char cmd)
-{
-  int rc;
-
-  rc=doRPCCmd(C,cmd);
-
-  //  printf("doRPC: rc=0x%x\n", rc);
-
-  return rc;
-}
-
-int
 doMove(Client *C){
-  int rc;
+  int rc,x;
   char ch;
 
   if(!globals.connected){
@@ -197,14 +168,21 @@ doMove(Client *C){
   }
 
   if((ch=getchar())=='\n'){
-    printf("Failed to move, usage move [1,2,3,4]\n");
+    printf("Failed to move, usage move <1/2/3/4>\n");
     return 1;
   }
 
   putchar(ch);
   scanf("%c", &ch);
 
-  globals.mv = atoi(&ch);
+  x = atoi(&ch);
+
+  if(x < 1 || x > 4){
+    printf("Failed to move, usage move <1/2/3/4>\n");
+    return 1;
+  }
+
+  globals.mv = x;
   
   rc = doRPC(C, 'v');
 
@@ -375,8 +353,8 @@ doNumWall(){
     printf("Not connected.");
     return 1;
   }    
- printf("Number of available wall cells = %d\n", globals.map->numwall);
- return 1;
+  printf("Number of available wall cells = %d\n", globals.map->numwall);
+  return 1;
 }
 
 int
@@ -399,13 +377,13 @@ doCInfo(Client *C){
     return 1;
   }
   putchar(c);
-
+  
   if(scanf("%d,%d", &x, &y)==2){
     if(!globals.connected){
       printf("Not Connected.");
       return 1;
     }        
-
+    
     globals.x = x;
     globals.y = y;
     rc = doRPC(C,'i');
@@ -425,7 +403,7 @@ doCInfo(Client *C){
     printf("Usage: \"cinfo <x,y>\"\n");
     return 1;
   }
-    
+  
   return 1;
 }
 
@@ -442,13 +420,13 @@ doDump(Client *C){
     printf("Dump Successful\n");
     return 1;
   }
-
+  
   return rc;
 }
 
 int
 doHelp(){
-  printf("Available commands: \n\tconnect <IP:PORT> \n\tdisconnect \n\twhere \n\tnumhome <1 or 2> \n\tnumjail <1 or 2> \n\tnumwall \n\tnumfloor \n\tdim \n\tcinfo <x,y> \n\tdump \n\tquit\n");
+  printf("Available commands: \n\tconnect <IP:PORT> \n\tdisconnect \n\twhere \n\tnumhome <1 or 2> \n\tnumjail <1 or 2> \n\tnumwall \n\tnumfloor \n\tdim \n\tcinfo <x,y> \n\tmove <1/2/3/4> \n\tdump \n\tquit\n");
 
   return 1;
 }

@@ -97,6 +97,20 @@ proto_client_event_null_handler(Proto_Session *s){
   return 1;
 }
 
+static int 
+proto_client_event_server_quit_handler(Proto_Session *s){
+  printf("Server quitting!\n");  
+
+  return 1;
+}
+
+static int 
+proto_client_event_move_handler(Proto_Session *s){
+  printf("proto_client_event_move_handler invoked!\n");  
+
+  return 1;
+}
+
 static void *
 proto_client_event_dispatcher(void * arg){
   Proto_Client *c;
@@ -143,11 +157,18 @@ proto_client_init(Proto_Client_Handle *ch){
   bzero(c, sizeof(Proto_Client));
 
   proto_client_set_session_lost_handler(c, 
-			      	proto_client_session_lost_default_hdlr);
-
- for (mt=PROTO_MT_EVENT_BASE_RESERVED_FIRST+1;
-       mt<PROTO_MT_EVENT_BASE_RESERVED_LAST; mt++)
-    proto_client_set_event_handler(c, mt, proto_client_event_null_handler);
+					proto_client_session_lost_default_hdlr);
+  
+  for (mt=PROTO_MT_EVENT_BASE_RESERVED_FIRST+1;
+       mt<PROTO_MT_EVENT_BASE_RESERVED_LAST; mt++){
+    if(mt == PROTO_MT_EVENT_BASE_MOVE)
+      proto_client_set_event_handler(c, mt, proto_client_event_move_handler);
+    else if(mt == PROTO_MT_EVENT_BASE_SERVER_QUIT)
+      proto_client_set_event_handler(c, mt, proto_client_event_server_quit_handler);
+    else
+      proto_client_set_event_handler(c, mt, proto_client_event_null_handler);
+  }
+  
 
   *ch = c;
   return 1;
