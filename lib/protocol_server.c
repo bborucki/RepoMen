@@ -35,11 +35,12 @@
 #include "protocol_session.h"
 #include "objectmap.h"
 #include "player.h"
+#include "gamestate.h"
 
 #define PROTO_SERVER_MAX_EVENT_SUBSCRIBERS 1024
 #define MAX_OBJECTS 404
 
-
+Gamestate *Server_Gamestate;
 Map *Server_Map;
 ObjectMap *Server_ObjectMap; 
 Player** players;
@@ -509,23 +510,21 @@ proto_server_init(void){
   int i;
   int rc;
   int dim;
+
   if((Server_Map = map_init(MAP_NAME)) == NULL)
     return -1;
   dim = Server_Map->dim;
-  Server_ObjectMap = (ObjectMap *)malloc(sizeof(ObjectMap));
-  bzero(Server_ObjectMap, sizeof(ObjectMap));
 
-  Server_ObjectMap->objects = (Cell **)malloc(sizeof(Cell *)*dim*dim);
-  if(Server_ObjectMap->objects == NULL){
-    fprintf(stderr, "Could not initiate objectmap\n");
-    return 0;
+  if((Server_Gamestate = gamestate_create()) == NULL){
+    fprintf(stderr, "could not create gamestate\n");
+    return -1;
   }
-  bzero(Server_ObjectMap->objects, sizeof(Server_ObjectMap->objects));
 
-  if(!objectmap_create(Server_Map, Server_ObjectMap)){
+  if((Server_ObjectMap = objectmap_create(Server_Map)) == NULL){
     fprintf(stderr, "could not load map\n");
     return -1;
   }
+
   players = (Player **)malloc(sizeof(int)*MAX_PLAYERS);
   bzero(players, sizeof(players));
   pidx = 0;

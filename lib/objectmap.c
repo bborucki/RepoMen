@@ -46,45 +46,53 @@ objectmap_validate_move(int x, int y, Player *p, ObjectMap *o){
   return 1;
 }
 
-extern int
-objectmap_create(Map *m, ObjectMap *o){
+extern ObjectMap *
+objectmap_create(Map *m){
+  ObjectMap *o;
+
   int seed;
   int idx;
   int i,j;
   int x,y;
   int dim = m->dim;
 
-  
+  o = (ObjectMap *)malloc(sizeof(ObjectMap));
+  bzero(o, sizeof(ObjectMap));
+
+  o->objects = (Cell **)malloc(sizeof(Cell *)*dim*dim);
+  bzero(o->objects, sizeof(o->objects));
+
   for(i = 0; i < dim; i++){
     for(j = 0; j < dim; j++){
       o->objects[i*dim + j] = (Cell *)malloc(sizeof(Cell));
       cell_create(m,o->objects[i*dim + j], i, j);
     }
   }
-  
-  
-  seed = time(NULL);
-  srand(seed);
 
-  //need to check that location randomly picked is valid
-  //ie. not a wall
+  /*
+    seed = time(NULL);
+    srand(seed);
+    
+    //need to check that location randomly picked is valid
+    //ie. not a wall
+    
+    x = rand()%(dim/2);
+    y = rand()%dim;
+    idx = x*dim+y;
+    
+    // while wall or iwall, search for new rand cell, otherwise put it in that one
+    //  o->objects[idx]->obj = FLAG1;
+    //same for flag 2
+    x = rand()%(dim/2)+dim/2;
+    y = rand()%dim;
+    idx = x*dim+y;
+    // use logic for finding rand cell
+    //  if(o->objects[idx]->type == WALL || o->objects[idx]->type == IWALL){
+    //    objectmap_remove_player(x,y,o);
+    //  }
+    //  o->objects[x*dim+y]->obj = FLAG2;
+    */
 
-  x = rand()%(dim/2);
-  y = rand()%dim;
-  idx = x*dim+y;
-
-  // while wall or iwall, search for new rand cell, otherwise put it in that one
-  //  o->objects[idx]->obj = FLAG1;
-  //same for flag 2
-  x = rand()%(dim/2)+dim/2;
-  y = rand()%dim;
-  idx = x*dim+y;
-  // use logic for finding rand cell
-  //  if(o->objects[idx]->type == WALL || o->objects[idx]->type == IWALL){
-  //    objectmap_remove_player(x,y,o);
-  //  }
-  //  o->objects[x*dim+y]->obj = FLAG2;
-  
   x = 109;
   y = 2;
   idx = x*dim+y;
@@ -101,5 +109,5 @@ objectmap_create(Map *m, ObjectMap *o){
   o->numPlayers = 0;
   o->dim = dim;
   
-  return 1;
+  return o;
 }
