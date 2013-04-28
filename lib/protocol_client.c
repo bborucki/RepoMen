@@ -227,8 +227,6 @@ proto_client_connect(Proto_Client_Handle ch, char *host, PortType port){
   if (net_setup_connection(&(c->event_session.fd), host, port+1)<0) 
     return -2; 
 
-  printf("Event listen fd = %d", c->event_session.fd);
-
   if (pthread_create(&(c->EventHandlerTid), NULL, 
 		     &proto_client_event_dispatcher, c) !=0) {
     fprintf(stderr, 

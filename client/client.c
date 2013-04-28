@@ -175,9 +175,9 @@ doMove(Client *C){
   putchar(ch);
   scanf("%c", &ch);
 
-  x = atoi(&ch);
+  x = atoi(&ch)-1;
 
-  if(x < 1 || x > 4){
+  if(x < 0 || x > 3){
     printf("Failed to move, usage move <1/2/3/4>\n");
     return 1;
   }

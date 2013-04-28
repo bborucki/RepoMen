@@ -89,13 +89,13 @@ player_move(dir_t dir, Player *p, ObjectMap *o, Map *m){
   if(dir == UP){
     nx = x-1;
     ny = y;
-  }else if(dir == DOWN){
+  } else if (dir == DOWN){
     nx = x+1;
     ny = y;
-  }else if(dir == LEFT){
+  } else if (dir == LEFT){
     nx = x;
     ny = y-1;
-  }else{
+  } else {
     nx = x;
     ny = y+1;
   }

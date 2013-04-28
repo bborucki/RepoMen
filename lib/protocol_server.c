@@ -172,13 +172,10 @@ proto_server_post_event(void){
   i = 0;
   num = Proto_Server.EventNumSubscribers;
 
-  printf("numsubs: %d\n", num);
   while (num) {
     Proto_Server.EventSession.fd = Proto_Server.EventSubscribers[i];
     if (Proto_Server.EventSession.fd != -1) {
       num--;
-
-      printf("sending update to fd: %d\n", Proto_Server.EventSession.fd);
       
       if (proto_session_send_msg(&(Proto_Server.EventSession),0)<0) {
 
