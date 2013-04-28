@@ -7,6 +7,7 @@
 #include "map.h"
 #include "cell.h"
 #include "player.h"
+#include "gamestate.h"
 
 extern int
 objectmap_remove_player(int x, int y, ObjectMap *o){
@@ -47,7 +48,7 @@ objectmap_validate_move(int x, int y, Player *p, ObjectMap *o){
 }
 
 extern ObjectMap *
-objectmap_create(Map *m){
+objectmap_create(Map *m, Gamestate *g){
   ObjectMap *o;
 
   int seed;
@@ -99,11 +100,15 @@ objectmap_create(Map *m){
   printf("x = %d, y = %d \n", x, y);
   o->objects[idx]->obj = SHOVEL1;
 
+  gamestate_add_cell(g, o->objects[idx]);
+
   x = 109;
   y = 197;
   idx = x*dim+y;
   printf("x = %d, y = %d \n", x, y);
   o->objects[idx]->obj = SHOVEL2;
+
+  gamestate_add_cell(g, o->objects[idx]);
 
   o->numCells = 4;
   o->numPlayers = 0;

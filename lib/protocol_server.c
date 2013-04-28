@@ -333,6 +333,7 @@ proto_server_hello_handler(Proto_Session *s){
     printf("Location: %d,%d\n", p->pcell->x, p->pcell->y);
     player_dump(p);
     s->player = p;
+    gamestate_add_player(Server_Gamestate, p);
   } else{
     sh.pstate.v0.raw = 0;
   }
@@ -519,7 +520,7 @@ proto_server_init(void){
     return -1;
   }
 
-  if((Server_ObjectMap = objectmap_create(Server_Map)) == NULL){
+  if((Server_ObjectMap = objectmap_create(Server_Map, Server_Gamestate)) == NULL){
     fprintf(stderr, "could not load map\n");
     return -1;
   }

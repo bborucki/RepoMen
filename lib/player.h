@@ -2,8 +2,10 @@
 #define __PLAYER_H__
 
 #include "types.h"
+#include "gamestate.h"
 #include "objectmap.h"
 #include "cell.h"
+#include "map.h"
 
 struct Player_ {
   char id;
