@@ -276,9 +276,7 @@ proto_server_start_rpc_loop(void){
 
 static int 
 proto_session_lost_default_handler(Proto_Session *s){
-  fprintf(stderr, "Session lost...:\n");
-
-
+  fprintf(stderr, "Player %d has disconnected\n", s->player->id);
 
   //  proto_session_dump(s);
   return -1;
@@ -318,8 +316,8 @@ proto_server_hello_handler(Proto_Session *s){
   bzero(p, sizeof(p));
   bzero(&sh, sizeof(sh));
   
-  fprintf(stderr, "proto_server_mt_hello_handler: invoked for session:\n");
-  proto_dump_msghdr(&(s->rhdr));
+  //  fprintf(stderr, "proto_server_mt_hello_handler: invoked for session:\n");
+  //  proto_dump_msghdr(&(s->rhdr));
   
   sh.type = proto_session_hdr_unmarshall_type(s);
   sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
@@ -334,6 +332,7 @@ proto_server_hello_handler(Proto_Session *s){
     printf("New player joining:\n");
     printf("Location: %d,%d\n", p->pcell->x, p->pcell->y);
     player_dump(p);
+    s->player = p;
   } else{
     sh.pstate.v0.raw = 0;
   }
@@ -345,7 +344,7 @@ proto_server_hello_handler(Proto_Session *s){
   
   proto_session_hdr_marshall(s, &sh);
   
-  proto_dump_msghdr(&(s->shdr));
+  //  proto_dump_msghdr(&(s->shdr));
   rc = proto_session_send_msg(s,1);
   
   return rc;

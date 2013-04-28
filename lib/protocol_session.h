@@ -36,6 +36,7 @@ typedef struct {
   Proto_Msg_Hdr rhdr;
   char sbuf[PROTO_SESSION_BUF_SIZE];
   char rbuf[PROTO_SESSION_BUF_SIZE];
+  Player *player;
 } Proto_Session;
 
 // Define Proto_MT_Handler type as a pointer to a function that returns
