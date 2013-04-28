@@ -9,11 +9,11 @@
 struct Cell_ {
   cell_t type;
   team_t team;
-  int x;
-  int y;
+  char x;
+  char y;
   object_t obj;
   Player *player;
-  int playerid;
+  char playerid;
 };
 
 extern int cell_create(Map *m, Cell *c, int x, int y);

@@ -7,7 +7,7 @@
 #include "playerlist.h"
 
 struct Player_ {
-  int id;
+  char id;
   team_t team;
   object_t shovel;
   object_t flag;

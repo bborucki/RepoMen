@@ -51,16 +51,11 @@ doUpdateClients(void)
 {
   Proto_Session *s;
   Proto_Msg_Hdr hdr;
-  ObjectMap *o;
-  o = proto_server_objectmap();
   s = proto_server_event_session();
   bzero(&(hdr), sizeof(hdr));
 
   hdr.type = PROTO_MT_EVENT_BASE_UPDATE;
   proto_session_hdr_marshall(s, &hdr);
-  proto_session_body_marshall_int(s, o->dim);
-  if(proto_session_body_marshall_objectmap(s,o) < 0)
-    printf("Object map too large!\n");
   fprintf(stderr, "\nServer updating clients with session:\n");
   proto_session_dump(s);
 

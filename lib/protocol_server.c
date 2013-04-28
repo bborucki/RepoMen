@@ -111,8 +111,9 @@ proto_server_record_event_subscriber(int fd, int *num){
       && Proto_Server.EventSubscribers[Proto_Server.EventLastSubscriber]
       ==-1) {
     Proto_Server.EventNumSubscribers++;
-    Proto_Server.EventSubscribers[0]=fd;
-    //    NYI; // if first subscriber?
+    *num = Proto_Server.EventLastSubscriber++;
+    Proto_Server.EventSubscribers[*num]=fd;
+    //NYI - unsure^^
     rc = 1;
   } else { //else search for first free array element
     int i;
@@ -150,11 +151,8 @@ proto_server_event_listen(void *arg){
    } else {
       int i;
       fprintf(stderr, "EventListen: connfd=%d -> ", connfd);
-      
-      //      NYI; //NEED TO SET "i"
-      //	NYI;//FILL IF STATEMENT
-      //unsure of second arguement of record
-      if (proto_server_record_event_subscriber(connfd, &(Proto_Server.EventLastSubscriber))<0){
+      if (proto_server_record_event_subscriber(connfd, &i)<0){
+	//not entirely sure of second arg^^
 	fprintf(stderr, "oops no space for any more event subscribers\n");
 	close(connfd);
       } else {
@@ -173,12 +171,18 @@ proto_server_post_event(void){
 
   i = 0;
   num = Proto_Server.EventNumSubscribers;
+
+  printf("numsubs: %d\n", num);
   while (num) {
     Proto_Server.EventSession.fd = Proto_Server.EventSubscribers[i];
     if (Proto_Server.EventSession.fd != -1) {
       num--;
+
+      printf("sending update to fd: %d\n", Proto_Server.EventSession.fd);
       
-      if (proto_session_send_msg(&(Proto_Server.EventSession),1)<0) {
+      if (proto_session_send_msg(&(Proto_Server.EventSession),0)<0) {
+
+	printf("Lost a connection.\n");
 
 	// must have lost an event connection
 	close(Proto_Server.EventSession.fd);
@@ -429,6 +433,7 @@ proto_server_move_handler(Proto_Session *s){
   bzero(&sh, sizeof(sh));
   bzero(&rh, sizeof(rh));
   Proto_Session *us;
+  int valid;
   
   //  fprintf(stderr, "proto_server_move_handler: invoked for session:\n");
   //  proto_session_dump(s);
@@ -441,30 +446,33 @@ proto_server_move_handler(Proto_Session *s){
   dir = rh.pstate.v1.raw;
   p = players[id];
   
-  if(player_move(dir,p,Server_ObjectMap, Server_Map)){
+  valid = player_move(dir,p,Server_ObjectMap, Server_Map);
+  
+  if (valid) {
     sh.pstate.v3.raw = 1;
     printf("Player %d is moving to (%d,%d)\n",id,p->pcell->x,p->pcell->y);
-  }  else{
+  } else {
     sh.pstate.v3.raw = 0;    
     printf("Player %d attemped an invalid move\n",id);
   }
   sh.pstate.v0.raw = p->id;
   sh.pstate.v1.raw = p->pcell->x;
   sh.pstate.v2.raw = p->pcell->y;
-
+ 
   proto_session_hdr_marshall(s, &sh);
   
   rc = proto_session_send_msg(s,1);
   
-  us = proto_server_event_session();
-  sh.type = PROTO_MT_EVENT_BASE_MOVE;
-  proto_session_hdr_marshall(us,&sh);
-  proto_server_post_event();
+  if(valid){
+    us = proto_server_event_session();
+    sh.type = PROTO_MT_EVENT_BASE_MOVE;
+    proto_session_hdr_marshall(us,&sh);
+    proto_server_post_event();
+  }
   // I think this should work, if we just update the clients
   //with the player that changed.
   
   return rc;
-
 }
 
 static int

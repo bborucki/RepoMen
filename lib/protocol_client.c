@@ -113,8 +113,17 @@ proto_client_event_player_quit_handler(Proto_Session *s){
 
 static int 
 proto_client_event_move_handler(Proto_Session *s){
+  int x,y,id;
+
   printf("proto_client_event_move_handler invoked!\n");  
 
+  proto_session_hdr_unmarshall(s,&s->rhdr);
+
+  id = s->rhdr.pstate.v0.raw;
+  x = s->rhdr.pstate.v1.raw;
+  y = s->rhdr.pstate.v2.raw;
+  printf("Player %d is now at (%d,%d)\n", id, x, y);  
+  
   return 1;
 }
 
@@ -217,6 +226,8 @@ proto_client_connect(Proto_Client_Handle ch, char *host, PortType port){
 
   if (net_setup_connection(&(c->event_session.fd), host, port+1)<0) 
     return -2; 
+
+  printf("Event listen fd = %d", c->event_session.fd);
 
   if (pthread_create(&(c->EventHandlerTid), NULL, 
 		     &proto_client_event_dispatcher, c) !=0) {

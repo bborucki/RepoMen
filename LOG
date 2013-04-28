@@ -104,3 +104,22 @@ corresponding handlers in the client, though they do nothing more than
 declare themselves. Need to figure out how the game state is to be stored
 server side, when and how it will be transfered to the client, and when and
 how the client's version will be changed.
+
+--------------------------------------------
+
+Sun Apr 28
+    -Brian
+
+Changed some fields in our structures from ints to chars, mostly in the
+interest of cutting down on data transfer as much as possible on updates.  
+The client now on a move update declares who's been moved where, but
+doesn't modify the client's idea of the game state in any way.
+
+The server now updates all clients with the same message (was reseting
+after the first).
+
+TODO:
+ - a second player joining is given a location at -68
+ - one of the moves server side may be a duplicate of another
+ - figure out handshake gamestate
+ - reroute update information up to the player's gamestate
