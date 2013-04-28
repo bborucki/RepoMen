@@ -35,7 +35,6 @@
 #include "protocol_session.h"
 #include "objectmap.h"
 #include "player.h"
-#include "playerlist.h"
 
 #define PROTO_SERVER_MAX_EVENT_SUBSCRIBERS 1024
 #define MAX_OBJECTS 404
@@ -43,7 +42,7 @@
 
 Map *Server_Map;
 ObjectMap *Server_ObjectMap; 
-PlayerList *players;
+Player** players;
 int pidx;
 team_t nextTeam;
 
@@ -277,7 +276,10 @@ proto_server_start_rpc_loop(void){
 static int 
 proto_session_lost_default_handler(Proto_Session *s){
   fprintf(stderr, "Session lost...:\n");
-  proto_session_dump(s);
+
+
+
+  //  proto_session_dump(s);
   return -1;
 }
 
@@ -524,7 +526,7 @@ proto_server_init(void){
     fprintf(stderr, "could not load map\n");
     return -1;
   }
-  players = (PlayerList *)malloc(sizeof(int)*MAX_PLAYERS);
+  players = (Player **)malloc(sizeof(int)*MAX_PLAYERS);
   bzero(players, sizeof(players));
   pidx = 0;
   nextTeam = TEAM1;

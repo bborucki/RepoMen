@@ -7,7 +7,6 @@
 #include "map.h"
 #include "cell.h"
 #include "player.h"
-#include "playerlist.h"
 
 extern int
 objectmap_remove_player(int x, int y, ObjectMap *o){

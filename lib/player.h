@@ -4,7 +4,6 @@
 #include "types.h"
 #include "objectmap.h"
 #include "cell.h"
-#include "playerlist.h"
 
 struct Player_ {
   char id;

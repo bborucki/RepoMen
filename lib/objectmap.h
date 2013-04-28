@@ -5,7 +5,6 @@
 #include "cell.h"
 #include "map.h"
 #include "player.h"
-#include "playerlist.h"
 
 #define MAX_PLAYERS 198
 

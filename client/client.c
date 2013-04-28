@@ -36,8 +36,8 @@ struct Globals {
   char host[STRLEN];
   PortType port;
   char connected;
-  int x;
-  int y;
+  unsigned char x;
+  unsigned char y;
   Map *map;
   //  ObjectMap *objmap;
   Cell *cell;
@@ -115,8 +115,8 @@ doRPC(Client *C, char c)
     s = proto_client_rpc_session(C->ph);
     proto_session_hdr_unmarshall(s,&hdr);
     if(s->rhdr.pstate.v0.raw){
-      globals.x = s->rhdr.pstate.v1.raw;
-      globals.y = s->rhdr.pstate.v2.raw;
+      globals.x = (unsigned char)s->rhdr.pstate.v1.raw;
+      globals.y = (unsigned char)s->rhdr.pstate.v2.raw;
       proto_session_body_unmarshall_player(s, 0, globals.player);
       proto_session_body_unmarshall_map(s,sizeof(Player),globals.map);
     }

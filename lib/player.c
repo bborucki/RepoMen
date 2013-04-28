@@ -3,7 +3,6 @@
 #include "cell.h"
 #include "types.h"
 #include "objectmap.h"
-#include "playerlist.h"
 #include <stdio.h>
 
 extern void

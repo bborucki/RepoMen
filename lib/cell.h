@@ -9,8 +9,8 @@
 struct Cell_ {
   cell_t type;
   team_t team;
-  char x;
-  char y;
+  unsigned char x;
+  unsigned char y;
   object_t obj;
   Player *player;
   char playerid;
