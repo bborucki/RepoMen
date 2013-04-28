@@ -33,17 +33,17 @@
 #define STRLEN 81
 
 struct Globals {
-  char host[STRLEN];
-  PortType port;
-  char connected;
-  unsigned char x;
-  unsigned char y;
-  Map *map;
-  //  ObjectMap *objmap;
-  Cell *cell;
   char debug;
   char mv;
+  unsigned char x;
+  unsigned char y;
+  char connected;
+  char host[STRLEN];
+  PortType port;
+  Map *map;
+  Cell *cell;
   Player *player;
+  //  ObjectMap *objmap;
 } globals;
 
 typedef struct ClientState  {
@@ -83,7 +83,7 @@ update_event_handler(Proto_Session *s){
 }
 
 int 
-startConnection(Client *C, char *host, PortType port, Proto_MT_Handler h){
+startConnection(Client *C, char *host, PortType port, Proto_Client_MT_Handler h){
   if (globals.host[0]!=0 && globals.port!=0) {
     if (proto_client_connect(C->ph, host, port)!=0) {
       fprintf(stderr, "failed to connect\n");

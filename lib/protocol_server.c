@@ -51,17 +51,17 @@ struct {
   FDType   RPCListenFD;
   PortType RPCPort;
 
-  FDType             EventListenFD;
-  PortType           EventPort;
-  pthread_t          EventListenTid;
-  pthread_mutex_t    EventSubscribersLock;
-  int                EventLastSubscriber;
-  int                EventNumSubscribers;
-  FDType             EventSubscribers[PROTO_SERVER_MAX_EVENT_SUBSCRIBERS];
-  Proto_Session      EventSession; 
-  pthread_t          RPCListenTid;
-  Proto_MT_Handler   session_lost_handler;
-  Proto_MT_Handler   base_req_handlers[PROTO_MT_REQ_BASE_RESERVED_LAST - 
+  FDType                    EventListenFD;
+  PortType                  EventPort;
+  pthread_t                 EventListenTid;
+  pthread_mutex_t           EventSubscribersLock;
+  int                       EventLastSubscriber;
+  int                       EventNumSubscribers;
+  FDType                    EventSubscribers[PROTO_SERVER_MAX_EVENT_SUBSCRIBERS];
+  Proto_Session             EventSession; 
+  pthread_t                 RPCListenTid;
+  Proto_Server_MT_Handler   session_lost_handler;
+  Proto_Server_MT_Handler   base_req_handlers[PROTO_MT_REQ_BASE_RESERVED_LAST - 
 				       PROTO_MT_REQ_BASE_RESERVED_FIRST-1];
 } Proto_Server;
 
@@ -81,12 +81,12 @@ proto_server_objectmap(void)
 }
 
 extern int
-proto_server_set_session_lost_handler(Proto_MT_Handler h){
+proto_server_set_session_lost_handler(Proto_Server_MT_Handler h){
   Proto_Server.session_lost_handler = h;
 }
 
 extern int
-proto_server_set_req_handler(Proto_Msg_Types mt, Proto_MT_Handler h){
+proto_server_set_req_handler(Proto_Msg_Types mt, Proto_Server_MT_Handler h){
   int i;
   
   if (mt>PROTO_MT_REQ_BASE_RESERVED_FIRST &&
@@ -204,7 +204,7 @@ static void *
 proto_server_req_dispatcher(void * arg){
   Proto_Session s;
   Proto_Msg_Types mt;
-  Proto_MT_Handler hdlr;
+  Proto_Server_MT_Handler hdlr;
   int i;
   int ret;
   unsigned long arg_value = (unsigned long) arg;

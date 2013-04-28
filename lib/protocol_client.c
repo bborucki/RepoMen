@@ -33,11 +33,12 @@
 #include "map.h"
 
 typedef struct {
+  Gamestate *Client_Gamestate;
   Proto_Session rpc_session;
   Proto_Session event_session;
   pthread_t EventHandlerTid;
-  Proto_MT_Handler session_lost_handler;
-  Proto_MT_Handler base_event_handlers[PROTO_MT_EVENT_BASE_RESERVED_LAST 
+  Proto_Client_MT_Handler session_lost_handler;
+  Proto_Client_MT_Handler base_event_handlers[PROTO_MT_EVENT_BASE_RESERVED_LAST 
 				       - PROTO_MT_EVENT_BASE_RESERVED_FIRST
 				       - 1];
 } Proto_Client;
@@ -55,14 +56,14 @@ proto_client_event_session(Proto_Client_Handle ch){
 }
 
 extern int
-proto_client_set_session_lost_handler(Proto_Client_Handle ch, Proto_MT_Handler h){
+proto_client_set_session_lost_handler(Proto_Client_Handle ch, Proto_Client_MT_Handler h){
   Proto_Client *c = ch;
   c->session_lost_handler = h;
 }
 
 extern int
 proto_client_set_event_handler(Proto_Client_Handle ch, Proto_Msg_Types mt,
-			       Proto_MT_Handler h){
+			       Proto_Client_MT_Handler h){
   int i;
   Proto_Client *c = ch;
   
@@ -80,7 +81,7 @@ proto_client_set_event_handler(Proto_Client_Handle ch, Proto_Msg_Types mt,
 }
 
 static int 
-proto_client_session_lost_default_hdlr(Proto_Session *s){
+proto_client_session_lost_default_hdlr(Proto_Session *s, Proto_Client_Handle ch){
   fprintf(stderr, "Session lost...:\n");
   proto_session_dump(s);
   net_close_socket(s->fd);
@@ -89,7 +90,7 @@ proto_client_session_lost_default_hdlr(Proto_Session *s){
 }
 
 static int 
-proto_client_event_null_handler(Proto_Session *s){
+proto_client_event_null_handler(Proto_Session *s, Proto_Client_Handle ch){
   fprintf(stderr, 
 	  "proto_client_event_null_handler: invoked for session:\n");
   proto_session_dump(s);
@@ -98,21 +99,21 @@ proto_client_event_null_handler(Proto_Session *s){
 }
 
 static int 
-proto_client_event_server_quit_handler(Proto_Session *s){
+proto_client_event_server_quit_handler(Proto_Session *s, Proto_Client_Handle ch){
   printf("Server quitting!\n");  
 
   return 1;
 }
 
 static int 
-proto_client_event_player_quit_handler(Proto_Session *s){
+proto_client_event_player_quit_handler(Proto_Session *s, Proto_Client_Handle ch){
   printf("proto_client_event_player_quit_handler invoked!\n");  
 
   return 1;
 }
 
 static int 
-proto_client_event_move_handler(Proto_Session *s){
+proto_client_event_move_handler(Proto_Session *s, Proto_Client_Handle ch){
   int x,y,id;
 
   printf("proto_client_event_move_handler invoked!\n");  
@@ -128,22 +129,22 @@ proto_client_event_move_handler(Proto_Session *s){
 }
 
 static int 
-proto_client_event_pickup_handler(Proto_Session *s){
+proto_client_event_pickup_handler(Proto_Session *s, Proto_Client_Handle ch){
   printf("proto_client_event_pickup_handler invoked!\n");  
 
   return 1;
 }
 
 static int 
-proto_client_event_drop_handler(Proto_Session *s){
+proto_client_event_drop_handler(Proto_Session *s, Proto_Client_Handle ch){
   printf("proto_client_event_drop_handler invoked!\n");  
 
   return 1;
 }
 
 static int 
-proto_client_event_win_handler(Proto_Session *s){
-  printf("proto_client_event_win_handler invoked!\n");  
+proto_client_event_win_handler(Proto_Session *s, Proto_Client_Handle ch){
+  printf("proto_client_event_win_handler invoked!\n"); 
 
   return 1;
 }
@@ -153,7 +154,7 @@ proto_client_event_dispatcher(void * arg){
   Proto_Client *c;
   Proto_Session *s;
   Proto_Msg_Types mt;
-  Proto_MT_Handler hdlr;
+  Proto_Client_MT_Handler hdlr;
   int i;
 
   pthread_detach(pthread_self());
@@ -170,7 +171,7 @@ proto_client_event_dispatcher(void * arg){
 	i = mt - PROTO_MT_EVENT_BASE_RESERVED_FIRST - 1;	
 	hdlr = c->base_event_handlers[i];
 
-	if (hdlr(s)<0) goto leave;
+	if (hdlr(s,arg)<0) goto leave;
       }
     } else {
       c->session_lost_handler;
@@ -267,7 +268,7 @@ do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt){
     } else
       proto_session_body_unmarshall_int(s, 0, &rc);
   } else {
-    c->session_lost_handler(s);
+    c->session_lost_handler(s,ch);
   }
 
   return rc;
@@ -297,7 +298,7 @@ do_move_rpc(Proto_Client_Handle ch, int playerid, int dir, Proto_Msg_Types mt){
     //    proto_dump_msghdr(&(s->rhdr));
   }
   else 
-    c->session_lost_handler(s);
+    c->session_lost_handler(s,ch);
   return rc;
 }
 
@@ -327,7 +328,7 @@ do_cinfo_rpc(Proto_Client_Handle ch, int x, int y, Proto_Msg_Types mt){
     proto_dump_msghdr(&(s->rhdr));
   }
   else 
-    c->session_lost_handler(s);
+    c->session_lost_handler(s,ch);
 
   return rc;
 }
@@ -366,9 +367,9 @@ proto_client_goodbye(Proto_Client_Handle ch){
 
   s = &(c->rpc_session);
   do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_GOODBYE);
-  proto_client_session_lost_default_hdlr(s);
+  proto_client_session_lost_default_hdlr(s,ch);
   s = &(c->event_session);
-  proto_client_session_lost_default_hdlr(s);
+  proto_client_session_lost_default_hdlr(s,ch);
 
   return 1;
 }
