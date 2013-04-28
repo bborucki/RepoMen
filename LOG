@@ -110,6 +110,8 @@ how the client's version will be changed.
 Sun Apr 28
     -Brian
 
+12pm
+
 Changed some fields in our structures from ints to chars, mostly in the
 interest of cutting down on data transfer as much as possible on updates.  
 The client now on a move update declares who's been moved where, but
@@ -119,7 +121,23 @@ The server now updates all clients with the same message (was reseting
 after the first).
 
 TODO:
- - a second player joining is given a location at -68
- - one of the moves server side may be a duplicate of another
  - figure out handshake gamestate
  - reroute update information up to the player's gamestate
+
+5pm
+
+Gamestate is now an object with two lists, one for players and one for
+cells which are different from those that could be derived from the
+original map. My thinking is that if we can do the correct bookkeeping it
+should be easy enough to marshall Gamestate up for a handshake
+function. I've modified objectmap_create and the servers initialization of
+its object map to simplify it.
+
+Next step would be to implement the gamestate player and cell, add and
+remove functions, and then make sure that the server correctly utilizes
+them. Then just implement the marshalling and unmarshalling of it and you
+have a complete handshake.
+
+Once the handshake is complete the client will have a complete idea of the
+gamestate and can thus implement the updates to modify it as necessary.
+We'll need to make sure the client handlers and the server "senders" are complimentary.
