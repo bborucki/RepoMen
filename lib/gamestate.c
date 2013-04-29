@@ -40,11 +40,23 @@ gamestate_add_player(Gamestate *g, Player *p){
   return rc;
 }
 
+//linear search for now
 extern int
-gamestate_remove_player(Gamestate *g, Player *p){
-  
+gamestate_remove_player(Gamestate *g, int playerid){
+  int num = g->numPlayers;
+  int i = 0;
 
-  return 0;
+  while(num){
+    if(g->plist[i] != NULL){
+      if(g->plist[i]->id == playerid){
+	g->plist[i] = NULL;
+	return 1;
+      }
+      num--;
+    }
+  }
+
+  return -1;
 }
 
 extern int
@@ -63,9 +75,21 @@ gamestate_add_cell(Gamestate *g, Cell *c){
   return rc;
 }
 
+//another linear search for now
 extern int
-gamestate_remove_cell(Gamestate *g, Cell *c){
+gamestate_remove_cell(Gamestate *g, int x, int y){
+  int num = g->numCells;
+  int i = 0;
 
+  while(num){
+    if(g->clist[i] != NULL){
+      if(g->clist[i]->x == x && g->clist[i]->y == y){
+	g->clist[i] = NULL;
+	return 1;
+      }
+      num--;
+    }
+  }
 
-  return 0;
+  return -1;
 }

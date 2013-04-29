@@ -32,19 +32,18 @@
 
 #define STRLEN 81
 
-struct Globals {
-  char debug;
-  char mv;
-  unsigned char x;
-  unsigned char y;
-  char connected;
-  char host[STRLEN];
-  PortType port;
-  Map *map;
-  Cell *cell;
-  Player *player;
-  //  ObjectMap *objmap;
-} globals;
+  struct Globals {
+    char debug;
+    char mv;
+    unsigned char x;
+    unsigned char y;
+    char host[STRLEN];
+    PortType port;
+    Map *map;
+    Cell *cell;
+    Player *player;
+    //  ObjectMap *objmap;
+  } globals;
 
 typedef struct ClientState  {
   int data;
@@ -89,7 +88,7 @@ startConnection(Client *C, char *host, PortType port, Proto_Client_MT_Handler h)
       fprintf(stderr, "failed to connect\n");
       return -1;
     }
-   proto_session_set_data(proto_client_event_session(C->ph), C);
+    proto_session_set_data(proto_client_event_session(C->ph), C);
 #if 1
     if (h != NULL) {
       proto_client_set_event_handler(C->ph, PROTO_MT_EVENT_BASE_UPDATE, 
@@ -148,7 +147,7 @@ doRPC(Client *C, char c)
     rc = proto_client_dump(C->ph);
     break;
   case 'g':
-    rc = proto_client_goodbye(C->ph);
+    rc = proto_client_goodbye(C->ph,globals.player);
     break;
   default:
     printf("%s: unknown command %c\n", __func__, c);
@@ -162,11 +161,6 @@ doMove(Client *C){
   int rc,x;
   char ch;
 
-  if(!globals.connected){
-    printf("Not Connected.");
-    return 1;
-  }
-
   if((ch=getchar())=='\n'){
     printf("Failed to move, usage move <1/2/3/4>\n");
     return 1;
@@ -174,6 +168,11 @@ doMove(Client *C){
 
   putchar(ch);
   scanf("%c", &ch);
+
+  if(!proto_client_get_connected(C->ph)){
+    printf("Not Connected.");
+    return 1;
+  }
 
   x = atoi(&ch)-1;
 
@@ -209,7 +208,7 @@ doConnect(Client *C){
     return 1;
   }
 
-  if(globals.connected){
+  if(proto_client_get_connected(C->ph)){
     printf("Already Connected.");
     return 1;
   }  
@@ -229,25 +228,25 @@ doConnect(Client *C){
     printf("\n");
     printf("Location: (%d,%d)\n", globals.x, globals.y);
     player_dump(globals.player);
-    globals.connected = 1;
+    proto_client_set_connected(C->ph, 1);
   }
   return 1;
 }
 
-int
-doDisconnect(Client *C, char cmd){
+extern int
+doDisconnect(Client* C, char cmd){
   Proto_Session *rpc;
   Proto_Session *event;
-
+  
   rpc = proto_client_rpc_session(C->ph);
   event = proto_client_event_session(C->ph);
-  
-  if(cmd == 'q' && !globals.connected){
+
+  if(cmd == 'q' && !proto_client_get_connected(C->ph)){
     printf("Terminated.\n");
     return -1;
   }
 
-  if(!globals.connected){
+  if(!proto_client_get_connected(C->ph)){
     printf("Not Connected.");
     return 1;
   }
@@ -257,19 +256,19 @@ doDisconnect(Client *C, char cmd){
   net_close_socket(rpc->fd);
   net_close_socket(event->fd);
 
-  globals.connected = 0;
+  proto_client_set_connected(C->ph, 0);
 
   if(cmd=='q'){
     printf("Terminated.\n");
     return -1;
   }
   printf("Disconnected");
-  return 1;  
+  return 1;
 }
 
 int
-doWhere(){
-  if(globals.connected)
+doWhere(Client *C){
+  if(proto_client_get_connected(C->ph))
     printf("Connected to: %s:%d", globals.host, globals.port);
   else
     printf("Not Connected.");
@@ -277,7 +276,7 @@ doWhere(){
 }
 
 int 
-doNumHome(){
+doNumHome(Client *C){
   char c;
   int teamNum;
   int rc;
@@ -289,7 +288,7 @@ doNumHome(){
   putchar(c);
   
   if(scanf("%d", &teamNum)==1 && (teamNum == 1 || teamNum == 2)){
-    if(!globals.connected){
+    if(!proto_client_get_connected(C->ph)){
       printf("Not Connected.");
       return 1;
     }
@@ -298,8 +297,7 @@ doNumHome(){
       printf("%d\n",globals.map->numhome1);
     else
       printf("%d\n",globals.map->numhome2);
-  }
-  else{
+  } else {
     printf("Usage: \"numhome <1 or 2>\"\n");
     return 1;
   }
@@ -308,7 +306,7 @@ doNumHome(){
 }
 
 int 
-doNumJail(){
+doNumJail(Client *C){
   char c;
   int teamNum;
 
@@ -319,7 +317,7 @@ doNumJail(){
   putchar(c);
   
   if(scanf("%d", &teamNum)==1 && (teamNum == 1 || teamNum == 2)){
-    if(!globals.connected){
+    if(!proto_client_get_connected(C->ph)){
       printf("Not Connected.");
       return 1;
     }
@@ -338,8 +336,8 @@ doNumJail(){
 }
 
 int
-doNumFloor(){
-  if(!globals.connected){
+doNumFloor(Client *C){
+  if(!proto_client_get_connected(C->ph)){
     printf("Not Connected.");
     return 1;
   }    
@@ -348,8 +346,8 @@ doNumFloor(){
 }
 
 int
-doNumWall(){
-  if(!globals.connected){
+doNumWall(Client *C){
+  if(!proto_client_get_connected(C->ph)){
     printf("Not connected.");
     return 1;
   }    
@@ -358,8 +356,8 @@ doNumWall(){
 }
 
 int
-doDim(){
-  if(!globals.connected){
+doDim(Client *C){
+  if(!proto_client_get_connected(C->ph)){
     printf("Not Connected.");
     return 1;
   }    
@@ -379,7 +377,7 @@ doCInfo(Client *C){
   putchar(c);
   
   if(scanf("%d,%d", &x, &y)==2){
-    if(!globals.connected){
+    if(!proto_client_get_connected(C->ph)){
       printf("Not Connected.");
       return 1;
     }        
@@ -411,7 +409,7 @@ int
 doDump(Client *C){
   int rc;
 
-  if(!globals.connected){
+  if(!proto_client_get_connected(C->ph)){
     printf("Not Connected.");
     return 1;
   }
@@ -490,25 +488,25 @@ docmd(Client *C, char cmd)
     rc=doDisconnect(C,cmd);
     break;
   case 'w': 
-    rc=doWhere(); 
+    rc=doWhere(C); 
     break;
-  case 'q': 
+  case 'q':
     rc=doDisconnect(C,cmd);
     break;
   case 'h': 
-    rc=doNumHome();
+    rc=doNumHome(C);
     break;
   case 'j': 
-    rc=doNumJail();
+    rc=doNumJail(C);
     break;
   case 'f': 
-    rc = doNumFloor();
+    rc = doNumFloor(C);
     break;
   case 'a': 
-    rc = doNumWall();
+    rc = doNumWall(C);
     break;
   case 'm': 
-    rc = doDim();
+    rc = doDim(C);
     break;
   case 'i': 
     rc = doCInfo(C);
@@ -517,9 +515,7 @@ docmd(Client *C, char cmd)
     rc = doDump(C);
     break;
   case 'v': 
-    //    printf("TIME TO MOVEEEEE!\n");
     rc = doMove(C);
-    rc = 1;
     break;
   case 'b': 
     rc = doDebug();
@@ -530,7 +526,7 @@ docmd(Client *C, char cmd)
   case ' ':
   case '\n':
     rc=1;
-    break;
+  break;
   default:
     printf("Unkown Command\n");
   }
@@ -575,15 +571,15 @@ int
 main(int argc, char **argv)
 {
   Client c;
-
+  
   bzero(&globals, sizeof(globals));
-
+  
   if (clientInit(&c) < 0) {
     fprintf(stderr, "ERROR: clientInit failed\n");
     return -1;
   }    
-
+  
   shell(&c);
-
+  
   return 0;
 }

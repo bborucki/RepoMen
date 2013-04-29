@@ -33,6 +33,7 @@
 #include "map.h"
 
 typedef struct {
+  int connected;
   Gamestate *Client_Gamestate;
   Proto_Session rpc_session;
   Proto_Session event_session;
@@ -53,6 +54,20 @@ extern Proto_Session *
 proto_client_event_session(Proto_Client_Handle ch){
   Proto_Client *c = ch;
   return &(c->event_session);
+}
+
+extern int
+proto_client_set_connected(Proto_Client_Handle ch, int i){
+    Proto_Client *c = ch;
+    c->connected = i;
+    return 0;
+}
+
+extern int
+proto_client_get_connected(Proto_Client_Handle ch){
+    Proto_Client *c = ch;
+    return c->connected;
+    return 0;
 }
 
 extern int
@@ -100,14 +115,30 @@ proto_client_event_null_handler(Proto_Session *s, Proto_Client_Handle ch){
 
 static int 
 proto_client_event_server_quit_handler(Proto_Session *s, Proto_Client_Handle ch){
-  printf("Server quitting!\n");  
+  Proto_Session *rpc;
+  Proto_Session *event;
+  
+  rpc = proto_client_rpc_session(ch);
+  event = proto_client_event_session(ch);
+  
+  net_close_socket(rpc->fd);
+  net_close_socket(event->fd);
+
+  proto_client_set_connected(ch,0);
+
+  printf("Server quitting!\n");
 
   return 1;
 }
 
 static int 
 proto_client_event_player_quit_handler(Proto_Session *s, Proto_Client_Handle ch){
-  printf("proto_client_event_player_quit_handler invoked!\n");  
+  Player p;
+
+  proto_session_body_unmarshall_player(s,0,&p);
+  printf("Player %d has disconnected.\n", p.id);  
+
+  //update client gamestate
 
   return 1;
 }
@@ -296,6 +327,32 @@ do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt){
 }
 
 static int
+do_goodbye_rpc(Proto_Client_Handle ch, Player *p, Proto_Msg_Types mt){
+  int rc=0;
+  Proto_Session *s;
+  Proto_Client *c = ch;
+  Proto_Msg_Hdr hdr;
+
+  s = &(c->rpc_session);  
+
+  bzero(&hdr, sizeof(Proto_Msg_Hdr));
+
+  hdr.type = mt;
+  proto_session_hdr_marshall(s,&hdr);
+  proto_session_body_marshall_player(s,p);
+
+  rc = proto_session_rpc(s);
+
+  if(rc==1){
+    proto_session_hdr_unmarshall(s,&s->rhdr);
+    //    proto_dump_msghdr(&(s->rhdr));
+  }
+  else 
+    c->session_lost_handler(s,ch);
+  return rc;
+}
+
+static int
 do_move_rpc(Proto_Client_Handle ch, int playerid, int dir, Proto_Msg_Types mt){
   int rc=0;
   Proto_Session *s;
@@ -381,13 +438,13 @@ proto_client_cinfo(Proto_Client_Handle ch, int x, int y){
 }
 
 extern int
-proto_client_goodbye(Proto_Client_Handle ch){
+proto_client_goodbye(Proto_Client_Handle ch, Player *p){
   int rc;
   Proto_Session *s;
   Proto_Client *c = ch;
 
   s = &(c->rpc_session);
-  do_generic_dummy_rpc(ch,PROTO_MT_REQ_BASE_GOODBYE);
+  do_goodbye_rpc(ch,p,PROTO_MT_REQ_BASE_GOODBYE);
   proto_client_session_lost_default_hdlr(s,ch);
   s = &(c->event_session);
   proto_client_session_lost_default_hdlr(s,ch);

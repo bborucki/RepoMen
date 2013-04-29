@@ -34,6 +34,9 @@ extern Proto_Session *proto_client_event_session(Proto_Client_Handle ch);
 extern int proto_client_init(Proto_Client_Handle *ch);
 extern int proto_client_connect(Proto_Client_Handle ch, char *host, PortType p);
 
+extern int proto_client_set_connected(Proto_Client_Handle ch, int i);
+extern int proto_client_get_connected(Proto_Client_Handle ch);
+
 extern int proto_client_set_session_lost_handler(Proto_Client_Handle ch,
 						 Proto_Client_MT_Handler h);
 
@@ -46,5 +49,5 @@ extern int proto_client_hello(Proto_Client_Handle ch);
 extern int proto_client_move(Proto_Client_Handle ch, int playerid, int mv);
 extern int proto_client_query(Proto_Client_Handle ch);
 extern int proto_client_cinfo(Proto_Client_Handle ch, int x, int y);
-extern int proto_client_goodbye(Proto_Client_Handle ch);
+extern int proto_client_goodbye(Proto_Client_Handle ch, Player *p);
 #endif

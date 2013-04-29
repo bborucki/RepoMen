@@ -511,7 +511,10 @@ static int
 proto_server_goodbye_handler(Proto_Session *s){
   Proto_Msg_Hdr h;
   Proto_Session *us;
+  Player p;
   int rc=1;
+  
+  proto_session_body_unmarshall_player(s,0,&p);
 
   bzero(&h, sizeof(h));
   h.type = PROTO_MT_REP_BASE_GOODBYE;
@@ -519,12 +522,12 @@ proto_server_goodbye_handler(Proto_Session *s){
 
   rc = proto_session_send_msg(s,1);
 
-  //need to remove player from gamestate
+  //remove player from gamestate
 
   us = proto_server_event_session();
   h.type = PROTO_MT_EVENT_BASE_PLAYER_QUIT;
   proto_session_hdr_marshall(us,&h);
-  //  proto_session_body_player_marshall();
+  proto_session_body_marshall_player(us, &p);
   proto_server_post_event();
 
   return rc;
