@@ -114,7 +114,21 @@ proto_client_event_player_quit_handler(Proto_Session *s, Proto_Client_Handle ch)
 
 static int 
 proto_client_event_player_join_handler(Proto_Session *s, Proto_Client_Handle ch){
-  printf("proto_client_event_player_join_handler invoked!\n");  
+  int x,y,id,ret;
+  Player p;
+
+  proto_session_hdr_unmarshall(s,&s->rhdr);
+
+  id = s->rhdr.pstate.v0.raw;
+  x = s->rhdr.pstate.v1.raw;
+  y = s->rhdr.pstate.v2.raw;
+
+  if((ret = proto_session_body_unmarshall_player(s,0,&p)) == 0){
+    fprintf(stderr, "Error unmarshalling new player.\n");
+    return -1;
+  }
+
+  printf("Player %d has joined at (%d,%d)\n", id, x, y);  
 
   return 1;
 }
@@ -122,8 +136,6 @@ proto_client_event_player_join_handler(Proto_Session *s, Proto_Client_Handle ch)
 static int 
 proto_client_event_move_handler(Proto_Session *s, Proto_Client_Handle ch){
   int x,y,id;
-
-  printf("proto_client_event_move_handler invoked!\n");  
 
   proto_session_hdr_unmarshall(s,&s->rhdr);
 
