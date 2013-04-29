@@ -113,6 +113,13 @@ proto_client_event_player_quit_handler(Proto_Session *s, Proto_Client_Handle ch)
 }
 
 static int 
+proto_client_event_player_join_handler(Proto_Session *s, Proto_Client_Handle ch){
+  printf("proto_client_event_player_join_handler invoked!\n");  
+
+  return 1;
+}
+
+static int 
 proto_client_event_move_handler(Proto_Session *s, Proto_Client_Handle ch){
   int x,y,id;
 
@@ -209,6 +216,8 @@ proto_client_init(Proto_Client_Handle *ch){
       proto_client_set_event_handler(c, mt, proto_client_event_server_quit_handler);
     else if(mt == PROTO_MT_EVENT_BASE_PLAYER_QUIT)
       proto_client_set_event_handler(c, mt, proto_client_event_player_quit_handler);
+    else if(mt == PROTO_MT_EVENT_BASE_PLAYER_JOIN)
+      proto_client_set_event_handler(c, mt, proto_client_event_player_join_handler);
     else
       proto_client_set_event_handler(c, mt, proto_client_event_null_handler);
   }

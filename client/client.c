@@ -71,7 +71,7 @@ clientInit(Client *C){
 }
 
 static int
-update_event_handler(Proto_Session *s){
+update_event_handler(Proto_Session *s, Proto_Client_Handle ch){
   //  Client *C = proto_session_get_data(s);
   //  proto_session_dump(s);
   //  proto_session_dump(C->ph->event_session);

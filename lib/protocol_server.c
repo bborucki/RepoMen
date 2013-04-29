@@ -309,8 +309,10 @@ proto_server_mt_null_handler(Proto_Session *s){
 static int
 proto_server_hello_handler(Proto_Session *s){
   int rc = 1;
+  int x;
   Player* p;
   Proto_Msg_Hdr sh;
+  Proto_Session *us;
 
   p = (Player *)malloc(sizeof(Player));
   bzero(p, sizeof(p));
@@ -322,7 +324,9 @@ proto_server_hello_handler(Proto_Session *s){
   sh.type = proto_session_hdr_unmarshall_type(s);
   sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
 
-  if(player_find_empty_home(p,nextTeam, Server_ObjectMap, pidx)){
+  x = player_find_empty_home(p,nextTeam, Server_ObjectMap, pidx);
+
+  if(x){
     sh.pstate.v0.raw = 1;
     sh.pstate.v1.raw = p->pcell->x;
     sh.pstate.v2.raw = p->pcell->y;
@@ -334,7 +338,7 @@ proto_server_hello_handler(Proto_Session *s){
     player_dump(p);
     s->player = p;
     gamestate_add_player(Server_Gamestate, p);
-  } else{
+  } else {
     sh.pstate.v0.raw = 0;
   }
   if(nextTeam == TEAM1)
@@ -348,6 +352,18 @@ proto_server_hello_handler(Proto_Session *s){
   //  proto_dump_msghdr(&(s->shdr));
   rc = proto_session_send_msg(s,1);
   
+  if(x){ //if new player joining, tell everyone    
+    us = proto_server_event_session();
+    bzero(&sh, sizeof(sh));
+    sh.type = PROTO_MT_EVENT_BASE_PLAYER_JOIN;
+    sh.pstate.v0.raw = p->id;
+    sh.pstate.v1.raw = p->pcell->x;
+    sh.pstate.v2.raw = p->pcell->y;
+    proto_session_hdr_marshall(us, &sh);
+    proto_session_body_marshall_player(us,p);
+    proto_server_post_event();
+  }
+
   return rc;
 }
 /*
