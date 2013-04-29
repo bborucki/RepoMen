@@ -113,7 +113,6 @@ proto_server_record_event_subscriber(int fd, int *num){
     Proto_Server.EventNumSubscribers++;
     *num = Proto_Server.EventLastSubscriber++;
     Proto_Server.EventSubscribers[*num]=fd;
-    //NYI - unsure^^
     rc = 1;
   } else { //else search for first free array element
     int i;
@@ -152,7 +151,6 @@ proto_server_event_listen(void *arg){
       int i;
       fprintf(stderr, "EventListen: connfd=%d -> ", connfd);
       if (proto_server_record_event_subscriber(connfd, &i)<0){
-	//not entirely sure of second arg^^
 	fprintf(stderr, "oops no space for any more event subscribers\n");
 	close(connfd);
       } else {
@@ -277,6 +275,8 @@ proto_server_start_rpc_loop(void){
 static int 
 proto_session_lost_default_handler(Proto_Session *s){
   fprintf(stderr, "Player %d has disconnected\n", s->player->id);
+
+  //player removal handled in goodbye_handler
 
   //  proto_session_dump(s);
   return -1;
@@ -450,9 +450,6 @@ proto_server_move_handler(Proto_Session *s){
   bzero(&rh, sizeof(rh));
   Proto_Session *us;
   int valid;
-  
-  //  fprintf(stderr, "proto_server_move_handler: invoked for session:\n");
-  //  proto_session_dump(s);
 
   sh.type = proto_session_hdr_unmarshall_type(s);
   sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
@@ -485,8 +482,6 @@ proto_server_move_handler(Proto_Session *s){
     proto_session_hdr_marshall(us,&sh);
     proto_server_post_event();
   }
-  // I think this should work, if we just update the clients
-  //with the player that changed.
   
   return rc;
 }

@@ -71,11 +71,6 @@ clientInit(Client *C){
 
 static int
 update_event_handler(Proto_Session *s, Proto_Client_Handle ch){
-  //  Client *C = proto_session_get_data(s);
-  //  proto_session_dump(s);
-  //  proto_session_dump(C->ph->event_session);
-  //  proto_session_hdr_unmarsahll(C->eventsession, &rh);
-
   printf("Update from the server!\n");  
   fprintf(stderr, "%s: called", __func__);
   return 1;
@@ -126,16 +121,16 @@ doRPC(Client *C, char c)
     proto_session_body_unmarshall_cell(s, 0, globals.cell);
     break;
   case 'v':
+    //currently no validity checking client-side
     rc = proto_client_move(C->ph, globals.player->id, globals.mv);
     s = proto_client_rpc_session(C->ph);
-    //    printf("rc = %d\n", rc);
     if(s->rhdr.pstate.v3.raw > 0){
       if(s->rhdr.pstate.v0.raw == globals.player->id){
 	globals.x = s->rhdr.pstate.v1.raw;
 	globals.y = s->rhdr.pstate.v2.raw;
 	printf("Now at (%d,%d)\n", globals.x, globals.y);
 
-	//insert way of waiting for a server move update
+	//insert way of blocking for a server move update
 	//hmmmm
       }
     }
@@ -340,7 +335,7 @@ doNumFloor(Client *C){
   if(!proto_client_get_connected(C->ph)){
     printf("Not Connected.");
     return 1;
-  }    
+  }
   printf("Number of available floor cells = %d\n", globals.map->numfloor);
   return 1;
 }
@@ -396,11 +391,9 @@ doCInfo(Client *C){
     printf("y: %d\n", globals.cell->y);
     printf("object1: %d\n", globals.cell->obj);
 
-  }
-  else{
+  } 
+  else
     printf("Usage: \"cinfo <x,y>\"\n");
-    return 1;
-  }
   
   return 1;
 }
@@ -424,7 +417,7 @@ doDump(Client *C){
 
 int
 doHelp(){
-  printf("Available commands: \n\tconnect <IP:PORT> \n\tdisconnect \n\twhere \n\tnumhome <1 or 2> \n\tnumjail <1 or 2> \n\tnumwall \n\tnumfloor \n\tdim \n\tcinfo <x,y> \n\tmove <1/2/3/4> \n\tdump \n\tquit\n");
+  printf("Available commands: \n\tconnect <IP:PORT> \n\tdisconnect \n\twhere \n\tnumhome <1 or 2> \n\tnumjail <1 or 2> \n\tnumwall \n\tnumfloor \n\tdim \n\tmove <1/2/3/4> \n\tdump \n\tquit\n");
 
   return 1;
 }
@@ -461,8 +454,8 @@ input2cmd(char* input){
     cmd = 'a';
   else if(!strcmp(input, "dim"))
     cmd = 'm';
-  else if(!strcmp(input, "cinfo"))
-    cmd = 'i';
+  //  else if(!strcmp(input, "cinfo"))
+  //    cmd = 'i';
   else if(!strcmp(input, "dump"))
     cmd = 'u';
   else if(!strcmp(input, "move"))

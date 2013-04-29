@@ -67,7 +67,6 @@ extern int
 proto_client_get_connected(Proto_Client_Handle ch){
     Proto_Client *c = ch;
     return c->connected;
-    return 0;
 }
 
 extern int
@@ -126,7 +125,7 @@ proto_client_event_server_quit_handler(Proto_Session *s, Proto_Client_Handle ch)
 
   proto_client_set_connected(ch,0);
 
-  printf("Server quitting!\n");
+  fprintf(stderr, "Disconnected: server quitting.\n");
 
   return 1;
 }
@@ -138,7 +137,7 @@ proto_client_event_player_quit_handler(Proto_Session *s, Proto_Client_Handle ch)
   proto_session_body_unmarshall_player(s,0,&p);
   printf("Player %d has disconnected.\n", p.id);  
 
-  //update client gamestate
+  //remove appropriate player from gamestate
 
   return 1;
 }
@@ -159,6 +158,8 @@ proto_client_event_player_join_handler(Proto_Session *s, Proto_Client_Handle ch)
     return -1;
   }
 
+  //add palyer to gamestate
+
   printf("Player %d has joined at (%d,%d)\n", id, x, y);  
 
   return 1;
@@ -174,6 +175,8 @@ proto_client_event_move_handler(Proto_Session *s, Proto_Client_Handle ch){
   x = s->rhdr.pstate.v1.raw;
   y = s->rhdr.pstate.v2.raw;
   printf("Player %d is now at (%d,%d)\n", id, x, y);  
+
+  //update appropriate player gamestate
   
   return 1;
 }
@@ -242,8 +245,7 @@ proto_client_init(Proto_Client_Handle *ch){
   if (c==NULL) return -1;
   bzero(c, sizeof(Proto_Client));
 
-  proto_client_set_session_lost_handler(c, 
-					proto_client_session_lost_default_hdlr);
+  proto_client_set_session_lost_handler(c, proto_client_session_lost_default_hdlr);
   
   for (mt=PROTO_MT_EVENT_BASE_RESERVED_FIRST+1;
        mt<PROTO_MT_EVENT_BASE_RESERVED_LAST; mt++){
@@ -265,7 +267,6 @@ proto_client_init(Proto_Client_Handle *ch){
       proto_client_set_event_handler(c, mt, proto_client_event_null_handler);
   }
   
-
   *ch = c;
   return 1;
 }
@@ -298,10 +299,8 @@ marshall_mtonly(Proto_Session *s, Proto_Msg_Types mt) {
   bzero(&h, sizeof(h));
   h.type = mt;
   proto_session_hdr_marshall(s, &h);
-};
+}
 
-// all rpc's are assume to only reply only with a return code in the body
-// eg.  like the null_mes
 static int
 do_generic_dummy_rpc(Proto_Client_Handle ch, Proto_Msg_Types mt){
   int rc;
