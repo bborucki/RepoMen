@@ -135,7 +135,7 @@ player_move(dir_t dir, Player *p, ObjectMap *o, Gamestate *g){
   int ret = 0;
   int dim = o->dim;
   Player *otherPlayer;
-  int x,y,nx,ny;
+  int x,y,nx,ny,nidx;
   
   x = p->pcell->x;
   y = p->pcell->y;
@@ -157,14 +157,23 @@ player_move(dir_t dir, Player *p, ObjectMap *o, Gamestate *g){
   if((ret = objectmap_validate_move(nx,ny,p,o)) > 0){
     if(ret == 2)
       player_tagHandler(otherPlayer,o,g);
+    nidx = nx*dim + ny;
+    //return code 3 for ret is digging
 
-    //took out the cell_create (I think this was old...) -chris
-    //need to also change player state and check if 
-    //picking up flag or a shovel and check if digging
+    if(p->state == SAFE)
+      if(o->objects[nidx]->type == FLOOR)
+	p->state = FREE;
+
+    if(p->state == FREE){
+      if(o->objects[nidx]->type == HOME1 && p->team == TEAM1)
+	p->state = SAFE;
+      else if(o->objects[nidx]->type == HOME2 && p->team == TEAM2)
+	p->state = SAFE;
+    }
 
     objectmap_remove_player(p->pcell->x,p->pcell->y, o);
-    p->pcell = o->objects[nx*dim + ny];
-    o->objects[nx*dim+ny]->player = p;
+    p->pcell = o->objects[nidx];
+    o->objects[nidx]->player = p;
     return 1;
   }
   

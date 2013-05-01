@@ -41,7 +41,7 @@ objectmap_validate_move(int x, int y, Player *p, ObjectMap *o){
     if(o->objects[idx]->type == IWALL)
       return 0;
     if(o->objects[idx]->type == WALL && p->shovel == NONE)
-      return 0;
+      return 3;
   }
   return 1;
 }
