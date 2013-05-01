@@ -459,7 +459,7 @@ proto_server_move_handler(Proto_Session *s){
   dir = rh.pstate.v1.raw;
   p = players[id];
   
-  valid = player_move(dir,p,Server_ObjectMap, Server_Map);
+  valid = player_move(dir,p,Server_ObjectMap, Server_Gamestate);
   
   if (valid) {
     sh.pstate.v3.raw = 1;

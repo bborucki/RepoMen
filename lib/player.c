@@ -62,8 +62,63 @@ player_find_empty_home(Player* p, team_t t, ObjectMap *o, int playerid){
 int
 player_drop_object(){}
 
+
 extern int
-player_do_tagged(){}
+player_tagHandler(Player *tagee, ObjectMap *o, Gamestate *g){
+  int x,y,px,py, idx;
+  team_t t;
+  t = tagee->team;
+
+  idx = x*(o->dim)+y;
+
+  if(tagee->shovel != NONE){
+    objectmap_place_shovel(o,g,tagee->team);
+  }
+  if(tagee->flag != NONE){
+    if(tagee == TEAM1)
+      o->objects[idx]->obj = FLAG1;
+    else
+      o->objects[idx]->obj = FLAG2;
+  }
+
+  if(t == TEAM1){
+    for(x = 91; x<=109; x++){
+      for(y = 102; y<=110; y++){
+	idx = x*(o->dim)+y;
+	if(o->objects[idx]->type == JAIL2 && o->objects[idx]->player == NULL){
+	  tagee->pcell = o->objects[idx];
+	  tagee->pcell->x = x;
+	  tagee->pcell->y = y;
+	  tagee->shovel = NONE;
+	  tagee->flag = NONE;
+	  tagee->state = JAILED;
+	  o->objects[idx]->player = tagee;
+	  return 1;
+	}
+      }
+    }
+  }
+  else{
+    for(x = 91; x<=109; x++){
+      for(y = 90;y<=98; y++){
+	idx = x*(o->dim)+y;
+	if(o->objects[idx]->type == JAIL1 && o->objects[idx]->player == NULL){
+	  tagee->pcell = o->objects[idx];
+	  tagee->pcell->x = x;
+	  tagee->pcell->y = y;
+	  tagee->shovel = NONE;
+	  tagee->flag = NONE;
+	  tagee->state = JAILED;
+	  o->objects[idx]->player = tagee;
+	  return 1;
+	}
+      }
+    }
+  }
+  objectmap_remove_player(tagee->pcell->x,tagee->pcell->y, o);
+      
+}
+
 
 extern int
 player_is_taggable(Player *tager, Player *tagee){
@@ -76,7 +131,7 @@ player_is_taggable(Player *tager, Player *tagee){
 }
 
 extern int
-player_move(dir_t dir, Player *p, ObjectMap *o, Map *m){
+player_move(dir_t dir, Player *p, ObjectMap *o, Gamestate *g){
   int ret = 0;
   int dim = o->dim;
   Player *otherPlayer;
@@ -101,7 +156,7 @@ player_move(dir_t dir, Player *p, ObjectMap *o, Map *m){
 
   if((ret = objectmap_validate_move(nx,ny,p,o)) > 0){
     if(ret == 2)
-      objectmap_tagHandler(p,otherPlayer);
+      player_tagHandler(otherPlayer,o,g);
 
     //took out the cell_create (I think this was old...) -chris
     //need to also change player state and check if 

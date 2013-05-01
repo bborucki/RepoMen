@@ -17,9 +17,8 @@ objectmap_remove_player(int x, int y, ObjectMap *o){
   return 1;
 }
 
-extern int
-objectmap_tagHandler(Player *tager, Player *tagee){
-  return 0;
+extern int 
+objectmap_reset_cell(int x, int y, ObjectMap *o){
 }
  
 extern int
@@ -45,6 +44,30 @@ objectmap_validate_move(int x, int y, Player *p, ObjectMap *o){
       return 0;
   }
   return 1;
+}
+
+extern int
+objectmap_place_shovel(ObjectMap *o, Gamestate *g, team_t team){
+  int x,y,idx;
+  int dim = o->dim;
+
+  if(team == TEAM1){
+    x = 109;
+    y = 2;
+    idx = x*dim+y;
+    printf("x = %d, y = %d \n", x, y);
+    o->objects[idx]->obj = SHOVEL1;
+  }
+
+  else{
+    x = 109;
+    y = 197;
+    idx = x*dim+y;
+    printf("x = %d, y = %d \n", x, y);
+    o->objects[idx]->obj = SHOVEL2;
+  }
+  gamestate_add_cell(g, o->objects[idx]);
+
 }
 
 extern ObjectMap *
@@ -94,25 +117,14 @@ objectmap_create(Map *m, Gamestate *g){
     //  o->objects[x*dim+y]->obj = FLAG2;
     */
 
-  x = 109;
-  y = 2;
-  idx = x*dim+y;
-  printf("x = %d, y = %d \n", x, y);
-  o->objects[idx]->obj = SHOVEL1;
-
-  gamestate_add_cell(g, o->objects[idx]);
-
-  x = 109;
-  y = 197;
-  idx = x*dim+y;
-  printf("x = %d, y = %d \n", x, y);
-  o->objects[idx]->obj = SHOVEL2;
-
-  gamestate_add_cell(g, o->objects[idx]);
 
   o->numCells = 4;
   o->numPlayers = 0;
   o->dim = dim;
+
+  objectmap_place_shovel(o,g,TEAM1);
+  objectmap_place_shovel(o,g,TEAM2);
+
   
   return o;
 }
