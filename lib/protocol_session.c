@@ -34,7 +34,7 @@
 #include "protocol_session.h"
 #include "objectmap.h"
 #include "player.h"
-
+#include "gamestate.h"
 extern void
 proto_session_dump(Proto_Session *s){
   fprintf(stderr, "Session s=%p:\n", s);
@@ -285,6 +285,27 @@ proto_session_body_unmarshall_map(Proto_Session *s, int offset, Map *m){
   }
   return -1;
 }
+
+extern int  
+proto_session_body_marshall_gamestate(Proto_Session *s, Gamestate *g){
+  if (s && ((s->slen + sizeof(Gamestate)) < PROTO_SESSION_BUF_SIZE)){
+    memcpy(s->sbuf + s->slen, g, sizeof(Player));
+    s->slen += sizeof(Gamestate);
+    return 1;
+  }
+  return -1;
+
+}
+extern int  
+proto_session_body_unmarshall_gamestate(Proto_Session *s, int offset, 
+					Gamestate *g){
+  if (s && ((s->rlen - (offset + sizeof(Gamestate)) >= 0))){
+    memcpy(g, s->rbuf + offset, sizeof(Gamestate));
+      return offset + sizeof(Player);
+  }
+  return -1;
+}
+
 
 extern int
 proto_session_body_marshall_player(Proto_Session *s, Player *p){

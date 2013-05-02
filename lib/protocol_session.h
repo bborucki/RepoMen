@@ -77,6 +77,8 @@ extern int  proto_session_body_unmarshall_cell(Proto_Session *s, int offset,
 extern int  proto_session_body_marshall_player(Proto_Session *s, Player *p);
 extern int  proto_session_body_unmarshall_player(Proto_Session *s, int offset, 
 						Player *p);
+extern int  proto_session_body_marshall_gamestate(Proto_Session *s, Gamestate *g);
+extern int  proto_session_body_unmarshall_gamestate(Proto_Session *s, int offset,Gamestate *g);
 extern int  proto_session_body_marshall_map(Proto_Session *s, Map *m);
 extern int  proto_session_body_unmarshall_map(Proto_Session *s, int offset, 
 						Map *m);

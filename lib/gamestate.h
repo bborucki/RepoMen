@@ -14,6 +14,10 @@ int flag1home1;
 int flag2home1;
 int flag1home2;
 int flag2home2;
+int numplayershome1;
+int numplayershome2;
+int numPlayers1;
+int numPlayers2;
 
 
 struct Gamestate_ {
