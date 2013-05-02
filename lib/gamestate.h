@@ -7,6 +7,10 @@
 
 #define MAX_PLAYERS 198
 
+int gamefull;
+int flag1found;
+int flag2found;
+
 struct Gamestate_ {
   char numCells;
   char numPlayers;

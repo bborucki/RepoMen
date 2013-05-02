@@ -45,7 +45,6 @@ Map *Server_Map;
 ObjectMap *Server_ObjectMap; 
 int pidx;
 team_t nextTeam;
-int gamefull = 0;
 
 struct {
   FDType   RPCListenFD;
@@ -451,7 +450,8 @@ proto_server_move_handler(Proto_Session *s){
   bzero(&rh, sizeof(rh));
   Proto_Session *us;
   int valid;
-  object_t flagindex;
+  int flagindex;
+  object_t flag;
   Proto_Session *fs;
   
 
@@ -469,6 +469,21 @@ proto_server_move_handler(Proto_Session *s){
     sh.pstate.v3.raw = 1;
     printf("Player %d is moving to (%d,%d)\n",id,p->pcell->x,p->pcell->y);
     flagindex = objectmap_flag_visible(p,Server_ObjectMap);
+    flag = Server_ObjectMap->objects[flagindex]->obj;
+
+    if(flag == FLAG1){
+      if(!flag1found)
+	flag1found = 1;
+      else
+	flagindex = -1;
+    }
+    if(flag == FLAG2){
+      if(!flag2found)
+	flag2found = 1;
+      else
+	flagindex = -1;
+    }
+
   } else {
     sh.pstate.v3.raw = 0;    
     printf("Player %d attemped an invalid move\n",id);
@@ -555,6 +570,10 @@ proto_server_init(void){
   int rc;
   int dim;
 
+  gamefull = 0;
+  flag1found = 0;
+  flag2found = 0;
+  
   if((Server_Map = map_init(MAP_NAME)) == NULL)
     return -1;
   dim = Server_Map->dim;
