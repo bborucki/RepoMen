@@ -14,6 +14,16 @@ player_dump(Player *p){
   dump_object(p->flag);
 }
 
+extern int
+player_find_next_id(Player **players){
+  int i;
+  for(i = 0; i<MAX_PLAYERS; i++){
+    if(players[i] == NULL)
+      return i;
+  }
+  return -1;
+}
+
 extern int 
 player_find_empty_home(Player* p, team_t t, ObjectMap *o, int playerid){
   int x,y,idx;

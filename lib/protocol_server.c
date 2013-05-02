@@ -43,9 +43,9 @@
 Gamestate *Server_Gamestate;
 Map *Server_Map;
 ObjectMap *Server_ObjectMap; 
-Player** players;
 int pidx;
 team_t nextTeam;
+int gamefull = 0;
 
 struct {
   FDType   RPCListenFD;
@@ -325,19 +325,18 @@ proto_server_hello_handler(Proto_Session *s){
   sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
 
   x = player_find_empty_home(p,nextTeam, Server_ObjectMap, pidx);
-
+  x = !gamefull;
   if(x){
     sh.pstate.v0.raw = 1;
     sh.pstate.v1.raw = p->pcell->x;
     sh.pstate.v2.raw = p->pcell->y;
-    players[pidx] = p;
+    Server_Gamestate->plist[pidx] = p;
     proto_session_body_marshall_player(s,p);
     proto_session_body_marshall_map(s,Server_Map);
     printf("New player joining:\n");
     printf("Location: %d,%d\n", p->pcell->x, p->pcell->y);
     player_dump(p);
     s->player = p;
-    gamestate_add_player(Server_Gamestate, p);
   } else {
     sh.pstate.v0.raw = 0;
   }
@@ -345,8 +344,10 @@ proto_server_hello_handler(Proto_Session *s){
     nextTeam = TEAM2;
   else
     nextTeam = TEAM1;
-  pidx++;
-  
+  pidx = player_find_next_id(Server_Gamestate->plist);
+  if(pidx<0)
+    gamefull = 1;
+
   proto_session_hdr_marshall(s, &sh);
   
   //  proto_dump_msghdr(&(s->shdr));
@@ -457,7 +458,7 @@ proto_server_move_handler(Proto_Session *s){
   proto_session_hdr_unmarshall(s, &rh);
   id = rh.pstate.v0.raw;
   dir = rh.pstate.v1.raw;
-  p = players[id];
+  p = Server_Gamestate->plist[id];
   
   valid = player_move(dir,p,Server_ObjectMap, Server_Gamestate);
   
@@ -517,7 +518,10 @@ proto_server_goodbye_handler(Proto_Session *s){
 
   rc = proto_session_send_msg(s,1);
 
-  //remove player from gamestate
+  Server_Gamestate->plist[p.id] = NULL;
+  pidx = player_find_next_id(Server_Gamestate->plist);
+  if(pidx<0)
+    gamefull = 1;
 
   us = proto_server_event_session();
   h.type = PROTO_MT_EVENT_BASE_PLAYER_QUIT;
@@ -548,8 +552,6 @@ proto_server_init(void){
     return -1;
   }
 
-  players = (Player **)malloc(sizeof(int)*MAX_PLAYERS);
-  bzero(players, sizeof(players));
   pidx = 0;
   nextTeam = TEAM1;
 
