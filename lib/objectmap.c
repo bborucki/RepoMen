@@ -70,6 +70,26 @@ objectmap_place_shovel(ObjectMap *o, Gamestate *g, team_t team){
 
 }
 
+extern int
+objectmap_flag_visible(Player *p, ObjectMap *o){
+  team_t t = p->team;
+  int x,y,idx,dim,i;
+  x = p->pcell->x - 5;
+  y = p->pcell->y - 5;
+  
+    for(i=0;i<121;i++){
+      if(t == TEAM1){
+	if(o->objects[idx]->obj == FLAG1)
+	  return idx;
+      }
+      if(t == TEAM2){
+	if(o->objects[idx]->obj == FLAG2)
+	  return idx;
+      }
+      idx++;
+    }
+    return -1;
+}
 extern ObjectMap *
 objectmap_create(Map *m, Gamestate *g){
   ObjectMap *o;

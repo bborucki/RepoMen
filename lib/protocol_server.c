@@ -451,6 +451,9 @@ proto_server_move_handler(Proto_Session *s){
   bzero(&rh, sizeof(rh));
   Proto_Session *us;
   int valid;
+  object_t flagindex;
+  Proto_Session *fs;
+  
 
   sh.type = proto_session_hdr_unmarshall_type(s);
   sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
@@ -465,6 +468,7 @@ proto_server_move_handler(Proto_Session *s){
   if (valid) {
     sh.pstate.v3.raw = 1;
     printf("Player %d is moving to (%d,%d)\n",id,p->pcell->x,p->pcell->y);
+    flagindex = objectmap_flag_visible(p,Server_ObjectMap);
   } else {
     sh.pstate.v3.raw = 0;    
     printf("Player %d attemped an invalid move\n",id);
@@ -484,6 +488,19 @@ proto_server_move_handler(Proto_Session *s){
     proto_server_post_event();
   }
   
+  bzero(&sh, sizeof(sh));
+  
+  if(!(flagindex<0)){
+    fs = proto_server_event_session();
+    sh.type = PROTO_MT_EVENT_BASE_FLAG;
+    
+    //gstate.v0 holds the flag itself
+    //gstate.v1 holds the index in the objectmap where that flag is located
+    sh.gstate.v0.raw = Server_ObjectMap->objects[flagindex]->obj;
+    sh.gstate.v1.raw = flagindex;
+    proto_session_hdr_marshall(fs,&sh);
+    proto_server_post_event();
+  }
   return rc;
 }
 
