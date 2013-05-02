@@ -10,6 +10,11 @@
 int gamefull;
 int flag1found;
 int flag2found;
+int flag1home1;
+int flag2home1;
+int flag1home2;
+int flag2home2;
+
 
 struct Gamestate_ {
   char numCells;

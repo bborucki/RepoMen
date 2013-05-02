@@ -439,6 +439,41 @@ proto_server_cinfo_handler(Proto_Session *s){
 }
 
 static int
+proto_server_pickup_handler(Proto_Session *s){
+  int id,rc,ret;
+  Proto_Msg_Hdr sh;
+  Proto_Msg_Hdr rh;
+  Player* p;
+  Proto_Session *us;
+
+  bzero(&sh, sizeof(sh));
+  bzero(&rh, sizeof(rh));
+
+  sh.type = proto_session_hdr_unmarshall_type(s);
+  sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
+
+  proto_session_hdr_unmarshall(s, &rh);
+  id = rh.pstate.v0.raw;
+  p = Server_Gamestate->plist[id];
+  
+  ret = player_obj_pickup(p,Server_ObjectMap);
+  sh.pstate.v0.raw = id;//same header for both reply and update
+  sh.pstate.v1.raw = ret; //sending back the actual thing picked up
+  proto_session_hdr_marshall(s, &sh);
+  rc = proto_session_send_msg(s,1);
+  
+  if(ret >= 0){
+    us = proto_server_event_session();
+    sh.type = PROTO_MT_EVENT_BASE_MOVE;
+    proto_session_hdr_marshall(us,&sh);
+    proto_server_post_event();
+  } 
+  return rc;
+
+
+}
+
+static int
 proto_server_move_handler(Proto_Session *s){
   int i,rx,ry,id,rc;
   dir_t dir;
@@ -446,13 +481,13 @@ proto_server_move_handler(Proto_Session *s){
   Proto_Msg_Hdr sh;
   Proto_Msg_Hdr rh;
   Player* p;
-  bzero(&sh, sizeof(sh));
-  bzero(&rh, sizeof(rh));
   Proto_Session *us;
   int valid;
   int flagindex;
-  object_t flag;
+  object_t flag = -1;
   Proto_Session *fs;
+  bzero(&sh, sizeof(sh));
+  bzero(&rh, sizeof(rh));
   
 
   sh.type = proto_session_hdr_unmarshall_type(s);
@@ -462,14 +497,15 @@ proto_server_move_handler(Proto_Session *s){
   id = rh.pstate.v0.raw;
   dir = rh.pstate.v1.raw;
   p = Server_Gamestate->plist[id];
-  
+  valid = 0;
   valid = player_move(dir,p,Server_ObjectMap, Server_Gamestate);
-  
+  printf("Valid bit%d\n", valid);
   if (valid) {
     sh.pstate.v3.raw = 1;
     printf("Player %d is moving to (%d,%d)\n",id,p->pcell->x,p->pcell->y);
     flagindex = objectmap_flag_visible(p,Server_ObjectMap);
-    flag = Server_ObjectMap->objects[flagindex]->obj;
+    if(flagindex>=0)
+      flag = Server_ObjectMap->objects[flagindex]->obj;
 
     if(flag == FLAG1){
       if(!flag1found)

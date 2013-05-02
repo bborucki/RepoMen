@@ -24,6 +24,26 @@ player_find_next_id(Player **players){
   return -1;
 }
 
+
+extern int 
+player_obj_pickup(Player* p, ObjectMap *o){
+  int x,y,idx;
+  team_t t;
+  idx = x*(o->dim)+y;
+  if(o->objects[idx] == NULL || o->objects[idx]->obj == NONE)
+    return -1;
+  if(o->objects[idx]->obj == FLAG1 ||o->objects[idx]->obj == FLAG2){
+    p->flag = o->objects[idx]->obj;
+    o->objects[idx]->obj = NONE;
+    return p->flag;
+  } else if(o->objects[idx]->obj == SHOVEL1 || o->objects[idx]->obj == SHOVEL2){
+    p->shovel = o->objects[idx]->obj;
+    o->objects[idx]->obj = NONE;
+    return p->shovel;
+  }
+  return -1;
+}
+
 extern int 
 player_find_empty_home(Player* p, team_t t, ObjectMap *o, int playerid){
   int x,y,idx;
@@ -170,9 +190,8 @@ player_move(dir_t dir, Player *p, ObjectMap *o, Gamestate *g){
     nidx = nx*dim + ny;
     //return code 3 for ret is digging
 
-    if(p->state == SAFE)
-      if(o->objects[nidx]->type == FLOOR)
-	p->state = FREE;
+    if(p->state == SAFE && o->objects[nidx]->type == FLOOR)
+      p->state = FREE;
 
     if(p->state == FREE){
       if(o->objects[nidx]->type == HOME1 && p->team == TEAM1)

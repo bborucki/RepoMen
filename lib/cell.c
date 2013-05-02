@@ -9,6 +9,8 @@ isMutable(Map* m, int x, int y){
   //slight performance optimizations
   int dim = m->dim;
   int w = x*dim+y;
+  int up = ((x-1)*dim)+y;
+  int down = ((x+1)*dim)+y;
 
   //  LINE_MAX and COLUMN_MAX != maze dimensions
   //  if(x == LINE_MAX - 1 || x == 0 || y == COLUMN_MAX -1 ||
@@ -16,14 +18,14 @@ isMutable(Map* m, int x, int y){
 
   if(x == dim-1 || x == 0 || y == dim-1 || y == 0)
     return 0;
-  else if(m->maze[x*(dim-1)+y] == 'h' || 
-	  m->maze[x*(dim+1)+y] == 'h' ||
+  else if(m->maze[up] == 'h' || 
+	  m->maze[down] == 'h' ||
 	  m->maze[w-1] == 'h' ||
 	  m->maze[w+1] == 'h' ||
 	  m->maze[w-1] == 'j' ||
 	  m->maze[w+1] == 'j' ||
-	  m->maze[x*(dim-1)+y] == 'j' ||
-	  m->maze[x*(dim+1)+y] == 'j'){
+	  m->maze[up] == 'j' ||
+	  m->maze[down] == 'j'){
     return 0;
   }
   return 1;
