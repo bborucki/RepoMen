@@ -9,6 +9,7 @@ cell_dump(Cell *c){
   cell_print_type(c);
   dump_team(c->team);
   printf("Location: %d,%d\n", c->x, c->y);
+  printf("Index: %d", c->idx);
   dump_object(c->obj);
   printf("Player ID: %d\n", (int)(c->playerid));
   return 1;

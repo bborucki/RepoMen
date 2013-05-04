@@ -215,7 +215,6 @@ player_move(dir_t dir, Player *p, ObjectMap *o, Gamestate *g){
 extern Player *
 player_create(){
   Player *p;
-
   p = (Player *)malloc(sizeof(Player));
   bzero(p, sizeof(Player));
   return p;

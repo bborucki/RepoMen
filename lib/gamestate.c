@@ -6,12 +6,13 @@
 #include "cell.h"
 #include "player.h"
 
-#define MAXNUMCELLS 20
-#define MAXNUMPLAYERS 20
+#define MAXNUMCELLS 40000
+#define MAXNUMPLAYERS 190
 
 extern int
 gamestate_dump(Gamestate *g){
-  int ncells, nplayers;
+  int ncells; 
+  int nplayers;
   int i = 0;
   
   printf("Dumping gamestate\n");
@@ -21,41 +22,26 @@ gamestate_dump(Gamestate *g){
   
   printf("There are %d players and %d cells\n", nplayers, ncells);
 
-  while(nplayers){
+  while(nplayers && i < MAXNUMPLAYERS){
     if(g->plist[i++] != NULL){
+      printf("i = %d\n", i);
       player_dump(g->plist[i]);
       nplayers--;
     }
   }
 
   i = 0;
-  while(ncells){
+  while(ncells && i < MAXNUMCELLS){
     if(g->clist[i++] != NULL){
+      printf("i = %d\n", i);
       cell_dump(g->clist[i]);
       ncells--;
     }    
   }
 
+  printf("Done dumping gamestate.\n");
+
   return 1;
-}
-
-extern Gamestate *
-gamestate_create(){
-  Gamestate *g;
-  
-  g = (Gamestate *)malloc(sizeof(Gamestate));
-  bzero(g, sizeof(Gamestate));
-  
-  g->numCells = 0;
-  g->numPlayers = 0;
-  
-  g->clist = (Cell **)malloc(sizeof(Cell *)*MAXNUMCELLS);
-  g->plist = (Player **)malloc(sizeof(Player *)*MAXNUMPLAYERS);
-
-  bzero(g->clist, sizeof(g->clist));
-  bzero(g->plist, sizeof(g->plist));
-
-  return g;
 }
 
 extern Player *
@@ -65,16 +51,12 @@ gamestate_get_player(Gamestate *g, int playerid){
 
 extern int
 gamestate_add_player(Gamestate *g, Player *p){
-  printf("Adding a player!\n");
-
   if(g->numPlayers >= MAXNUMPLAYERS){
     return -1;
   }
 
   g->plist[p->id] = p;
   g->numPlayers++;
-
-  printf("Added!\n");
 
   return 0;
 }
@@ -96,16 +78,12 @@ gamestate_remove_player(Gamestate *g, int playerid){
 
 extern int
 gamestate_add_cell(Gamestate *g, Cell *c){
-  printf("Adding a cell!\n");
-
   if(g->numCells >= MAXNUMCELLS){
     return -1;
   }
 
   g->clist[c->idx] = c;
   g->numCells++;
-
-  printf("Added!\n");
 
   return 0;
 }
@@ -127,4 +105,28 @@ gamestate_remove_cell(Gamestate *g, int x, int y){
   }
 
   return -1;
+}
+
+extern Gamestate *
+gamestate_create(){
+  Gamestate *g;
+  int i;
+  
+  g = (Gamestate *)malloc(sizeof(Gamestate));
+  bzero(g, sizeof(Gamestate));
+  
+  g->numCells = 0;
+  g->numPlayers = 0;
+  
+  g->clist = (Cell **)malloc(sizeof(Cell *)*MAXNUMCELLS);
+  g->plist = (Player **)malloc(sizeof(Player *)*MAXNUMPLAYERS);
+
+  for(i = 0; i < MAXNUMCELLS; i++){
+    g->clist[i] = NULL;    
+  }
+  for(i = 0; i < MAXNUMPLAYERS; i++){
+    g->plist[i] = NULL;
+  }
+
+  return g;
 }

@@ -467,8 +467,6 @@ proto_server_pickup_handler(Proto_Session *s){
     proto_server_post_event();
   } 
   return rc;
-
-
 }
 
 static int
@@ -611,6 +609,8 @@ proto_server_init(void){
     return -1;
   dim = Server_Map->dim;
 
+  printf("making gamestate\n");
+
   if((Server_Gamestate = gamestate_create()) == NULL){
     fprintf(stderr, "could not create gamestate\n");
     return -1;
@@ -620,6 +620,13 @@ proto_server_init(void){
     fprintf(stderr, "could not load map\n");
     return -1;
   }
+
+  printf("dumping gamestate\n");
+
+  gamestate_dump(Server_Gamestate);
+
+  printf("dumped gamestate\n");
+
 
   pidx = 0;
   nextTeam = TEAM1;
