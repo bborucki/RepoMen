@@ -300,23 +300,25 @@ proto_session_body_marshall_gamestate(Proto_Session *s, Gamestate *g){
 
   ncell = g->numCells;
   while(ncell){
-    if(g->clist[i++] != NULL){
+    if(g->clist[i] != NULL){
       if(proto_session_body_marshall_cell(s,g->clist[i])<0){
 	return -1;
       }
       ncell--;
     }
+    i++;
   }
 
   i = 0;
   nplayers = g->numPlayers;
   while(nplayers){
-    if(g->plist[i++] != NULL){
+    if(g->plist[i] != NULL){
       if(proto_session_body_marshall_player(s,g->plist[i])<0){
 	return -1;
       }
       nplayers--;
     }
+    i++;
   }
   
   return 1;

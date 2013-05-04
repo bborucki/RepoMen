@@ -18,12 +18,16 @@ player_dump(Player *p){
 
 extern int
 player_find_next_id(Player **players){
+  printf("in find next id\n");
+
   int i;
   for(i = 0; i<MAX_PLAYERS; i++){
     if(players[i] == NULL)
       return i;
   }
   return -1;
+
+  printf("done with find next id\n");
 }
 
 extern int 

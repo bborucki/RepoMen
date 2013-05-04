@@ -15,7 +15,7 @@ gamestate_dump(Gamestate *g){
   int nplayers;
   int i = 0;
   
-  printf("Dumping gamestate\n");
+  printf("~~~~~~~~~~~~~~~~~~~~Dumping gamestate~~~~~~~~~~~~~~~~~~~~\n");
 
   ncells = g->numCells;
   nplayers = g->numPlayers;
@@ -23,23 +23,23 @@ gamestate_dump(Gamestate *g){
   printf("There are %d players and %d cells\n", nplayers, ncells);
 
   while(nplayers && i < MAXNUMPLAYERS){
-    if(g->plist[i++] != NULL){
-      printf("i = %d\n", i);
+    if(g->plist[i] != NULL){
       player_dump(g->plist[i]);
       nplayers--;
     }
+    i++;
   }
 
   i = 0;
   while(ncells && i < MAXNUMCELLS){
-    if(g->clist[i++] != NULL){
-      printf("i = %d\n", i);
+    if(g->clist[i] != NULL){
       cell_dump(g->clist[i]);
       ncells--;
     }    
+    i++;
   }
 
-  printf("Done dumping gamestate.\n");
+  printf("~~~~~~~~~~~~~~~~~~~~Done dumping gamestate~~~~~~~~~~~~~~~~~~~~\n");
 
   return 1;
 }

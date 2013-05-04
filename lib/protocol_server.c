@@ -326,13 +326,13 @@ proto_server_hello_handler(Proto_Session *s){
     gamestate_add_player(Server_Gamestate,p);
     printf("New player joining:\n");
     printf("Location: %d,%d\n", p->pcell->x, p->pcell->y);
+    player_dump(p);
     sh.pstate.v0.raw = 1;
     sh.pstate.v1.raw = p->pcell->x;
     sh.pstate.v2.raw = p->pcell->y;
     gamestate_dump(Server_Gamestate);
     proto_session_body_marshall_gamestate(s,Server_Gamestate);
     proto_session_body_marshall_map(s,Server_Map);
-    player_dump(p);
     s->player = p;
   } else {
     sh.pstate.v0.raw = 0;
@@ -609,8 +609,6 @@ proto_server_init(void){
     return -1;
   dim = Server_Map->dim;
 
-  printf("making gamestate\n");
-
   if((Server_Gamestate = gamestate_create()) == NULL){
     fprintf(stderr, "could not create gamestate\n");
     return -1;
@@ -620,13 +618,6 @@ proto_server_init(void){
     fprintf(stderr, "could not load map\n");
     return -1;
   }
-
-  printf("dumping gamestate\n");
-
-  gamestate_dump(Server_Gamestate);
-
-  printf("dumped gamestate\n");
-
 
   pidx = 0;
   nextTeam = TEAM1;
