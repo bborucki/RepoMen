@@ -59,7 +59,6 @@ objectmap_place_shovel(ObjectMap *o, Gamestate *g, team_t team){
     printf("x = %d, y = %d \n", x, y);
     o->objects[idx]->obj = SHOVEL1;
   }
-
   else{
     x = 109;
     y = 197;
@@ -68,7 +67,6 @@ objectmap_place_shovel(ObjectMap *o, Gamestate *g, team_t team){
     o->objects[idx]->obj = SHOVEL2;
   }
   gamestate_add_cell(g, o->objects[idx]);
-
 }
 
 extern int

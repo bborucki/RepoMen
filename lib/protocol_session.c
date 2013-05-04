@@ -288,24 +288,76 @@ proto_session_body_unmarshall_map(Proto_Session *s, int offset, Map *m){
 
 extern int  
 proto_session_body_marshall_gamestate(Proto_Session *s, Gamestate *g){
-  if (s && ((s->slen + sizeof(Gamestate)) < PROTO_SESSION_BUF_SIZE)){
-    memcpy(s->sbuf + s->slen, g, sizeof(Player));
-    s->slen += sizeof(Gamestate);
-    return 1;
-  }
-  return -1;
+  int ncell, nplayers;
+  int i = 0;
 
+  if(proto_session_body_marshall_int(s,g->numCells)<0){
+    return -1;
+  }
+  if(proto_session_body_marshall_int(s,g->numPlayers)<0){
+    return -1;
+  }
+
+  ncell = g->numCells;
+  while(ncell){
+    if(g->clist[i++] != NULL){
+      if(proto_session_body_marshall_cell(s,g->clist[i])<0){
+	return -1;
+      }
+      ncell--;
+    }
+  }
+
+  i = 0;
+  nplayers = g->numPlayers;
+  while(nplayers){
+    if(g->plist[i++] != NULL){
+      if(proto_session_body_marshall_player(s,g->plist[i])<0){
+	return -1;
+      }
+      nplayers--;
+    }
+  }
+  
+  return 1;
 }
+
 extern int  
 proto_session_body_unmarshall_gamestate(Proto_Session *s, int offset, 
 					Gamestate *g){
-  if (s && ((s->rlen - (offset + sizeof(Gamestate)) >= 0))){
-    memcpy(g, s->rbuf + offset, sizeof(Gamestate));
-      return offset + sizeof(Player);
-  }
-  return -1;
-}
+  Player *p;
+  Cell *c;
+  int nplayers;
+  int ncells;
 
+  offset+= proto_session_body_unmarshall_int(s,offset,&(g->numCells));
+  offset+= proto_session_body_unmarshall_int(s,offset,&(g->numPlayers)); 
+
+  nplayers = g->numPlayers;
+  ncells = g->numCells;
+
+  while(ncells){
+    c = (Cell *)malloc(sizeof(Cell));
+    if((offset+=proto_session_body_unmarshall_cell(s,offset,c))<0){
+      free(c);
+      return -1;
+    }
+    gamestate_add_cell(g,c);
+    ncells--;
+  }
+
+  while(nplayers){
+    p = (Player *)malloc(sizeof(Player));
+    if((offset+=proto_session_body_unmarshall_player(s,offset,p))<0){
+      free(p);
+      return -1;
+    }
+    gamestate_add_player(g,p);
+    nplayers--;
+  }
+
+  return offset;
+}
 
 extern int
 proto_session_body_marshall_player(Proto_Session *s, Player *p){

@@ -42,6 +42,7 @@
     Map *map;
     Cell *cell;
     Player *player;
+    Gamestate *gamestate;
     //  ObjectMap *objmap;
   } globals;
 
@@ -61,6 +62,8 @@ clientInit(Client *C){
   bzero(globals.player,sizeof(globals.player));
   bzero(globals.map,sizeof(globals.map));
   bzero(globals.cell,sizeof(globals.cell));
+
+  globals.gamestate = gamestate_create();
 
   if (proto_client_init(&(C->ph))<0) {
     fprintf(stderr, "client: main: ERROR initializing proto system\n");
@@ -101,6 +104,7 @@ doRPC(Client *C, char c)
   Proto_Msg_Hdr hdr;
   int rc=-1;
   int x,y;
+  int offset=0;
 
   Proto_Session *s;
   switch (c) {
@@ -111,8 +115,9 @@ doRPC(Client *C, char c)
     if(s->rhdr.pstate.v0.raw){
       globals.x = (unsigned char)s->rhdr.pstate.v1.raw;
       globals.y = (unsigned char)s->rhdr.pstate.v2.raw;
-      proto_session_body_unmarshall_player(s, 0, globals.player);
-      proto_session_body_unmarshall_map(s,sizeof(Player),globals.map);
+      offset = proto_session_body_unmarshall_gamestate(s,0,globals.gamestate);
+      gamestate_dump(globals.gamestate);
+      proto_session_body_unmarshall_map(s,offset,globals.map);
     }
     break;
   case 'i':

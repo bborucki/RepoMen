@@ -4,17 +4,22 @@
 #include "types.h"
 #include "player.h"
 
+extern int
+cell_dump(Cell *c){
+  cell_print_type(c);
+  dump_team(c->team);
+  printf("Location: %d,%d\n", c->x, c->y);
+  dump_object(c->obj);
+  printf("Player ID: %d\n", (int)(c->playerid));
+  return 1;
+}
+
 int
 isMutable(Map* m, int x, int y){
-  //slight performance optimizations
   int dim = m->dim;
   int w = x*dim+y;
   int up = ((x-1)*dim)+y;
   int down = ((x+1)*dim)+y;
-
-  //  LINE_MAX and COLUMN_MAX != maze dimensions
-  //  if(x == LINE_MAX - 1 || x == 0 || y == COLUMN_MAX -1 ||
-  //    y == 0)
 
   if(x == dim-1 || x == 0 || y == dim-1 || y == 0)
     return 0;
@@ -67,6 +72,7 @@ extern int
 cell_create(Map *m, Cell *c, int x, int y){
   c->x = x;
   c->y = y;
+  c->idx = x*m->dim + y;
   c->team = getTeam(x,y,m->dim);
   c->player = NULL;
   c->obj = NONE;

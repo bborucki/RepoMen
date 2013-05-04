@@ -17,6 +17,7 @@ struct Player_ {
 };
 
 extern void player_dump(Player *p);
+extern Player *player_create();
 extern int player_move(dir_t dir, Player *p, ObjectMap *o, Gamestate *g);
 extern int player_is_taggable(Player *tager, Player *tagee);
 extern int player_tagHandler(Player *tagee, ObjectMap *o, Gamestate *g);

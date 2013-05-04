@@ -83,7 +83,7 @@ dump_object(object_t object){
     break;
   default:
     printf("UNKNOWN=%d", object);
-}
+  }
 }
 
 extern void

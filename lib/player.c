@@ -1,9 +1,11 @@
+#include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "player.h"
 #include "cell.h"
 #include "types.h"
 #include "objectmap.h"
-#include <stdio.h>
+
 
 extern void
 player_dump(Player *p){
@@ -23,7 +25,6 @@ player_find_next_id(Player **players){
   }
   return -1;
 }
-
 
 extern int 
 player_obj_pickup(Player* p, ObjectMap *o){
@@ -211,3 +212,11 @@ player_move(dir_t dir, Player *p, ObjectMap *o, Gamestate *g){
 
 //Need to ensure that the cell gets into the objectmap
 
+extern Player *
+player_create(){
+  Player *p;
+
+  p = (Player *)malloc(sizeof(Player));
+  bzero(p, sizeof(Player));
+  return p;
+}

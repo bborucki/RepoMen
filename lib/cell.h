@@ -7,12 +7,12 @@
 #include "map.h"
 #include "player.h"
 
-
 struct Cell_ {
   cell_t type;
   team_t team;
-  unsigned char x;
-  unsigned char y;
+  int x;
+  int y;
+  int idx;
   object_t obj;
   Player *player;
   char playerid;
@@ -20,5 +20,6 @@ struct Cell_ {
 
 extern int cell_create(Map *m, Cell *c, int x, int y);
 extern int cell_print_type(Cell *c);
+extern int cell_dump(Cell *c);
 
 #endif

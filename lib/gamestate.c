@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include "types.h"
 #include "gamestate.h"
@@ -7,6 +8,36 @@
 
 #define MAXNUMCELLS 20
 #define MAXNUMPLAYERS 20
+
+extern int
+gamestate_dump(Gamestate *g){
+  int ncells, nplayers;
+  int i = 0;
+  
+  printf("Dumping gamestate\n");
+
+  ncells = g->numCells;
+  nplayers = g->numPlayers;
+  
+  printf("There are %d players and %d cells\n", nplayers, ncells);
+
+  while(nplayers){
+    if(g->plist[i++] != NULL){
+      player_dump(g->plist[i]);
+      nplayers--;
+    }
+  }
+
+  i = 0;
+  while(ncells){
+    if(g->clist[i++] != NULL){
+      cell_dump(g->clist[i]);
+      ncells--;
+    }    
+  }
+
+  return 1;
+}
 
 extern Gamestate *
 gamestate_create(){
@@ -18,61 +49,65 @@ gamestate_create(){
   g->numCells = 0;
   g->numPlayers = 0;
   
-  g->clist = (Cell **)malloc(sizeof(Cell)*MAXNUMCELLS);
-  g->plist = (Player **)malloc(sizeof(Player)*MAXNUMPLAYERS);
+  g->clist = (Cell **)malloc(sizeof(Cell *)*MAXNUMCELLS);
+  g->plist = (Player **)malloc(sizeof(Player *)*MAXNUMPLAYERS);
+
+  bzero(g->clist, sizeof(g->clist));
+  bzero(g->plist, sizeof(g->plist));
 
   return g;
 }
 
+extern Player *
+gamestate_get_player(Gamestate *g, int playerid){
+  return g->plist[playerid];
+}
+
 extern int
 gamestate_add_player(Gamestate *g, Player *p){
-  int rc = -1;
-  int i = g->numPlayers;
+  printf("Adding a player!\n");
 
-  if(i < MAXNUMPLAYERS){
-    if(g->plist[i] = NULL){
-      g->plist[i] = p;
-      g->numPlayers++;
-      rc = 0; 
-    }
+  if(g->numPlayers >= MAXNUMPLAYERS){
+    return -1;
   }
 
-  return rc;
+  g->plist[p->id] = p;
+  g->numPlayers++;
+
+  printf("Added!\n");
+
+  return 0;
 }
 
 //linear search for now
 extern int
 gamestate_remove_player(Gamestate *g, int playerid){
-  int num = g->numPlayers;
-  int i = 0;
+  if(g->numPlayers < 1)
+    return -1;
 
-  while(num){
-    if(g->plist[i] != NULL){
-      if(g->plist[i]->id == playerid){
-	g->plist[i] = NULL;
-	return 1;
-      }
-      num--;
-    }
-  }
+  if(g->plist[playerid] == NULL)
+    return -1;
 
-  return -1;
+  g->plist[playerid] = NULL;
+  g->numPlayers--;
+
+  return 1;
 }
 
 extern int
 gamestate_add_cell(Gamestate *g, Cell *c){
-  int rc = -1;
-  int i = g->numCells;
+  printf("Adding a cell!\n");
 
-  if(i < MAXNUMCELLS){
-    if(g->clist[i] = NULL){
-      g->clist[i] = c;
-      g->numCells++;
-      rc = 0; 
-    }
+  if(g->numCells >= MAXNUMCELLS){
+    return -1;
   }
 
-  return rc;
+  g->clist[c->idx] = c;
+  g->numCells++;
+
+  printf("Added!\n");
+
+  return 0;
 }
 
 //another linear search for now

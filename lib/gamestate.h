@@ -19,10 +19,9 @@ int numplayershome2;
 int numPlayers1;
 int numPlayers2;
 
-
 struct Gamestate_ {
-  char numCells;
-  char numPlayers;
+  int numCells;
+  int numPlayers;
   Cell **clist;
   Player **plist;
 };
@@ -32,5 +31,6 @@ extern int gamestate_add_cell(Gamestate *g, Cell *c);
 extern int gamestate_remove_cell(Gamestate *g, int x, int y);
 extern int gamestate_add_player(Gamestate *g, Player *p);
 extern int gamestate_remove_player(Gamestate *g, int playerid);
+extern Player * gamestate_get_player(Gamestate *g, int playerid);
 
 #endif

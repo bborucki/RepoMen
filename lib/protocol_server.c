@@ -313,27 +313,25 @@ proto_server_hello_handler(Proto_Session *s){
   Proto_Msg_Hdr sh;
   Proto_Session *us;
 
-  p = (Player *)malloc(sizeof(Player));
-  bzero(p, sizeof(p));
+  p = player_create();
+
   bzero(&sh, sizeof(sh));
-  
-  //  fprintf(stderr, "proto_server_mt_hello_handler: invoked for session:\n");
-  //  proto_dump_msghdr(&(s->rhdr));
   
   sh.type = proto_session_hdr_unmarshall_type(s);
   sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
 
   x = player_find_empty_home(p,nextTeam, Server_ObjectMap, pidx);
-  x = !gamefull;
+  //  x = !gamefull;
   if(x){
+    gamestate_add_player(Server_Gamestate,p);
+    printf("New player joining:\n");
+    printf("Location: %d,%d\n", p->pcell->x, p->pcell->y);
     sh.pstate.v0.raw = 1;
     sh.pstate.v1.raw = p->pcell->x;
     sh.pstate.v2.raw = p->pcell->y;
-    Server_Gamestate->plist[pidx] = p;
-    proto_session_body_marshall_player(s,p);
+    gamestate_dump(Server_Gamestate);
+    proto_session_body_marshall_gamestate(s,Server_Gamestate);
     proto_session_body_marshall_map(s,Server_Map);
-    printf("New player joining:\n");
-    printf("Location: %d,%d\n", p->pcell->x, p->pcell->y);
     player_dump(p);
     s->player = p;
   } else {
@@ -454,7 +452,7 @@ proto_server_pickup_handler(Proto_Session *s){
 
   proto_session_hdr_unmarshall(s, &rh);
   id = rh.pstate.v0.raw;
-  p = Server_Gamestate->plist[id];
+  p = gamestate_get_player(Server_Gamestate,id);
   
   ret = player_obj_pickup(p,Server_ObjectMap);
   sh.pstate.v0.raw = id;//same header for both reply and update
@@ -488,7 +486,6 @@ proto_server_move_handler(Proto_Session *s){
   Proto_Session *fs;
   bzero(&sh, sizeof(sh));
   bzero(&rh, sizeof(rh));
-  
 
   sh.type = proto_session_hdr_unmarshall_type(s);
   sh.type += PROTO_MT_REP_BASE_RESERVED_FIRST;
@@ -496,7 +493,7 @@ proto_server_move_handler(Proto_Session *s){
   proto_session_hdr_unmarshall(s, &rh);
   id = rh.pstate.v0.raw;
   dir = rh.pstate.v1.raw;
-  p = Server_Gamestate->plist[id];
+  p = gamestate_get_player(Server_Gamestate,id);
   valid = 0;
   valid = player_move(dir,p,Server_ObjectMap, Server_Gamestate);
   printf("Valid bit%d\n", valid);
@@ -586,7 +583,7 @@ proto_server_goodbye_handler(Proto_Session *s){
 
   rc = proto_session_send_msg(s,1);
 
-  Server_Gamestate->plist[p.id] = NULL;
+  gamestate_remove_player(Server_Gamestate,p.id);
   pidx = player_find_next_id(Server_Gamestate->plist);
   if(pidx<0)
     gamefull = 1;
