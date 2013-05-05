@@ -93,16 +93,21 @@ objectmap_flag_visible(Player *p, ObjectMap *o){
 extern int
 objectmap_place_flag(ObjectMap *o, team_t t){
   int x,y,idx,dim;
-  long seed;
+
+  srand(time(NULL));
+  dim = o->dim;
+
+  x = rand() % dim/2;
+  y = rand() % dim;
+  idx = x*dim+y;
   
-  seed = time(NULL);
-  srand(seed);
   
-  
-  while(o->objects[idx]->type != FLOOR){
-    x = rand()%(dim/2);
-    y = rand()%dim;
+  while(o->objects[idx] == NULL || o->objects[idx]->type != FLOOR
+	|| o->objects[idx]->team != t){
+    x = rand() % dim/2;
+    y = rand() % dim;
     idx = x*dim+y;
+    
   }
   if(t == TEAM1)
     o->objects[idx]->obj = FLAG1;
