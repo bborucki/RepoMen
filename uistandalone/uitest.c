@@ -32,7 +32,6 @@
 
 UI *ui;
 
-
 int
 prompt(int menu) 
 {
@@ -57,23 +56,23 @@ docmd(char cmd)
     printf("q ->quitting...\n");
     rc=-1;
     break;
-  case 'a':
-    printf("a ->do rpc: up\n");
+  case 'w':
+    printf("w ->do rpc: up\n");
     ui_dummy_up(ui);
     rc=2;
     break;
-  case 'z':
-    printf("z ->do rpc: down\n");
+  case 's':
+    printf("s ->do rpc: down\n");
     ui_dummy_down(ui);
     rc=2;
     break;
-  case ',':
-    printf("u ->do rpc: left\n");
+  case 'a':
+    printf("a ->do rpc: left\n");
     ui_dummy_left(ui);
     rc=2;
     break;
-  case '.':
-    printf(". ->do rpc: right\n");
+  case 'd':
+    printf("d ->do rpc: right\n");
     ui_dummy_right(ui);
     rc=2;
     break;
@@ -135,27 +134,27 @@ ui_keypress(UI *ui, SDL_KeyboardEvent *e)
   // fprintf(stderr, "%c\n", sym);
   //  fprintf(stderr, "d\n",mod);
   if (e->type == SDL_KEYDOWN) {
-    if (sym == SDLK_PERIOD && mod == KMOD_NONE) {
+    if (sym == SDLK_a && mod == KMOD_NONE) {
       fprintf(stderr, "%s: move left\n", __func__);
       return ui_dummy_left(ui);
     }
-    if (sym == SDLK_SLASH && mod == KMOD_NONE) {
+    if (sym == SDLK_d && mod == KMOD_NONE) {
       fprintf(stderr, "%s: move right\n", __func__);
       return ui_dummy_right(ui);
     }
-    if (sym == SDLK_a && mod == KMOD_NONE)  {  
+    if (sym == SDLK_w && mod == KMOD_NONE)  {  
       fprintf(stderr, "%s: move up\n", __func__);
       return ui_dummy_up(ui);
     }
-    if (sym == SDLK_z && mod == KMOD_NONE)  {
+    if (sym == SDLK_s && mod == KMOD_NONE)  {
       fprintf(stderr, "%s: move down\n", __func__);
       return ui_dummy_down(ui);
     }
-    if (sym == SDLK_r && mod == KMOD_NONE)  {  
+    if (sym == SDLK_e && mod == KMOD_NONE)  {  
       fprintf(stderr, "%s: dummy pickup red flag\n", __func__);
       return ui_dummy_pickup_red(ui);
     }
-    if (sym == SDLK_g && mod == KMOD_NONE)  {   
+    if (sym == SDLK_f && mod == KMOD_NONE)  {   
       fprintf(stderr, "%s: dummy pickup green flag\n", __func__);
       return ui_dummy_pickup_green(ui);
     }
