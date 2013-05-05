@@ -376,15 +376,10 @@ ui_paintmap(UI *ui){
 
   h = ui->screen->h;
   w = ui->screen->w;
-  printf("Before\n");
-  i = (int)floor(ui->x/(int)h);
-  j = (int)floor(ui->y/(int)w);
-  printf("After\n");
-
-  dim = ui->uimap->dim -1;
+  i = floor(ui->x/h);
 
   for (t.y=0; t.y<h; t.y+=t.h, i++) {
-    for (t.x=0; t.x<w; t.x+=t.w, j++) {
+    for (t.x=0, j = floor(ui->x/h); t.x<w; t.x+=t.w, j++) {
       if(cell_get_type(ui->uimap,i,j) == FLOOR){
 	draw_cell(ui, FLOOR_S, &t, ui->screen);
       } else {

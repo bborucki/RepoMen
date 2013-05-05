@@ -38,6 +38,7 @@ struct UI_Struct {
 
   int x; //top left x
   int y; //top left y
+  Player *uiplayer;
   Map *uimap;
   Gamestate *uigs;
 

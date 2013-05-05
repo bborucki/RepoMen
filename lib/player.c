@@ -52,8 +52,8 @@ player_find_empty_home(Player* p, team_t t, ObjectMap *o, int playerid){
   int x,y,idx;
 
   if(DEBUG_MAP){
-    x = 1;
-    y = 1;
+    x = 2;
+    y = 2;
     idx = x*(o->dim)+y;
     p->pcell = o->objects[idx];
     p->pcell->x = x;

@@ -824,6 +824,7 @@ main(int argc, char **argv){
     tty_init(STDIN_FILENO);
     ui_init(&(Client.ui));
     pthread_create(&tid, NULL, ui_shell, NULL);
+    Client.ui->uiplayer = Client.Player;
     Client.ui->uigs = Client.Gamestate;
     Client.ui->uimap = Client.Map;
     ui_main_loop(Client.ui, 320, 320);
