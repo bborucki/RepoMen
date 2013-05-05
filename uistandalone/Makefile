@@ -51,5 +51,5 @@ uitest: uistandalone.o uitest.o tty.o ttymodes.o
 	gcc $(CFLAGS) uistandalone.o uitest.o tty.o ttymodes.o -o uitest ${UILIBS}
 
 clean:
-	rm uitest *.o
+	rm -f uitest *.o
 

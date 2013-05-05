@@ -19,7 +19,6 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 * THE SOFTWARE.
 *****************************************************************************/
-
 #include <stdio.h>
 #include <stdlib.h> /* for exit() */
 #include <pthread.h>
@@ -32,7 +31,6 @@
 /* Forward declaration of some dummy player code */
 static void dummyPlayer_init(UI *ui);
 static void dummyPlayer_paint(UI *ui, SDL_Rect *t);
-
 
 #define SPRITE_H 32
 #define SPRITE_W 32
@@ -57,15 +55,13 @@ struct UI_Player_Struct {
 typedef struct UI_Player_Struct UI_Player;
 
 static inline SDL_Surface *
-ui_player_img(UI *ui, int team)
-{  
+ui_player_img(UI *ui, int team){  
   return (team == 0) ? ui->sprites[TEAMA_S].img 
     : ui->sprites[TEAMB_S].img;
 }
 
 static inline sval 
-pxSpriteOffSet(int team, int state)
-{
+pxSpriteOffSet(int team, int state){
   if (state == 1)
     return (team==0) ? SPRITE_W*1 : SPRITE_W*2;
   if (state == 2) 
@@ -75,8 +71,7 @@ pxSpriteOffSet(int team, int state)
 }
 
 static sval
-ui_uip_init(UI *ui, UI_Player **p, int id, int team)
-{
+ui_uip_init(UI *ui, UI_Player **p, int id, int team){
   UI_Player *ui_p;
   
   ui_p = (UI_Player *)malloc(sizeof(UI_Player));
@@ -96,8 +91,7 @@ ui_uip_init(UI *ui, UI_Player **p, int id, int team)
  * NOTE: The surface must be locked before calling this!
  */
 static uint32_t 
-ui_getpixel(SDL_Surface *surface, int x, int y)
-{
+ui_getpixel(SDL_Surface *surface, int x, int y){
   int bpp = surface->format->BytesPerPixel;
   /* Here p is the address to the pixel we want to retrieve */
   uint8_t *p = (uint8_t *)surface->pixels + y * surface->pitch + x * bpp;
@@ -124,8 +118,7 @@ ui_getpixel(SDL_Surface *surface, int x, int y)
  * NOTE: The surface must be locked before calling this!
  */
 static void 
-ui_putpixel(SDL_Surface *surface, int x, int y, uint32_t pixel)
- {
+ui_putpixel(SDL_Surface *surface, int x, int y, uint32_t pixel){
    int bpp = surface->format->BytesPerPixel;
    /* Here p is the address to the pixel we want to set */
    uint8_t *p = (uint8_t *)surface->pixels + y * surface->pitch + x * bpp;
@@ -157,11 +150,10 @@ ui_putpixel(SDL_Surface *surface, int x, int y, uint32_t pixel)
    default:
      break;           /* shouldn't happen, but avoids warnings */
    } // switch
- }
+}
 
 static 
-sval splash(UI *ui)
-{
+sval splash(UI *ui){
   SDL_Rect r;
   SDL_Surface *temp;
 
@@ -208,8 +200,7 @@ sval splash(UI *ui)
 
 
 static sval
-load_sprites(UI *ui) 
-{
+load_sprites(UI *ui){
   SDL_Surface *temp;
   sval colorkey;
 
@@ -300,10 +291,8 @@ load_sprites(UI *ui)
   return 1;
 }
 
-
 inline static void
-draw_cell(UI *ui, SPRITE_INDEX si, SDL_Rect *t, SDL_Surface *s)
-{
+draw_cell(UI *ui, SPRITE_INDEX si, SDL_Rect *t, SDL_Surface *s){
   SDL_Surface *ts=NULL;
   uint32_t tc;
 
@@ -314,8 +303,7 @@ draw_cell(UI *ui, SPRITE_INDEX si, SDL_Rect *t, SDL_Surface *s)
 }
 
 static sval
-ui_paintmap(UI *ui) 
-{
+ui_paintmap(UI *ui){
   SDL_Rect t;
   int i, j;
   t.y = 0; t.x = 0; t.h = ui->tile_h; t.w = ui->tile_w; 
@@ -333,9 +321,7 @@ ui_paintmap(UI *ui)
 }
 
 static sval
-ui_init_sdl(UI *ui, int32_t h, int32_t w, int32_t d)
-{
-
+ui_init_sdl(UI *ui, int32_t h, int32_t w, int32_t d){
   fprintf(stderr, "UI_init: Initializing SDL.\n");
 
   /* Initialize defaults, Video and Audio subsystems */
@@ -358,7 +344,6 @@ ui_init_sdl(UI *ui, int32_t h, int32_t w, int32_t d)
     
   fprintf(stderr, "UI_init: SDL initialized.\n");
 
-
   if (load_sprites(ui)<=0) return -1;
 
   ui->black_c      = SDL_MapRGB(ui->screen->format, 0x00, 0x00, 0x00);
@@ -376,8 +361,7 @@ ui_init_sdl(UI *ui, int32_t h, int32_t w, int32_t d)
   ui->flag_teama_c   = ui->white_c;
   ui->flag_teamb_c   = ui->white_c;
   ui->jackhammer_c   = ui->yellow_c;
-  
- 
+   
   /* set keyboard repeat */
   SDL_EnableKeyRepeat(70, 70);  
 
@@ -390,23 +374,20 @@ ui_init_sdl(UI *ui, int32_t h, int32_t w, int32_t d)
 }
 
 static void
-ui_shutdown_sdl(void)
-{
+ui_shutdown_sdl(void){
   fprintf(stderr, "UI_shutdown: Quitting SDL.\n");
   SDL_Quit();
 }
 
 static sval
-ui_userevent(UI *ui, SDL_UserEvent *e) 
-{
+ui_userevent(UI *ui, SDL_UserEvent *e) {
   if (e->code == UI_SDLEVENT_UPDATE) return 2;
   if (e->code == UI_SDLEVENT_QUIT) return -1;
   return 0;
 }
 
 static sval
-ui_process(UI *ui)
-{
+ui_process(UI *ui){
   SDL_Event e;
   sval rc = 1;
 
@@ -415,9 +396,12 @@ ui_process(UI *ui)
     case SDL_QUIT:
       return -1;
     case SDL_KEYDOWN:
-    case SDL_KEYUP:
       fprintf(stderr,"processing key\n");
       rc = ui_keypress(ui, &(e.key));
+      break;
+    case SDL_KEYUP:
+      //fprintf(stderr,"processing key\n");
+      //rc = ui_keypress(ui, &(e.key));
       break;
     case SDL_ACTIVEEVENT:
       break;
@@ -434,42 +418,36 @@ ui_process(UI *ui)
 }
 
 extern sval
-ui_zoom(UI *ui, sval fac)
-{
+ui_zoom(UI *ui, sval fac){
   fprintf(stderr, "%s:\n", __func__);
   return 2;
 }
 
 extern sval
-ui_pan(UI *ui, sval xdir, sval ydir)
-{
+ui_pan(UI *ui, sval xdir, sval ydir){
   fprintf(stderr, "%s:\n", __func__);
   return 2;
 }
 
 extern sval
-ui_move(UI *ui, sval xdir, sval ydir)
-{
+ui_move(UI *ui, sval xdir, sval ydir){
   fprintf(stderr, "%s:\n", __func__);
+  fprintf(stderr, "xdir: %d, ydir: %d\n", xdir, ydir);
   return 1;
 }
 
-
 extern void
-ui_update(UI *ui)
-{
+ui_update(UI *ui){
   SDL_Event event;
   
   event.type      = SDL_USEREVENT;
   event.user.code = UI_SDLEVENT_UPDATE;
   SDL_PushEvent(&event);
-
 }
 
 
 extern void
-ui_quit(UI *ui)
-{  
+ui_quit(UI *ui){  
   SDL_Event event;
   fprintf(stderr, "ui_quit: stopping ui...\n");
   event.type      = SDL_USEREVENT;
@@ -478,8 +456,7 @@ ui_quit(UI *ui)
 }
 
 extern void
-ui_main_loop(UI *ui, uval h, uval w)
-{
+ui_main_loop(UI *ui, uval h, uval w){
   sval rc;
   
   assert(ui);
@@ -500,8 +477,7 @@ ui_main_loop(UI *ui, uval h, uval w)
 
 
 extern void
-ui_init(UI **ui)
-{
+ui_init(UI **ui){
   *ui = (UI *)malloc(sizeof(UI));
   if (ui==NULL) return;
 
@@ -524,8 +500,7 @@ struct DummyPlayerDesc {
 } dummyPlayer;
 
 static void 
-dummyPlayer_init(UI *ui) 
-{
+dummyPlayer_init(UI *ui) {
   pthread_mutex_init(&(dummyPlayer.lock), NULL);
   dummyPlayer.id = 0;
   dummyPlayer.x = 0; dummyPlayer.y = 0; dummyPlayer.team = 0; dummyPlayer.state = 0;
@@ -533,8 +508,7 @@ dummyPlayer_init(UI *ui)
 }
 
 static void 
-dummyPlayer_paint(UI *ui, SDL_Rect *t)
-{
+dummyPlayer_paint(UI *ui, SDL_Rect *t){
   pthread_mutex_lock(&dummyPlayer.lock);
     t->y = dummyPlayer.y * t->h; t->x = dummyPlayer.x * t->w;
     dummyPlayer.uip->clip.x = dummyPlayer.uip->base_clip_x +
@@ -544,44 +518,43 @@ dummyPlayer_paint(UI *ui, SDL_Rect *t)
 }
 
 int
-ui_dummy_left(UI *ui)
-{
+ui_dummy_left(UI *ui){
   pthread_mutex_lock(&dummyPlayer.lock);
     dummyPlayer.x--;
+    ui_move(ui, -1, 0);
   pthread_mutex_unlock(&dummyPlayer.lock);
   return 2;
 }
 
 int
-ui_dummy_right(UI *ui)
-{
+ui_dummy_right(UI *ui){
   pthread_mutex_lock(&dummyPlayer.lock);
     dummyPlayer.x++;
+    ui_move(ui, 1, 0);
   pthread_mutex_unlock(&dummyPlayer.lock);
   return 2;
 }
 
 int
-ui_dummy_down(UI *ui)
-{
+ui_dummy_down(UI *ui){
   pthread_mutex_lock(&dummyPlayer.lock);
     dummyPlayer.y++;
+    ui_move(ui, 0, -1);
   pthread_mutex_unlock(&dummyPlayer.lock);
   return 2;
 }
 
 int
-ui_dummy_up(UI *ui)
-{
+ui_dummy_up(UI *ui){
   pthread_mutex_lock(&dummyPlayer.lock);
     dummyPlayer.y--;
+    ui_move(ui, 0, 1);
   pthread_mutex_unlock(&dummyPlayer.lock);
   return 2;
 }
 
 int
-ui_dummy_normal(UI *ui)
-{
+ui_dummy_normal(UI *ui){
   pthread_mutex_lock(&dummyPlayer.lock);
     dummyPlayer.state = 0;
   pthread_mutex_unlock(&dummyPlayer.lock);
@@ -589,8 +562,7 @@ ui_dummy_normal(UI *ui)
 }
 
 int
-ui_dummy_pickup_red(UI *ui)
-{
+ui_dummy_pickup_red(UI *ui){
   pthread_mutex_lock(&dummyPlayer.lock);
     dummyPlayer.state = 1;
   pthread_mutex_unlock(&dummyPlayer.lock);
@@ -598,8 +570,7 @@ ui_dummy_pickup_red(UI *ui)
 }
 
 int
-ui_dummy_pickup_green(UI *ui)
-{
+ui_dummy_pickup_green(UI *ui){
   pthread_mutex_lock(&dummyPlayer.lock);
     dummyPlayer.state = 2;
   pthread_mutex_unlock(&dummyPlayer.lock);
@@ -608,8 +579,7 @@ ui_dummy_pickup_green(UI *ui)
 
 
 int
-ui_dummy_jail(UI *ui)
-{
+ui_dummy_jail(UI *ui){
   pthread_mutex_lock(&dummyPlayer.lock);
     dummyPlayer.state = 3;
   pthread_mutex_unlock(&dummyPlayer.lock);
@@ -617,8 +587,7 @@ ui_dummy_jail(UI *ui)
 }
 
 int
-ui_dummy_toggle_team(UI *ui)
-{
+ui_dummy_toggle_team(UI *ui){
   pthread_mutex_lock(&dummyPlayer.lock);
     if (dummyPlayer.uip) free(dummyPlayer.uip);
     dummyPlayer.team = (dummyPlayer.team) ? 0 : 1;
@@ -628,8 +597,7 @@ ui_dummy_toggle_team(UI *ui)
 }
 
 int
-ui_dummy_inc_id(UI *ui)
-{
+ui_dummy_inc_id(UI *ui){
   pthread_mutex_lock(&dummyPlayer.lock);
     if (dummyPlayer.uip) free(dummyPlayer.uip);
     dummyPlayer.id++;
