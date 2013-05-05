@@ -206,8 +206,8 @@ player_move(dir_t dir, Player *p, ObjectMap *o, Gamestate *g){
     o->objects[nidx]->player = p;
     return 1;
   }
-  
-  return 0;
+  else
+    return 0;
 }
 
 //Need to ensure that the cell gets into the objectmap

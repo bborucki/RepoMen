@@ -495,10 +495,11 @@ proto_server_move_handler(Proto_Session *s){
   valid = 0;
   valid = player_move(dir,p,Server_ObjectMap, Server_Gamestate);
   printf("Valid bit%d\n", valid);
-  if (valid) {
+  if (valid>0) {
     sh.pstate.v3.raw = 1;
     printf("Player %d is moving to (%d,%d)\n",id,p->pcell->x,p->pcell->y);
     flagindex = objectmap_flag_visible(p,Server_ObjectMap);
+    
     if(flagindex>=0)
       flag = Server_ObjectMap->objects[flagindex]->obj;
 
@@ -536,7 +537,7 @@ proto_server_move_handler(Proto_Session *s){
   
   bzero(&sh, sizeof(sh));
   
-  if(!(flagindex<0)){
+  if(flagindex>=0){
     fs = proto_server_event_session();
     sh.type = PROTO_MT_EVENT_BASE_FLAG;
     

@@ -35,16 +35,18 @@ objectmap_validate_move(int x, int y, Player *p, ObjectMap *o){
   
   idx = x*dim+y;
 
+  printf("celltype = %d\n", o->objects[idx]->type);
   if(o->objects[idx] != NULL){
     if((otherPlayer = o->objects[idx]->player) != NULL)
       return player_is_taggable(p,otherPlayer);
-    if(o->objects[idx]->type == IWALL)
+    else if(o->objects[idx]->type == IWALL)
       return 0;
-    if(o->objects[idx]->type == WALL && p->shovel != NONE)
+    else if(o->objects[idx]->type == WALL && p->shovel != NONE)
       return 3;
+    else
+      return 1;
   }
-  printf("celltype = %d\n", o->objects[idx]->type);
-  return 1;
+  return 0;
 }
 
 extern int
