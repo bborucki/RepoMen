@@ -131,21 +131,23 @@ ui_keypress(UI *ui, SDL_KeyboardEvent *e)
 {
   SDLKey sym = e->keysym.sym;
   SDLMod mod = e->keysym.mod;
-
+  
+  // fprintf(stderr, "%c\n", sym);
+  //  fprintf(stderr, "d\n",mod);
   if (e->type == SDL_KEYDOWN) {
-    if (sym == SDLK_LEFT && mod == KMOD_NONE) {
+    if (sym == SDLK_PERIOD && mod == KMOD_NONE) {
       fprintf(stderr, "%s: move left\n", __func__);
       return ui_dummy_left(ui);
     }
-    if (sym == SDLK_RIGHT && mod == KMOD_NONE) {
+    if (sym == SDLK_SLASH && mod == KMOD_NONE) {
       fprintf(stderr, "%s: move right\n", __func__);
       return ui_dummy_right(ui);
     }
-    if (sym == SDLK_UP && mod == KMOD_NONE)  {  
+    if (sym == SDLK_a && mod == KMOD_NONE)  {  
       fprintf(stderr, "%s: move up\n", __func__);
       return ui_dummy_up(ui);
     }
-    if (sym == SDLK_DOWN && mod == KMOD_NONE)  {
+    if (sym == SDLK_z && mod == KMOD_NONE)  {
       fprintf(stderr, "%s: move down\n", __func__);
       return ui_dummy_down(ui);
     }
