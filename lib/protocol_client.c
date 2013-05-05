@@ -57,19 +57,6 @@ proto_client_event_session(Proto_Client_Handle ch){
 }
 
 extern int
-proto_client_set_connected(Proto_Client_Handle ch, int i){
-    Proto_Client *c = ch;
-    c->connected = i;
-    return 0;
-}
-
-extern int
-proto_client_get_connected(Proto_Client_Handle ch){
-    Proto_Client *c = ch;
-    return c->connected;
-}
-
-extern int
 proto_client_set_session_lost_handler(Proto_Client_Handle ch, Proto_MT_Handler h){
   Proto_Client *c = ch;
   c->session_lost_handler = h;

@@ -10,6 +10,7 @@
 extern void
 player_dump(Player *p){
   printf("ID = %d\n", p->id);
+  printf("Location = (%d,%d)\n", p->x,p->y);
   dump_team(p->team);
   dump_state(p->state);
   dump_object(p->shovel);
