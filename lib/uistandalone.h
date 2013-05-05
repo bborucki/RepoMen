@@ -23,6 +23,8 @@
 *****************************************************************************/
 
 #include <SDL/SDL.h>   /* All SDL apps need this */
+#include "map.h"
+#include "gamestate.h"
 
 typedef enum { 
   TEAMA_S=0, TEAMB_S, FLOOR_S, REDWALL_S, GREENWALL_S, LOGO_S, JACKHAMMER_S, REDFLAG_S, GREENFLAG_S, NUM_S 
@@ -33,6 +35,11 @@ struct UI_Struct {
   int32_t depth;
   int32_t tile_h;
   int32_t tile_w;
+
+  int x; //top left x
+  int y; //top left y
+  Map *uimap;
+  Gamestate *uigs;
 
   struct Sprite {
     SDL_Surface *img;

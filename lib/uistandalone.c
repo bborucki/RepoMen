@@ -370,12 +370,23 @@ draw_cell(UI *ui, SPRITE_INDEX si, SDL_Rect *t, SDL_Surface *s){
 static sval
 ui_paintmap(UI *ui){
   SDL_Rect t;
-  int i, j;
+  int i, j, dim;
   t.y = 0; t.x = 0; t.h = ui->tile_h; t.w = ui->tile_w; 
 
-  for (t.y=0; t.y<ui->screen->h; t.y+=t.h) {
-    for (t.x=0; t.x<ui->screen->w; t.x+=t.w) {
-      draw_cell(ui, FLOOR_S, &t, ui->screen);
+  i = ui->x;
+  j = ui->y;
+  dim = ui->uimap->dim -1;
+
+  for (t.y=0; t.y<ui->screen->h; t.y+=t.h, i++) {
+    for (t.x=0; t.x<ui->screen->w; t.x+=t.w, j++) {
+      printf("i = %d, j = %d\n",i ,j);
+      if(cell_get_type(ui->uimap,i,j) == FLOOR){
+	printf("floor\n");
+	draw_cell(ui, FLOOR_S, &t, ui->screen);
+      } else {
+	printf("wall\n");
+	draw_cell(ui, REDWALL_S, &t, ui->screen);
+      }
     }
   }
 
@@ -426,7 +437,10 @@ ui_init_sdl(UI *ui, int32_t h, int32_t w, int32_t d){
   ui->flag_teama_c   = ui->white_c;
   ui->flag_teamb_c   = ui->white_c;
   ui->jackhammer_c   = ui->yellow_c;
-   
+
+  ui->x = 0;
+  ui->y = 0;
+
   /* set keyboard repeat */
   SDL_EnableKeyRepeat(70, 70);  
 

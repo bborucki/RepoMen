@@ -216,7 +216,7 @@ doRPC(char c){
       offset = proto_session_body_unmarshall_gamestate(s,0,Client.Gamestate);
       Client.Player = gamestate_get_player(Client.Gamestate,Client.playerid);
       player_dump(Client.Player);
-      proto_session_body_unmarshall_map(s,offset,Client.Map);
+      //      proto_session_body_unmarshall_map(s,offset,Client.Map);
       setGamestateEventHandlers();
     }
     break;
@@ -639,11 +639,10 @@ static int
 clientInit(){
   int mt;
 
-  Client.Player = (Player *)malloc(sizeof(Player));
-  Client.Map = (Map *)malloc(sizeof(Map));
+  Client.Player = player_create();
+  Client.Map = map_init(MAP_NAME);
   globals.cell = (Cell *)malloc(sizeof(Cell));
 
-  bzero(Client.Player,sizeof(Client.Player));
   bzero(Client.Map,sizeof(Client.Map));
   bzero(globals.cell,sizeof(globals.cell));
   
@@ -826,7 +825,9 @@ main(int argc, char **argv){
     tty_init(STDIN_FILENO);
     ui_init(&(Client.ui));
     pthread_create(&tid, NULL, ui_shell, NULL);
-    ui_main_loop(Client.ui, 320, 320);
+    Client.ui->uigs = Client.Gamestate;
+    Client.ui->uimap = Client.Map;
+    ui_main_loop(Client.ui, 640, 640);//320
   } else {
     shell(NULL);
   }
