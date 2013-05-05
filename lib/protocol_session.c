@@ -35,6 +35,7 @@
 #include "objectmap.h"
 #include "player.h"
 #include "gamestate.h"
+
 extern void
 proto_session_dump(Proto_Session *s){
   fprintf(stderr, "Session s=%p:\n", s);
@@ -181,6 +182,8 @@ proto_session_body_unmarshall_int(Proto_Session *s, int offset, int *v){
   if (s && ((s->rlen  - (offset + sizeof(int))) >=0 )) {
     *v = *((int *)(s->rbuf + offset));
     *v = htonl(*v);
+    printf("un-int: sizeof(int) = %d\n", sizeof(int));
+    printf("un-int: offset = %d\n", offset);
     return offset + sizeof(int);
   }
   return -1;
@@ -332,15 +335,18 @@ proto_session_body_unmarshall_gamestate(Proto_Session *s, int offset,
   int nplayers;
   int ncells;
 
-  offset+= proto_session_body_unmarshall_int(s,offset,&(g->numCells));
-  offset+= proto_session_body_unmarshall_int(s,offset,&(g->numPlayers)); 
+  offset= proto_session_body_unmarshall_int(s,offset,&(g->numCells));
+  offset= proto_session_body_unmarshall_int(s,offset,&(g->numPlayers)); 
 
-  nplayers = g->numPlayers;
   ncells = g->numCells;
+  nplayers = g->numPlayers;
+
+  printf("cells = %d\n", ncells);
+  printf("nplayers = %d\n", nplayers);
 
   while(ncells){
     c = (Cell *)malloc(sizeof(Cell));
-    if((offset+=proto_session_body_unmarshall_cell(s,offset,c))<0){
+    if((offset=proto_session_body_unmarshall_cell(s,offset,c))<0){
       free(c);
       return -1;
     }
@@ -350,7 +356,7 @@ proto_session_body_unmarshall_gamestate(Proto_Session *s, int offset,
 
   while(nplayers){
     p = (Player *)malloc(sizeof(Player));
-    if((offset+=proto_session_body_unmarshall_player(s,offset,p))<0){
+    if((offset=proto_session_body_unmarshall_player(s,offset,p))<0){
       free(p);
       return -1;
     }
