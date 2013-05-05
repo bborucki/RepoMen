@@ -493,6 +493,7 @@ proto_server_move_handler(Proto_Session *s){
   dir = rh.pstate.v1.raw;
   p = gamestate_get_player(Server_Gamestate,id);
   valid = 0;
+  flagindex = -1;
   valid = player_move(dir,p,Server_ObjectMap, Server_Gamestate);
   printf("Valid bit%d\n", valid);
   if (valid>0) {
@@ -536,7 +537,6 @@ proto_server_move_handler(Proto_Session *s){
   }
   
   bzero(&sh, sizeof(sh));
-  
   if(flagindex>=0){
     fs = proto_server_event_session();
     sh.type = PROTO_MT_EVENT_BASE_FLAG;
