@@ -140,4 +140,31 @@ have a complete handshake.
 
 Once the handshake is complete the client will have a complete idea of the
 gamestate and can thus implement the updates to modify it as necessary.
-We'll need to make sure the client handlers and the server "senders" are complimentary.
+We'll need to make sure the client handlers and the server "senders" are
+complimentary.
+
+--------------------------------------------
+
+Sun May 5th
+    -Brian
+
+I've been integrating the UI slowing in the client.  This is taking a while
+because design decisions that I made a long time ago deviated from what was
+originally given to us.  This has made it hard to integrate code that
+builds off of the original design, so I have to overhaul the client to
+revert it back to the way it had been.  
+
+The client now has a #DEFINE ENABLEUI binary value which when set uses the
+GUI, and when 0 allows the user to interact with the client through the
+terminal.  I've mostly left in the latter for debugging purposes. I've
+disabled keypresses while focused on the game window, to force the user to
+have the terminal in focus while playing.  While not ideal, this allows
+(forces) use of the client's RPC's.  So a user can connect and move around
+through RPC's.
+
+I've removed extraneous code and files from the repo.
+
+TODO:
+ - Continue integrating the UI
+ - Make the real map the one that shows up in the UI
+ - implement pickup/drop RPC's client-side 

@@ -461,12 +461,10 @@ ui_process(UI *ui){
     case SDL_QUIT:
       return -1;
     case SDL_KEYDOWN:
-      fprintf(stderr,"processing key\n");
-      rc = ui_keypress(ui, &(e.key));
-      break;
     case SDL_KEYUP:
       //fprintf(stderr,"processing key\n");
       //rc = ui_keypress(ui, &(e.key));
+      rc = 1;
       break;
     case SDL_ACTIVEEVENT:
       break;

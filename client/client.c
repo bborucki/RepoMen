@@ -34,7 +34,7 @@
 #include "../lib/uistandalone.h"
 #include "../lib/tty.h"
 
-#define ENABLEUI 0
+#define ENABLEUI 1
 #define STRLEN 81
 
 struct Globals {
@@ -197,78 +197,6 @@ setGamestateEventHandlers(){
   return 1;
 }
 
-int
-ui_prompt(int menu) 
-{
-  static char MenuString[] = "\nclient> ";
-  int ret;
-  int c=0;
-
-  if (menu) printf("%s", MenuString);
-  fflush(stdout);
-  c = getchar();
-  return c;
-}
-
-int 
-ui_docmd(char cmd){
-  int rc = 1;
-
-  switch (cmd) {
-  case 'q':
-    printf("q ->quitting...\n");
-    rc=-1;
-    break;
-  case 'w':
-    printf("w ->do rpc: up\n");
-    ui_dummy_up(Client.ui);
-    rc=2;
-    break;
-  case 's':
-    printf("s ->do rpc: down\n");
-    ui_dummy_down(Client.ui);
-    rc=2;
-    break;
-  case 'a':
-    printf("a ->do rpc: left\n");
-    ui_dummy_left(Client.ui);
-    rc=2;
-    break;
-  case 'd':
-    printf("d ->do rpc: right\n");
-    ui_dummy_right(Client.ui);
-    rc=2;
-    break;
-  case '\n':
-    rc=1;
-    break;
-  default:
-    printf("Unkown Command\n");
-  }
-  if (rc==2) ui_update(Client.ui);
-  return rc;
-}
-
-void *
-ui_shell(void *arg){
-  char c;
-  int rc;
-  int menu=1;
-
-  pthread_detach(pthread_self());
-
-  while (1) {
-    if ((c=ui_prompt(menu))!=0) rc=ui_docmd(c);
-    if (rc<0) break;
-    if (rc==1) menu=1; else menu=0;
-  }
-
-  fprintf(stderr, "terminating\n");
-  fflush(stdout);
-  ui_quit(Client.ui);
-  return NULL;
-}
-
 int 
 doRPC(char c){
   Proto_Msg_Hdr hdr;
@@ -290,12 +218,6 @@ doRPC(char c){
       gamestate_dump(Client.Gamestate);
       proto_session_body_unmarshall_map(s,offset,Client.Map);
       setGamestateEventHandlers();
-      if(ENABLEUI){
-	tty_init(STDIN_FILENO);
-	ui_init(&(Client.ui));
-	pthread_create(&tid,NULL,ui_shell, NULL);
-	ui_main_loop(Client.ui, 320, 320);
-      }
     }
     break;
   case 'i':
@@ -309,6 +231,8 @@ doRPC(char c){
     s = proto_client_rpc_session(Client.ph);
     if(s->rhdr.pstate.v3.raw > 0){
       if(s->rhdr.pstate.v0.raw == Client.Player->id){
+
+	rc = 2;
 	//	Client.Player->x = s->rhdr.pstate.v1.raw;
 	//	Client.Player->y = s->rhdr.pstate.v2.raw;
 	//	printf("Now at (%d,%d)\n", Client.Player->x, Client.Player->y);
@@ -316,8 +240,8 @@ doRPC(char c){
 	//insert way of blocking for a server move update
 	//hmmmm
       }
-    }
-    else{
+    } else {
+      rc = 0;
       printf("Invalid move\n");
     }
     break;
@@ -760,6 +684,86 @@ shell(void *arg){
   return NULL;
 }
 
+int
+ui_prompt(int menu) 
+{
+  static char MenuString[] = "\nclient> ";
+  int ret;
+  int c=0;
+
+  if (menu) printf("%s", MenuString);
+  fflush(stdout);
+  c = getchar();
+  return c;
+}
+
+int 
+ui_docmd(char cmd){
+  int rc = 1;
+
+  switch (cmd) {
+  case 'q':
+    printf("q ->quitting...\n");
+    rc=-1;
+    break;
+  case 'w':
+    printf("w ->do rpc: up\n");
+    globals.mv = UP;
+    if((rc = doRPC('v'))>0){
+      ui_dummy_up(Client.ui);
+    }
+    break;
+  case 's':
+    printf("s ->do rpc: down\n");
+    globals.mv = DOWN;
+    if((rc = doRPC('v'))>0){
+      ui_dummy_down(Client.ui);
+    }
+    break;
+  case 'a':
+    printf("a ->do rpc: left\n");
+    globals.mv = LEFT;
+    if((rc = doRPC('v'))>0){
+      ui_dummy_left(Client.ui);
+    }
+    break;
+  case 'd':
+    printf("d ->do rpc: right\n");
+    globals.mv = RIGHT;
+    if((rc = doRPC('v'))>0){
+      ui_dummy_right(Client.ui);
+    }
+    break;
+  case '\n':
+    rc=1;
+    break;
+  default:
+    printf("Unkown Command\n");
+  }
+  if (rc==2) ui_update(Client.ui);
+  return rc;
+}
+
+void *
+ui_shell(void *arg){
+  char c;
+  int rc;
+  int menu=1;
+
+  pthread_detach(pthread_self());
+
+  while (1) {
+    if ((c=ui_prompt(menu))!=0) rc=ui_docmd(c);
+    if (rc<0) break;
+    if (rc==1) menu=1; else menu=0;
+  }
+
+  fprintf(stderr, "terminating\n");
+  fflush(stdout);
+  ui_quit(Client.ui);
+  return NULL;
+}
+
 void 
 usage(char *pgm)
 {
@@ -797,6 +801,7 @@ initGlobals(int argc, char **argv){
 
 int 
 main(int argc, char **argv){  
+  pthread_t tid;
 
   initGlobals(argc, argv);
 
@@ -806,8 +811,15 @@ main(int argc, char **argv){
   }    
 
   doConnect();
-  
-  shell(NULL);
-  
+
+  if(ENABLEUI){
+    tty_init(STDIN_FILENO);
+    ui_init(&(Client.ui));
+    pthread_create(&tid, NULL, ui_shell, NULL);
+    ui_main_loop(Client.ui, 320, 320);
+  } else {
+    shell(NULL);
+  }
+
   return 0;
 }
