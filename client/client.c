@@ -32,23 +32,22 @@
 
 #define STRLEN 81
 
-  struct Globals {
-    char debug;
-    char mv;
-    unsigned char x;
-    unsigned char y;
-    char host[STRLEN];
-    PortType port;
-    Map *map;
-    Cell *cell;
-    Player *player;
-    Gamestate *gamestate;
-    //  ObjectMap *objmap;
-  } globals;
+struct Globals {
+  char debug;
+  char mv;
+  unsigned char x;
+  unsigned char y;
+  char host[STRLEN];
+  PortType port;
+  Cell *cell;
+} globals;
 
-typedef struct ClientState  {
-  int data;
+typedef struct ClientState {
   Proto_Client_Handle ph;
+  Gamestate *Gamestate;
+  Player *Player;
+  Map *Map; 
+  int data;
 } Client;
 
 static int
@@ -195,9 +194,9 @@ doRPC(Client *C, char c)
     if(s->rhdr.pstate.v0.raw){
       globals.x = (unsigned char)s->rhdr.pstate.v1.raw;
       globals.y = (unsigned char)s->rhdr.pstate.v2.raw;
-      offset = proto_session_body_unmarshall_gamestate(s,0,globals.gamestate);
-      gamestate_dump(globals.gamestate);
-      proto_session_body_unmarshall_map(s,offset,globals.map);
+      offset = proto_session_body_unmarshall_gamestate(s,0,C->Gamestate);
+      gamestate_dump(C->Gamestate);
+      proto_session_body_unmarshall_map(s,offset,C->Map);
     }
     break;
   case 'i':
@@ -207,10 +206,10 @@ doRPC(Client *C, char c)
     break;
   case 'v':
     //currently no validity checking client-side
-    rc = proto_client_move(C->ph, globals.player->id, globals.mv);
+    rc = proto_client_move(C->ph, C->Player->id, globals.mv);
     s = proto_client_rpc_session(C->ph);
     if(s->rhdr.pstate.v3.raw > 0){
-      if(s->rhdr.pstate.v0.raw == globals.player->id){
+      if(s->rhdr.pstate.v0.raw == C->Player->id){
 	globals.x = s->rhdr.pstate.v1.raw;
 	globals.y = s->rhdr.pstate.v2.raw;
 	printf("Now at (%d,%d)\n", globals.x, globals.y);
@@ -227,7 +226,7 @@ doRPC(Client *C, char c)
     rc = proto_client_dump(C->ph);
     break;
   case 'g':
-    rc = proto_client_goodbye(C->ph,globals.player);
+    rc = proto_client_goodbye(C->ph,C->Player);
     break;
   default:
     printf("%s: unknown command %c\n", __func__, c);
@@ -307,7 +306,7 @@ doConnect(Client *C){
     printf("Connected.");
     printf("\n");
     printf("Location: (%d,%d)\n", globals.x, globals.y);
-    player_dump(globals.player);
+    player_dump(C->Player);
     proto_client_set_connected(C->ph, 1);
   }
   return 1;
@@ -374,9 +373,9 @@ doNumHome(Client *C){
     }
     printf("Number of home cells for team %d = ", teamNum);
     if(teamNum == 1)
-      printf("%d\n",globals.map->numhome1);
+      printf("%d\n",C->Map->numhome1);
     else
-      printf("%d\n",globals.map->numhome2);
+      printf("%d\n",C->Map->numhome2);
   } else {
     printf("Usage: \"numhome <1 or 2>\"\n");
     return 1;
@@ -403,9 +402,9 @@ doNumJail(Client *C){
     }
     printf("Number of jail cells for team %d = ", teamNum);
     if(teamNum == 1)
-      printf("%d\n",globals.map->numjail1);
+      printf("%d\n",C->Map->numjail1);
     else
-      printf("%d\n",globals.map->numjail2);
+      printf("%d\n",C->Map->numjail2);
   }
   else{
     printf("Usage: \"numjail <1 or 2>\"\n");
@@ -421,7 +420,7 @@ doNumFloor(Client *C){
     printf("Not Connected.");
     return 1;
   }
-  printf("Number of available floor cells = %d\n", globals.map->numfloor);
+  printf("Number of available floor cells = %d\n", C->Map->numfloor);
   return 1;
 }
 
@@ -431,7 +430,7 @@ doNumWall(Client *C){
     printf("Not connected.");
     return 1;
   }    
-  printf("Number of available wall cells = %d\n", globals.map->numwall);
+  printf("Number of available wall cells = %d\n", C->Map->numwall);
   return 1;
 }
 
@@ -441,7 +440,7 @@ doDim(Client *C){
     printf("Not Connected.");
     return 1;
   }    
-  printf("Dimensions of the maze are %d x %d\n", globals.map->dim-1,globals.map->dim-1);
+  printf("Dimensions of the maze are %d x %d\n", C->Map->dim-1,C->Map->dim-1);
   return 1;
 }
 
@@ -632,15 +631,15 @@ clientInit(Client *C){
   int mt;
   bzero(C, sizeof(Client));
 
-  globals.player = (Player *)malloc(sizeof(Player));
-  globals.map = (Map *)malloc(sizeof(Map));
+  C->Player = (Player *)malloc(sizeof(Player));
+  C->Map = (Map *)malloc(sizeof(Map));
   globals.cell = (Cell *)malloc(sizeof(Cell));
 
-  bzero(globals.player,sizeof(globals.player));
-  bzero(globals.map,sizeof(globals.map));
+  bzero(C->Player,sizeof(C->Player));
+  bzero(C->Map,sizeof(C->Map));
   bzero(globals.cell,sizeof(globals.cell));
   
-  globals.gamestate = gamestate_create();
+  C->Gamestate = gamestate_create();
   
   if (proto_client_init(&(C->ph))<0) {
     fprintf(stderr, "client: main: ERROR initializing proto system\n");
