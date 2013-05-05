@@ -328,8 +328,10 @@ proto_server_hello_handler(Proto_Session *s){
     printf("Location: %d,%d\n", p->pcell->x, p->pcell->y);
     player_dump(p);
     sh.pstate.v0.raw = 1;
-    sh.pstate.v1.raw = p->pcell->x;
-    sh.pstate.v2.raw = p->pcell->y;
+    //    sh.pstate.v1.raw = p->pcell->x;
+    //    sh.pstate.v2.raw = p->pcell->y;
+    sh.pstate.v1.raw = p->id;
+    printf("\n\nplayerid = %d\n", p->id);
     gamestate_dump(Server_Gamestate);
     proto_session_body_marshall_gamestate(s,Server_Gamestate);
     proto_session_body_marshall_map(s,Server_Map);

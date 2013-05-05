@@ -58,6 +58,8 @@ player_find_empty_home(Player* p, team_t t, ObjectMap *o, int playerid){
 	  p->pcell = o->objects[idx];
 	  p->pcell->x = x;
 	  p->pcell->y = y;
+	  p->x = x;
+	  p->y = y;
 	  p->id = playerid;
 	  p->team = t;
 	  p->shovel = NONE;

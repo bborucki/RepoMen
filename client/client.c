@@ -55,6 +55,7 @@ struct ClientState {
   UI *ui;
   int connected;
   int data;
+  int playerid;
 } Client;
 
 int 
@@ -132,7 +133,6 @@ event_player_join_handler(Proto_Session *s){
 
   gamestate_add_player(Client.Gamestate,p);
   gamestate_dump(Client.Gamestate);
-
   return 1;
 }
 
@@ -212,10 +212,10 @@ doRPC(char c){
     s = proto_client_rpc_session(Client.ph);
     proto_session_hdr_unmarshall(s,&hdr);
     if(s->rhdr.pstate.v0.raw){
-      globals.x = (unsigned char)s->rhdr.pstate.v1.raw;
-      globals.y = (unsigned char)s->rhdr.pstate.v2.raw;
+      Client.playerid = (unsigned char)s->rhdr.pstate.v1.raw;
       offset = proto_session_body_unmarshall_gamestate(s,0,Client.Gamestate);
-      gamestate_dump(Client.Gamestate);
+      Client.Player = gamestate_get_player(Client.Gamestate,Client.playerid);
+      player_dump(Client.Player);
       proto_session_body_unmarshall_map(s,offset,Client.Map);
       setGamestateEventHandlers();
     }
@@ -350,7 +350,6 @@ doConnect(){
   doRPC('h');
   printf("Connected.");
   printf("\n");
-  player_dump(Client.Player);
   Client.connected = 1;
   return 1;
 }
@@ -685,8 +684,7 @@ shell(void *arg){
 }
 
 int
-ui_prompt(int menu) 
-{
+ui_prompt(int menu) {
   static char MenuString[] = "\nclient> ";
   int ret;
   int c=0;
@@ -702,15 +700,11 @@ ui_docmd(char cmd){
   int rc = 1;
 
   switch (cmd) {
-  case 'q':
-    printf("q ->quitting...\n");
-    rc=-1;
-    break;
-  case 'w':
-    printf("w ->do rpc: up\n");
-    globals.mv = UP;
+  case 'a':
+    printf("a ->do rpc: left\n");
+    globals.mv = LEFT;
     if((rc = doRPC('v'))>0){
-      ui_dummy_up(Client.ui);
+      ui_dummy_left(Client.ui);
     }
     break;
   case 's':
@@ -720,18 +714,34 @@ ui_docmd(char cmd){
       ui_dummy_down(Client.ui);
     }
     break;
-  case 'a':
-    printf("a ->do rpc: left\n");
-    globals.mv = LEFT;
-    if((rc = doRPC('v'))>0){
-      ui_dummy_left(Client.ui);
-    }
-    break;
   case 'd':
     printf("d ->do rpc: right\n");
     globals.mv = RIGHT;
     if((rc = doRPC('v'))>0){
       ui_dummy_right(Client.ui);
+    }
+    break;
+  case 'w':
+    printf("w ->do rpc: up\n");
+    globals.mv = UP;
+    if((rc = doRPC('v'))>0){
+      ui_dummy_up(Client.ui);
+    }
+    break;
+  case 'q':
+    printf("q ->quitting...\n");
+    rc=-1;
+    break;
+  case 'e':
+    printf("w ->do rpc: pickup\n");
+    if(Client.Player->team==TEAM1){
+      printf("team1 pickup\n");
+      //      if((rc = doRPC())>0){}
+      ui_dummy_pickup_red(Client.ui);
+    } else {
+      printf("team2 pickup\n");
+      //      if((rc = doRPC())>0){}
+      ui_dummy_pickup_green(Client.ui);
     }
     break;
   case '\n':
