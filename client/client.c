@@ -30,7 +30,6 @@
 #include "../lib/protocol_utils.h"
 #include "../lib/map.h"
 #include "../lib/cell.h"
-#include "../lib/objectmap.h"
 #include "../lib/uistandalone.h"
 #include "../lib/tty.h"
 
@@ -703,28 +702,28 @@ ui_docmd(char cmd){
     printf("a ->do rpc: left\n");
     globals.mv = LEFT;
     if((rc = doRPC('v'))>0){
-      ui_dummy_left(Client.ui);
+      rc = ui_dummy_left(Client.ui);
     }
     break;
   case 's':
     printf("s ->do rpc: down\n");
     globals.mv = DOWN;
     if((rc = doRPC('v'))>0){
-      ui_dummy_down(Client.ui);
+      rc = ui_dummy_down(Client.ui);
     }
     break;
   case 'd':
     printf("d ->do rpc: right\n");
     globals.mv = RIGHT;
     if((rc = doRPC('v'))>0){
-      ui_dummy_right(Client.ui);
+      rc = ui_dummy_right(Client.ui);
     }
     break;
   case 'w':
     printf("w ->do rpc: up\n");
     globals.mv = UP;
-    if((rc = doRPC('v'))>0){
-      ui_dummy_up(Client.ui);
+    if(doRPC('v')>0){
+      rc = ui_dummy_up(Client.ui);
     }
     break;
   case 'q':

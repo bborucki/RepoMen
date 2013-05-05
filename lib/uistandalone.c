@@ -24,6 +24,7 @@
 #include <stdlib.h> /* for exit() */
 #include <pthread.h>
 #include <assert.h>
+#include <math.h>
 #include "types.h"
 #include "uistandalone.h"
 
@@ -373,10 +374,13 @@ ui_paintmap(UI *ui){
   int i, j, h, w, dim;
   t.y = 0; t.x = 0; t.h = ui->tile_h; t.w = ui->tile_w; 
 
-  i = ui->x;
-  j = ui->y;
   h = ui->screen->h;
   w = ui->screen->w;
+  printf("Before\n");
+  i = (int)floor(ui->x/(int)h);
+  j = (int)floor(ui->y/(int)w);
+  printf("After\n");
+
   dim = ui->uimap->dim -1;
 
   for (t.y=0; t.y<h; t.y+=t.h, i++) {

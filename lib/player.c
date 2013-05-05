@@ -6,6 +6,7 @@
 #include "types.h"
 #include "objectmap.h"
 
+#define DEBUG_MAP 1
 
 extern void
 player_dump(Player *p){
@@ -49,6 +50,25 @@ player_obj_pickup(Player* p, ObjectMap *o){
 extern int 
 player_find_empty_home(Player* p, team_t t, ObjectMap *o, int playerid){
   int x,y,idx;
+
+  if(DEBUG_MAP){
+    x = 1;
+    y = 1;
+    idx = x*(o->dim)+y;
+    p->pcell = o->objects[idx];
+    p->pcell->x = x;
+    p->pcell->y = y;
+    p->x = x;
+    p->y = y;
+    p->id = playerid;
+    p->team = t;
+    p->shovel = NONE;
+    p->flag = NONE;
+    p->state = SAFE;
+    o->objects[idx]->player = p;
+    return 1;	  
+  }
+  
   if(t == TEAM1){
     for(x = 91; x<=109; x++){
       for(y = 2; y<=11; y++){

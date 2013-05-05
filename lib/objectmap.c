@@ -9,6 +9,8 @@
 #include "player.h"
 #include "gamestate.h"
 
+#define DEBUG_MAP 1
+
 extern int
 objectmap_remove_player(int x, int y, ObjectMap *o){
   int idx = x*(o->dim)+y;
@@ -148,11 +150,12 @@ objectmap_create(Map *m, Gamestate *g){
   o->numPlayers = 0;
   o->dim = dim;
 
-  objectmap_place_flag(o,TEAM1);
-  objectmap_place_flag(o,TEAM2);
-  objectmap_place_shovel(o,g,TEAM1);
-  objectmap_place_shovel(o,g,TEAM2);
-
+  if(!DEBUG_MAP){
+    objectmap_place_flag(o,TEAM1);
+    objectmap_place_flag(o,TEAM2);
+    objectmap_place_shovel(o,g,TEAM1);
+    objectmap_place_shovel(o,g,TEAM2);
+  }
   
   return o;
 }

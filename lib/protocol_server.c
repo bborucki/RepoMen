@@ -37,6 +37,8 @@
 #include "player.h"
 #include "gamestate.h"
 
+#define DEBUG_MAP 1
+
 #define PROTO_SERVER_MAX_EVENT_SUBSCRIBERS 1024
 #define MAX_OBJECTS 404
 
@@ -328,13 +330,10 @@ proto_server_hello_handler(Proto_Session *s){
     printf("Location: %d,%d\n", p->pcell->x, p->pcell->y);
     player_dump(p);
     sh.pstate.v0.raw = 1;
-    //    sh.pstate.v1.raw = p->pcell->x;
-    //    sh.pstate.v2.raw = p->pcell->y;
     sh.pstate.v1.raw = p->id;
-    printf("\n\nplayerid = %d\n", p->id);
     gamestate_dump(Server_Gamestate);
     proto_session_body_marshall_gamestate(s,Server_Gamestate);
-    proto_session_body_marshall_map(s,Server_Map);
+    //    proto_session_body_marshall_map(s,Server_Map);
     s->player = p;
   } else {
     sh.pstate.v0.raw = 0;
@@ -501,24 +500,25 @@ proto_server_move_handler(Proto_Session *s){
   if (valid>0) {
     sh.pstate.v3.raw = 1;
     printf("Player %d is moving to (%d,%d)\n",id,p->pcell->x,p->pcell->y);
-    flagindex = objectmap_flag_visible(p,Server_ObjectMap);
-    
-    if(flagindex>=0)
-      flag = Server_ObjectMap->objects[flagindex]->obj;
-
-    if(flag == FLAG1){
-      if(!flag1found)
-	flag1found = 1;
-      else
-	flagindex = -1;
+    if(!DEBUG_MAP){
+      flagindex = objectmap_flag_visible(p,Server_ObjectMap);
+      
+      if(flagindex>=0)
+	flag = Server_ObjectMap->objects[flagindex]->obj;
+      
+      if(flag == FLAG1){
+	if(!flag1found)
+	  flag1found = 1;
+	else
+	  flagindex = -1;
+      }
+      if(flag == FLAG2){
+	if(!flag2found)
+	  flag2found = 1;
+	else
+	  flagindex = -1;
+      }
     }
-    if(flag == FLAG2){
-      if(!flag2found)
-	flag2found = 1;
-      else
-	flagindex = -1;
-    }
-
   } else {
     sh.pstate.v3.raw = 0;    
     printf("Player %d attemped an invalid move\n",id);
