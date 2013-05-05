@@ -89,11 +89,33 @@ objectmap_flag_visible(Player *p, ObjectMap *o){
     }
     return -1;
 }
+
+extern int
+objectmap_place_flag(ObjectMap *o, team_t t){
+  int x,y,idx,dim;
+  long seed;
+  
+  seed = time(NULL);
+  srand(seed);
+  
+  
+  while(o->objects[idx]->type != FLOOR){
+    x = rand()%(dim/2);
+    y = rand()%dim;
+    idx = x*dim+y;
+  }
+  if(t == TEAM1)
+    o->objects[idx]->obj = FLAG1;
+  else
+    o->objects[idx]->obj = FLAG2;
+
+  return 1;
+
+}
 extern ObjectMap *
 objectmap_create(Map *m, Gamestate *g){
   ObjectMap *o;
 
-  int seed;
   int idx;
   int i,j;
   int x,y;
@@ -112,35 +134,13 @@ objectmap_create(Map *m, Gamestate *g){
     }
   }
 
-  /*
-    seed = time(NULL);
-    srand(seed);
-    
-    //need to check that location randomly picked is valid
-    //ie. not a wall
-    
-    x = rand()%(dim/2);
-    y = rand()%dim;
-    idx = x*dim+y;
-    
-    // while wall or iwall, search for new rand cell, otherwise put it in that one
-    //  o->objects[idx]->obj = FLAG1;
-    //same for flag 2
-    x = rand()%(dim/2)+dim/2;
-    y = rand()%dim;
-    idx = x*dim+y;
-    // use logic for finding rand cell
-    //  if(o->objects[idx]->type == WALL || o->objects[idx]->type == IWALL){
-    //    objectmap_remove_player(x,y,o);
-    //  }
-    //  o->objects[x*dim+y]->obj = FLAG2;
-    */
-
-
+ 
   o->numCells = 4;
   o->numPlayers = 0;
   o->dim = dim;
 
+  objectmap_place_flag(o,TEAM1);
+  objectmap_place_flag(o,TEAM2);
   objectmap_place_shovel(o,g,TEAM1);
   objectmap_place_shovel(o,g,TEAM2);
 
