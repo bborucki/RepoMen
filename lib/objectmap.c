@@ -77,6 +77,8 @@ objectmap_flag_visible(Player *p, ObjectMap *o){
   int x,y,idx,dim,i;
   x = p->pcell->x - 5;
   y = p->pcell->y - 5;
+  dim = o->dim;
+  idx = x*dim+y;
   
     for(i=0;i<121;i++){
       if(t == TEAM1){
