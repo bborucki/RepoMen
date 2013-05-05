@@ -44,6 +44,17 @@ gamestate_dump(Gamestate *g){
   return 1;
 }
 
+extern int
+gamestate_move_player(Gamestate *g, int pid, int x, int y){
+  Player *p;
+  
+  p = gamestate_get_player(g,pid);
+  p->x = x;
+  p->y = y;
+
+  return 1;
+}
+
 extern Player *
 gamestate_get_player(Gamestate *g, int playerid){
   return g->plist[playerid];

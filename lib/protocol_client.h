@@ -38,11 +38,11 @@ extern int proto_client_set_connected(Proto_Client_Handle ch, int i);
 extern int proto_client_get_connected(Proto_Client_Handle ch);
 
 extern int proto_client_set_session_lost_handler(Proto_Client_Handle ch,
-						 Proto_Client_MT_Handler h);
+						 Proto_MT_Handler h);
 
 extern int proto_client_set_event_handler(Proto_Client_Handle ch,
 					  Proto_Msg_Types mt,
-					  Proto_Client_MT_Handler h);
+					  Proto_MT_Handler h);
 
 // client side protocol rpc's
 extern int proto_client_hello(Proto_Client_Handle ch);

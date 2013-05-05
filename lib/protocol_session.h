@@ -42,8 +42,7 @@ typedef struct {
 
 // Define Proto_MT_Handler type as a pointer to a function that returns
 // an int and takes a Session pointer as an argument
-typedef int (*Proto_Client_MT_Handler)(Proto_Session *, void *);
-typedef int (*Proto_Server_MT_Handler)(Proto_Session *);
+typedef int (*Proto_MT_Handler)(Proto_Session *);
 
 extern void proto_session_dump(Proto_Session *s);
 
