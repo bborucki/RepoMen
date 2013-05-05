@@ -370,21 +370,20 @@ draw_cell(UI *ui, SPRITE_INDEX si, SDL_Rect *t, SDL_Surface *s){
 static sval
 ui_paintmap(UI *ui){
   SDL_Rect t;
-  int i, j, dim;
+  int i, j, h, w, dim;
   t.y = 0; t.x = 0; t.h = ui->tile_h; t.w = ui->tile_w; 
 
   i = ui->x;
   j = ui->y;
+  h = ui->screen->h;
+  w = ui->screen->w;
   dim = ui->uimap->dim -1;
 
-  for (t.y=0; t.y<ui->screen->h; t.y+=t.h, i++) {
-    for (t.x=0; t.x<ui->screen->w; t.x+=t.w, j++) {
-      printf("i = %d, j = %d\n",i ,j);
+  for (t.y=0; t.y<h; t.y+=t.h, i++) {
+    for (t.x=0; t.x<w; t.x+=t.w, j++) {
       if(cell_get_type(ui->uimap,i,j) == FLOOR){
-	printf("floor\n");
 	draw_cell(ui, FLOOR_S, &t, ui->screen);
       } else {
-	printf("wall\n");
 	draw_cell(ui, REDWALL_S, &t, ui->screen);
       }
     }

@@ -233,8 +233,8 @@ doRPC(char c){
       if(s->rhdr.pstate.v0.raw == Client.Player->id){
 
 	rc = 2;
-	//	Client.Player->x = s->rhdr.pstate.v1.raw;
-	//	Client.Player->y = s->rhdr.pstate.v2.raw;
+	Client.ui->x = s->rhdr.pstate.v1.raw;
+	Client.ui->y = s->rhdr.pstate.v2.raw;
 	//	printf("Now at (%d,%d)\n", Client.Player->x, Client.Player->y);
 
 	//insert way of blocking for a server move update
@@ -827,7 +827,7 @@ main(int argc, char **argv){
     pthread_create(&tid, NULL, ui_shell, NULL);
     Client.ui->uigs = Client.Gamestate;
     Client.ui->uimap = Client.Map;
-    ui_main_loop(Client.ui, 640, 640);//320
+    ui_main_loop(Client.ui, 320, 320);
   } else {
     shell(NULL);
   }
