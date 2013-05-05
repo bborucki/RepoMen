@@ -64,7 +64,7 @@ cell_get_type(Map *m, int x, int y){
 
 int
 getTeam(int x, int y, int dim){
-  if(x > dim/2) //may need to use floor() or ceil()
+  if(y > dim/2) //may need to use floor() or ceil()
     return TEAM2;
   return TEAM1;
 }
