@@ -52,35 +52,115 @@ typedef struct ClientState  {
 } Client;
 
 static int
-clientInit(Client *C){
-  bzero(C, sizeof(Client));
-
-  globals.player = (Player *)malloc(sizeof(Player));
-  globals.map = (Map *)malloc(sizeof(Map));
-  globals.cell = (Cell *)malloc(sizeof(Cell));
-
-  bzero(globals.player,sizeof(globals.player));
-  bzero(globals.map,sizeof(globals.map));
-  bzero(globals.cell,sizeof(globals.cell));
-
-  globals.gamestate = gamestate_create();
-
-  if (proto_client_init(&(C->ph))<0) {
-    fprintf(stderr, "client: main: ERROR initializing proto system\n");
-    return -1;
-  }
-  return 1;
-}
-
-static int
-update_event_handler(Proto_Session *s, Proto_Client_Handle ch){
+update_event_handler(Proto_Session *s){
   printf("Update from the server!\n");  
   fprintf(stderr, "%s: called", __func__);
   return 1;
 }
 
+static int 
+proto_client_session_lost_default_hdlr(Proto_Session *s){
+  fprintf(stderr, "Session lost...:\n");
+  proto_session_dump(s);
+  net_close_socket(s->fd);
+
+  return -1;
+}
+
+static int 
+event_null_handler(Proto_Session *s){
+  fprintf(stderr, 
+	  "proto_client_event_null_handler: invoked for session:\n");
+  proto_session_dump(s);
+
+  return 1;
+}
+
+static int 
+event_server_quit_handler(Proto_Session *s){
+  
+  //  doDisconnect(C, 's');
+
+  fprintf(stderr, "Disconnected: server quitting.\n");
+
+  return 1;
+}
+
+static int 
+event_player_quit_handler(Proto_Session *s){
+  Player p;
+
+  proto_session_body_unmarshall_player(s,0,&p);
+  printf("Player %d has disconnected.\n", p.id);  
+
+  //remove appropriate player from gamestate
+
+  return 1;
+}
+
+static int 
+event_player_join_handler(Proto_Session *s){
+  int x,y,id,ret;
+  Player p;
+
+  proto_session_hdr_unmarshall(s,&s->rhdr);
+
+  id = s->rhdr.pstate.v0.raw;
+  x = s->rhdr.pstate.v1.raw;
+  y = s->rhdr.pstate.v2.raw;
+
+  if((ret = proto_session_body_unmarshall_player(s,0,&p)) == 0){
+    fprintf(stderr, "Error unmarshalling new player.\n");
+    return -1;
+  }
+
+  //add palyer to gamestate
+
+  printf("Player %d has joined at (%d,%d)\n", id, x, y);  
+
+  return 1;
+}
+
+static int 
+event_move_handler(Proto_Session *s){
+  int x,y,id;
+
+  proto_session_hdr_unmarshall(s,&s->rhdr);
+
+  id = s->rhdr.pstate.v0.raw;
+  x = s->rhdr.pstate.v1.raw;
+  y = s->rhdr.pstate.v2.raw;
+
+  printf("Player %d is now at (%d,%d)\n", id, x, y);  
+
+  //update appropriate player gamestate
+  
+  return 1;
+}
+
+static int 
+event_pickup_handler(Proto_Session *s){
+  printf("proto_client_event_pickup_handler invoked!\n");  
+
+  return 1;
+}
+
+static int 
+event_drop_handler(Proto_Session *s){
+  printf("proto_client_event_drop_handler invoked!\n");  
+
+  return 1;
+}
+
+static int 
+event_win_handler(Proto_Session *s){
+  printf("proto_client_event_win_handler invoked!\n"); 
+
+  return 1;
+}
+
 int 
-startConnection(Client *C, char *host, PortType port, Proto_Client_MT_Handler h){
+startConnection(Client *C, char *host, PortType port, Proto_MT_Handler h){
   if (globals.host[0]!=0 && globals.port!=0) {
     if (proto_client_connect(C->ph, host, port)!=0) {
       fprintf(stderr, "failed to connect\n");
@@ -545,6 +625,51 @@ prompt(int menu)
   c=input2cmd(input);
 
   return c;
+}
+
+static int
+clientInit(Client *C){
+  int mt;
+  bzero(C, sizeof(Client));
+
+  globals.player = (Player *)malloc(sizeof(Player));
+  globals.map = (Map *)malloc(sizeof(Map));
+  globals.cell = (Cell *)malloc(sizeof(Cell));
+
+  bzero(globals.player,sizeof(globals.player));
+  bzero(globals.map,sizeof(globals.map));
+  bzero(globals.cell,sizeof(globals.cell));
+  
+  globals.gamestate = gamestate_create();
+  
+  if (proto_client_init(&(C->ph))<0) {
+    fprintf(stderr, "client: main: ERROR initializing proto system\n");
+    return -1;
+  }
+  
+  proto_client_set_session_lost_handler(C->ph, proto_client_session_lost_default_hdlr);
+  
+  for (mt=PROTO_MT_EVENT_BASE_RESERVED_FIRST+1;
+       mt<PROTO_MT_EVENT_BASE_RESERVED_LAST; mt++){
+    if(mt == PROTO_MT_EVENT_BASE_MOVE)
+      proto_client_set_event_handler(C->ph, mt, event_move_handler);
+    else if(mt == PROTO_MT_EVENT_BASE_PICKUP)
+      proto_client_set_event_handler(C->ph, mt, event_pickup_handler);
+    else if(mt == PROTO_MT_EVENT_BASE_DROP)
+      proto_client_set_event_handler(C->ph, mt, event_drop_handler);
+    else if(mt == PROTO_MT_EVENT_BASE_WIN)
+      proto_client_set_event_handler(C->ph, mt, event_win_handler);
+    else if(mt == PROTO_MT_EVENT_BASE_SERVER_QUIT)
+      proto_client_set_event_handler(C->ph, mt, event_server_quit_handler);
+    else if(mt == PROTO_MT_EVENT_BASE_PLAYER_QUIT)
+      proto_client_set_event_handler(C->ph, mt, event_player_quit_handler);
+    else if(mt == PROTO_MT_EVENT_BASE_PLAYER_JOIN)
+      proto_client_set_event_handler(C->ph, mt, event_player_join_handler);
+    else
+      proto_client_set_event_handler(C->ph, mt, event_null_handler);
+  }
+  
+  return 1;
 }
 
 void *

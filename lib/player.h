@@ -8,6 +8,8 @@
 #include "map.h"
 
 struct Player_ {
+  int x;
+  int y;
   char id;
   team_t team;
   object_t shovel;
