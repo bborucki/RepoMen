@@ -36,15 +36,15 @@ static void dummyPlayer_paint(UI *ui, SDL_Rect *t);
 #define SPRITE_H 32
 #define SPRITE_W 32
 
-#define UI_FLOOR_BMP "images/floor.bmp"
-#define UI_REDWALL_BMP "images/redwall.bmp"
-#define UI_GREENWALL_BMP "images/greenwall.bmp"
-#define UI_TEAMA_BMP "images/teama.bmp"
-#define UI_TEAMB_BMP "images/teamb.bmp"
-#define UI_LOGO_BMP "images/logo.bmp"
-#define UI_REDFLAG_BMP "images/redflag.bmp"
-#define UI_GREENFLAG_BMP "images/greenflag.bmp"
-#define UI_JACKHAMMER_BMP "images/shovel.bmp"
+#define UI_FLOOR_BMP "./lib/images/floor.bmp"
+#define UI_REDWALL_BMP "./lib/images/redwall.bmp"
+#define UI_GREENWALL_BMP "./lib/images/greenwall.bmp"
+#define UI_TEAMA_BMP "./lib/images/teama.bmp"
+#define UI_TEAMB_BMP "./lib/images/teamb.bmp"
+#define UI_LOGO_BMP "./lib/images/logo.bmp"
+#define UI_REDFLAG_BMP "./lib/images/redflag.bmp"
+#define UI_GREENFLAG_BMP "./lib/images/greenflag.bmp"
+#define UI_JACKHAMMER_BMP "./lib/images/shovel.bmp"
 
 typedef enum {UI_SDLEVENT_UPDATE, UI_SDLEVENT_QUIT} UI_SDL_Event;
 

@@ -19,6 +19,8 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 * THE SOFTWARE.
 *****************************************************************************/
+#include <unistd.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -29,6 +31,8 @@
 #include "../lib/map.h"
 #include "../lib/cell.h"
 #include "../lib/objectmap.h"
+#include "../lib/uistandalone.h"
+#include "../lib/tty.h"
 
 #define STRLEN 81
 
@@ -47,6 +51,7 @@ struct ClientState {
   Gamestate *Gamestate;
   Player *Player;
   Map *Map; 
+  UI *ui;
   int connected;
   int data;
 } Client;
@@ -213,6 +218,8 @@ doRPC(char c)
       gamestate_dump(Client.Gamestate);
       proto_session_body_unmarshall_map(s,offset,Client.Map);
       setGamestateEventHandlers();
+      tty_init(STDIN_FILENO);
+      //      ui_init();
     }
     break;
   case 'i':
