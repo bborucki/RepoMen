@@ -1,4 +1,4 @@
-CFLAGS := -g
+CFLAGS := -g -lSDL
 targets = libdagame.a
 src = $(wildcard *.c)
 objs = $(patsubst %.c,%.o,$(src))
