@@ -204,6 +204,7 @@ doRPC(char c)
   int rc=-1;
   int x,y;
   int offset=0;
+  pthread_t tid;
 
   Proto_Session *s;
   switch (c) {
@@ -219,7 +220,8 @@ doRPC(char c)
       proto_session_body_unmarshall_map(s,offset,Client.Map);
       setGamestateEventHandlers();
       tty_init(STDIN_FILENO);
-      //      ui_init();
+      ui_init(&(Client.ui));
+      //      pthread_create(&tid,NULL,ui_main_loop, NULL);
     }
     break;
   case 'i':

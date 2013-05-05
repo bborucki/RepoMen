@@ -61,6 +61,70 @@ ui_player_img(UI *ui, int team){
     : ui->sprites[TEAMB_S].img;
 }
 
+extern sval
+ui_keypress(UI *ui, SDL_KeyboardEvent *e){
+  SDLKey sym = e->keysym.sym;
+  SDLMod mod = e->keysym.mod;
+  
+  // fprintf(stderr, "%c\n", sym);
+  //  fprintf(stderr, "d\n",mod);
+  if (e->type == SDL_KEYDOWN) {
+    if (sym == SDLK_a && mod == KMOD_NONE) {
+      fprintf(stderr, "%s: move left\n", __func__);
+      return ui_dummy_left(ui);
+    }
+    if (sym == SDLK_d && mod == KMOD_NONE) {
+      fprintf(stderr, "%s: move right\n", __func__);
+      return ui_dummy_right(ui);
+    }
+    if (sym == SDLK_w && mod == KMOD_NONE)  {  
+      fprintf(stderr, "%s: move up\n", __func__);
+      return ui_dummy_up(ui);
+    }
+    if (sym == SDLK_s && mod == KMOD_NONE)  {
+      fprintf(stderr, "%s: move down\n", __func__);
+      return ui_dummy_down(ui);
+    }
+    if (sym == SDLK_e && mod == KMOD_NONE)  {  
+      fprintf(stderr, "%s: dummy pickup red flag\n", __func__);
+      return ui_dummy_pickup_red(ui);
+    }
+    if (sym == SDLK_f && mod == KMOD_NONE)  {   
+      fprintf(stderr, "%s: dummy pickup green flag\n", __func__);
+      return ui_dummy_pickup_green(ui);
+    }
+    if (sym == SDLK_j && mod == KMOD_NONE)  {   
+      fprintf(stderr, "%s: dummy jail\n", __func__);
+      return ui_dummy_jail(ui);
+    }
+    if (sym == SDLK_n && mod == KMOD_NONE)  {   
+      fprintf(stderr, "%s: dummy normal state\n", __func__);
+      return ui_dummy_normal(ui);
+    }
+    if (sym == SDLK_t && mod == KMOD_NONE)  {   
+      fprintf(stderr, "%s: dummy toggle team\n", __func__);
+      return ui_dummy_toggle_team(ui);
+    }
+    if (sym == SDLK_i && mod == KMOD_NONE)  {   
+      fprintf(stderr, "%s: dummy inc player id \n", __func__);
+      return ui_dummy_inc_id(ui);
+    }
+    if (sym == SDLK_q) return -1;
+    if (sym == SDLK_z && mod == KMOD_NONE) return ui_zoom(ui, 1);
+    if (sym == SDLK_z && mod & KMOD_SHIFT ) return ui_zoom(ui,-1);
+    if (sym == SDLK_LEFT && mod & KMOD_SHIFT) return ui_pan(ui,-1,0);
+    if (sym == SDLK_RIGHT && mod & KMOD_SHIFT) return ui_pan(ui,1,0);
+    if (sym == SDLK_UP && mod & KMOD_SHIFT) return ui_pan(ui, 0,-1);
+    if (sym == SDLK_DOWN && mod & KMOD_SHIFT) return ui_pan(ui, 0,1);
+    else {
+      fprintf(stderr, "%s: key pressed: %d\n", __func__, sym); 
+    }
+  } else {
+    fprintf(stderr, "%s: key released: %d\n", __func__, sym);
+  }
+  return 1;
+}
+
 static inline sval 
 pxSpriteOffSet(int team, int state){
   if (state == 1)
