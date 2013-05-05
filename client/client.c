@@ -365,7 +365,6 @@ doConnect(){
     doRPC('h');
     printf("Connected.");
     printf("\n");
-    printf("Location: (%d,%d)\n", globals.x, globals.y);
     player_dump(Client.Player);
     Client.connected = 1;
   }

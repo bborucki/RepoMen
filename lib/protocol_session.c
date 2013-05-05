@@ -333,11 +333,8 @@ proto_session_body_unmarshall_gamestate(Proto_Session *s, int offset,
   int nplayers;
   int ncells;
 
-  offset= proto_session_body_unmarshall_int(s,offset,&(g->numCells));
-  offset= proto_session_body_unmarshall_int(s,offset,&(g->numPlayers)); 
-
-  ncells = g->numCells;
-  nplayers = g->numPlayers;
+  offset= proto_session_body_unmarshall_int(s,offset,&ncells);
+  offset= proto_session_body_unmarshall_int(s,offset,&nplayers); 
 
   while(ncells){
     c = (Cell *)malloc(sizeof(Cell));
