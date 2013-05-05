@@ -42,13 +42,33 @@ struct Globals {
   Cell *cell;
 } globals;
 
-typedef struct ClientState {
+struct ClientState {
   Proto_Client_Handle ph;
   Gamestate *Gamestate;
   Player *Player;
   Map *Map; 
+  int connected;
   int data;
 } Client;
+
+int 
+startConnection(char *host, PortType port, Proto_MT_Handler h){
+  if (globals.host[0]!=0 && globals.port!=0) {
+    if (proto_client_connect(Client.ph, host, port)!=0) {
+      fprintf(stderr, "failed to connect\n");
+      return -1;
+    }
+    proto_session_set_data(proto_client_event_session(Client.ph), NULL);
+#if 1
+    if (h != NULL) {
+      proto_client_set_event_handler(Client.ph, PROTO_MT_EVENT_BASE_UPDATE, 
+				     h);
+    }
+#endif
+    return 1;
+  }
+  return 0;
+}
 
 static int
 update_event_handler(Proto_Session *s){
@@ -68,19 +88,8 @@ proto_client_session_lost_default_hdlr(Proto_Session *s){
 
 static int 
 event_null_handler(Proto_Session *s){
-  fprintf(stderr, 
-	  "proto_client_event_null_handler: invoked for session:\n");
-  proto_session_dump(s);
-
-  return 1;
-}
-
-static int 
-event_server_quit_handler(Proto_Session *s){
-  
-  //  doDisconnect(C, 's');
-
-  fprintf(stderr, "Disconnected: server quitting.\n");
+  //  fprintf(stderr,"proto_client_event_null_handler: invoked for session:\n");
+  //  proto_session_dump(s);
 
   return 1;
 }
@@ -100,7 +109,9 @@ event_player_quit_handler(Proto_Session *s){
 static int 
 event_player_join_handler(Proto_Session *s){
   int x,y,id,ret;
-  Player p;
+  Player *p;
+
+  p = player_create();
 
   proto_session_hdr_unmarshall(s,&s->rhdr);
 
@@ -108,14 +119,13 @@ event_player_join_handler(Proto_Session *s){
   x = s->rhdr.pstate.v1.raw;
   y = s->rhdr.pstate.v2.raw;
 
-  if((ret = proto_session_body_unmarshall_player(s,0,&p)) == 0){
+  if((ret = proto_session_body_unmarshall_player(s,0,p)) == 0){
     fprintf(stderr, "Error unmarshalling new player.\n");
     return -1;
   }
 
-  //add palyer to gamestate
-
-  printf("Player %d has joined at (%d,%d)\n", id, x, y);  
+  gamestate_add_player(Client.Gamestate,p);
+  gamestate_dump(Client.Gamestate);
 
   return 1;
 }
@@ -130,9 +140,10 @@ event_move_handler(Proto_Session *s){
   x = s->rhdr.pstate.v1.raw;
   y = s->rhdr.pstate.v2.raw;
 
+  gamestate_move_player(Client.Gamestate,id,x,y);
+  //  gamestate_dump(Client.Gamestate);
+  
   printf("Player %d is now at (%d,%d)\n", id, x, y);  
-
-  //update appropriate player gamestate
   
   return 1;
 }
@@ -158,27 +169,31 @@ event_win_handler(Proto_Session *s){
   return 1;
 }
 
-int 
-startConnection(Client *C, char *host, PortType port, Proto_MT_Handler h){
-  if (globals.host[0]!=0 && globals.port!=0) {
-    if (proto_client_connect(C->ph, host, port)!=0) {
-      fprintf(stderr, "failed to connect\n");
-      return -1;
-    }
-    proto_session_set_data(proto_client_event_session(C->ph), C);
-#if 1
-    if (h != NULL) {
-      proto_client_set_event_handler(C->ph, PROTO_MT_EVENT_BASE_UPDATE, 
-				     h);
-    }
-#endif
-    return 1;
+static int
+setGamestateEventHandlers(){
+  int mt;
+
+  for (mt=PROTO_MT_EVENT_BASE_RESERVED_FIRST+1;
+       mt<PROTO_MT_EVENT_BASE_RESERVED_LAST; mt++){
+    if(mt == PROTO_MT_EVENT_BASE_MOVE)
+      proto_client_set_event_handler(Client.ph, mt, event_move_handler);
+    else if(mt == PROTO_MT_EVENT_BASE_PICKUP)
+      proto_client_set_event_handler(Client.ph, mt, event_pickup_handler);
+    else if(mt == PROTO_MT_EVENT_BASE_DROP)
+      proto_client_set_event_handler(Client.ph, mt, event_drop_handler);
+    else if(mt == PROTO_MT_EVENT_BASE_WIN)
+      proto_client_set_event_handler(Client.ph, mt, event_win_handler);
+    else if(mt == PROTO_MT_EVENT_BASE_PLAYER_QUIT)
+      proto_client_set_event_handler(Client.ph, mt, event_player_quit_handler);
+    else if(mt == PROTO_MT_EVENT_BASE_PLAYER_JOIN)
+      proto_client_set_event_handler(Client.ph, mt, event_player_join_handler);
   }
-  return 0;
+  return 1;
 }
 
+
 int 
-doRPC(Client *C, char c) 
+doRPC(char c) 
 {
   Proto_Msg_Hdr hdr;
   int rc=-1;
@@ -188,28 +203,29 @@ doRPC(Client *C, char c)
   Proto_Session *s;
   switch (c) {
   case 'h':
-    rc = proto_client_hello(C->ph);
-    s = proto_client_rpc_session(C->ph);
+    rc = proto_client_hello(Client.ph);
+    s = proto_client_rpc_session(Client.ph);
     proto_session_hdr_unmarshall(s,&hdr);
     if(s->rhdr.pstate.v0.raw){
       globals.x = (unsigned char)s->rhdr.pstate.v1.raw;
       globals.y = (unsigned char)s->rhdr.pstate.v2.raw;
-      offset = proto_session_body_unmarshall_gamestate(s,0,C->Gamestate);
-      gamestate_dump(C->Gamestate);
-      proto_session_body_unmarshall_map(s,offset,C->Map);
+      offset = proto_session_body_unmarshall_gamestate(s,0,Client.Gamestate);
+      gamestate_dump(Client.Gamestate);
+      proto_session_body_unmarshall_map(s,offset,Client.Map);
+      setGamestateEventHandlers();
     }
     break;
   case 'i':
-    rc = proto_client_cinfo(C->ph, globals.x, globals.y);
-    s = proto_client_rpc_session(C->ph);
+    rc = proto_client_cinfo(Client.ph, globals.x, globals.y);
+    s = proto_client_rpc_session(Client.ph);
     proto_session_body_unmarshall_cell(s, 0, globals.cell);
     break;
   case 'v':
     //currently no validity checking client-side
-    rc = proto_client_move(C->ph, C->Player->id, globals.mv);
-    s = proto_client_rpc_session(C->ph);
+    rc = proto_client_move(Client.ph, Client.Player->id, globals.mv);
+    s = proto_client_rpc_session(Client.ph);
     if(s->rhdr.pstate.v3.raw > 0){
-      if(s->rhdr.pstate.v0.raw == C->Player->id){
+      if(s->rhdr.pstate.v0.raw == Client.Player->id){
 	globals.x = s->rhdr.pstate.v1.raw;
 	globals.y = s->rhdr.pstate.v2.raw;
 	printf("Now at (%d,%d)\n", globals.x, globals.y);
@@ -223,10 +239,10 @@ doRPC(Client *C, char c)
     }
     break;
   case 'd':
-    rc = proto_client_dump(C->ph);
+    rc = proto_client_dump(Client.ph);
     break;
   case 'g':
-    rc = proto_client_goodbye(C->ph,C->Player);
+    rc = proto_client_goodbye(Client.ph,Client.Player);
     break;
   default:
     printf("%s: unknown command %c\n", __func__, c);
@@ -236,7 +252,7 @@ doRPC(Client *C, char c)
 }
 
 int
-doMove(Client *C){
+doMove(){
   int rc,x;
   char ch;
 
@@ -248,7 +264,7 @@ doMove(Client *C){
   putchar(ch);
   scanf("%c", &ch);
 
-  if(!proto_client_get_connected(C->ph)){
+  if(!Client.connected){
     printf("Not Connected.");
     return 1;
   }
@@ -262,13 +278,57 @@ doMove(Client *C){
 
   globals.mv = x;
   
-  rc = doRPC(C, 'v');
+  rc = doRPC('v');
 
   return rc;
 }
 
+extern int
+doDisconnect(char cmd){
+  Proto_Session *rpc;
+  Proto_Session *event;
+  
+  rpc = proto_client_rpc_session(Client.ph);
+  event = proto_client_event_session(Client.ph);
+
+  if(cmd == 'q' && !Client.connected){
+    printf("Terminated.\n");
+    return -1;
+  }
+
+  if(!Client.connected){
+    printf("Not Connected.");
+    return 1;
+  }
+
+  if(cmd != 's'){
+    doRPC('g'); //goodbye
+  }
+
+  net_close_socket(rpc->fd);
+  net_close_socket(event->fd);
+
+  Client.connected = 0;
+
+  if(cmd=='q'){
+    printf("Terminated.\n");
+    return -1;
+  }
+  if(cmd == 's'){
+    fprintf(stderr, "Disconnected: Server Quit.\n");
+    return 1;
+  }
+  printf("Disconnected");
+  return 1;
+}
+
+static int 
+event_server_quit_handler(Proto_Session *s){
+  return doDisconnect('s');
+}
+
 int
-doConnect(Client *C){
+doConnect(){
   char addr_port[42];
   char host[81];
   int port;
@@ -287,7 +347,7 @@ doConnect(Client *C){
     return 1;
   }
 
-  if(proto_client_get_connected(C->ph)){
+  if(Client.connected){
     printf("Already Connected.");
     return 1;
   }  
@@ -297,57 +357,24 @@ doConnect(Client *C){
   strncpy(globals.host, addr_port, strlen(addr_port));
   globals.port = atoi(ptr+sizeof(char));
   
-  if (startConnection(C, globals.host, globals.port, update_event_handler)<0) {
+  if (startConnection(globals.host, globals.port, update_event_handler)<0) {
     fprintf(stderr, "ERROR: startConnection failed\n");
     return -1;
   }
   else{
-    doRPC(C,'h');
+    doRPC('h');
     printf("Connected.");
     printf("\n");
     printf("Location: (%d,%d)\n", globals.x, globals.y);
-    player_dump(C->Player);
-    proto_client_set_connected(C->ph, 1);
+    player_dump(Client.Player);
+    Client.connected = 1;
   }
-  return 1;
-}
-
-extern int
-doDisconnect(Client* C, char cmd){
-  Proto_Session *rpc;
-  Proto_Session *event;
-  
-  rpc = proto_client_rpc_session(C->ph);
-  event = proto_client_event_session(C->ph);
-
-  if(cmd == 'q' && !proto_client_get_connected(C->ph)){
-    printf("Terminated.\n");
-    return -1;
-  }
-
-  if(!proto_client_get_connected(C->ph)){
-    printf("Not Connected.");
-    return 1;
-  }
-
-  doRPC(C,'g'); //goodbye
-
-  net_close_socket(rpc->fd);
-  net_close_socket(event->fd);
-
-  proto_client_set_connected(C->ph, 0);
-
-  if(cmd=='q'){
-    printf("Terminated.\n");
-    return -1;
-  }
-  printf("Disconnected");
   return 1;
 }
 
 int
-doWhere(Client *C){
-  if(proto_client_get_connected(C->ph))
+doWhere(){
+  if(Client.connected)
     printf("Connected to: %s:%d", globals.host, globals.port);
   else
     printf("Not Connected.");
@@ -355,7 +382,7 @@ doWhere(Client *C){
 }
 
 int 
-doNumHome(Client *C){
+doNumHome(){
   char c;
   int teamNum;
   int rc;
@@ -367,15 +394,15 @@ doNumHome(Client *C){
   putchar(c);
   
   if(scanf("%d", &teamNum)==1 && (teamNum == 1 || teamNum == 2)){
-    if(!proto_client_get_connected(C->ph)){
+    if(!Client.connected){
       printf("Not Connected.");
       return 1;
     }
     printf("Number of home cells for team %d = ", teamNum);
     if(teamNum == 1)
-      printf("%d\n",C->Map->numhome1);
+      printf("%d\n",Client.Map->numhome1);
     else
-      printf("%d\n",C->Map->numhome2);
+      printf("%d\n",Client.Map->numhome2);
   } else {
     printf("Usage: \"numhome <1 or 2>\"\n");
     return 1;
@@ -385,7 +412,7 @@ doNumHome(Client *C){
 }
 
 int 
-doNumJail(Client *C){
+doNumJail(){
   char c;
   int teamNum;
 
@@ -396,15 +423,15 @@ doNumJail(Client *C){
   putchar(c);
   
   if(scanf("%d", &teamNum)==1 && (teamNum == 1 || teamNum == 2)){
-    if(!proto_client_get_connected(C->ph)){
+    if(!Client.connected){
       printf("Not Connected.");
       return 1;
     }
     printf("Number of jail cells for team %d = ", teamNum);
     if(teamNum == 1)
-      printf("%d\n",C->Map->numjail1);
+      printf("%d\n",Client.Map->numjail1);
     else
-      printf("%d\n",C->Map->numjail2);
+      printf("%d\n",Client.Map->numjail2);
   }
   else{
     printf("Usage: \"numjail <1 or 2>\"\n");
@@ -415,37 +442,37 @@ doNumJail(Client *C){
 }
 
 int
-doNumFloor(Client *C){
-  if(!proto_client_get_connected(C->ph)){
+doNumFloor(){
+  if(!Client.connected){
     printf("Not Connected.");
     return 1;
   }
-  printf("Number of available floor cells = %d\n", C->Map->numfloor);
+  printf("Number of available floor cells = %d\n", Client.Map->numfloor);
   return 1;
 }
 
 int
-doNumWall(Client *C){
-  if(!proto_client_get_connected(C->ph)){
+doNumWall(){
+  if(!Client.connected){
     printf("Not connected.");
     return 1;
   }    
-  printf("Number of available wall cells = %d\n", C->Map->numwall);
+  printf("Number of available wall cells = %d\n", Client.Map->numwall);
   return 1;
 }
 
 int
-doDim(Client *C){
-  if(!proto_client_get_connected(C->ph)){
+doDim(){
+  if(!Client.connected){
     printf("Not Connected.");
     return 1;
   }    
-  printf("Dimensions of the maze are %d x %d\n", C->Map->dim-1,C->Map->dim-1);
+  printf("Dimensions of the maze are %d x %d\n", Client.Map->dim-1,Client.Map->dim-1);
   return 1;
 }
 
 int 
-doCInfo(Client *C){
+doCInfo(){
   char c;
   int rc,x,y;
 
@@ -456,14 +483,14 @@ doCInfo(Client *C){
   putchar(c);
   
   if(scanf("%d,%d", &x, &y)==2){
-    if(!proto_client_get_connected(C->ph)){
+    if(!Client.connected){
       printf("Not Connected.");
       return 1;
     }        
     
     globals.x = x;
     globals.y = y;
-    rc = doRPC(C,'i');
+    rc = doRPC('i');
     printf("Type: ");
     cell_print_type(globals.cell);
     printf("Team: %d\n", globals.cell->team); //FIX ME
@@ -483,15 +510,15 @@ doCInfo(Client *C){
 }
 
 int 
-doDump(Client *C){
+doDump(){
   int rc;
 
-  if(!proto_client_get_connected(C->ph)){
+  if(!Client.connected){
     printf("Not Connected.");
     return 1;
   }
   
-  if((rc=doRPC(C,'d'))>0){
+  if((rc=doRPC('d'))>0){
     printf("Dump Successful\n");
     return 1;
   }
@@ -553,46 +580,46 @@ input2cmd(char* input){
 }
 
 int 
-docmd(Client *C, char cmd)
+docmd(char cmd)
 {
   int rc = 1;
 
   switch (cmd) {
   case 'c': 
-    rc=doConnect(C);
+    rc=doConnect();
     break;
   case 'd': 
-    rc=doDisconnect(C,cmd);
+    rc=doDisconnect(cmd);
     break;
   case 'w': 
-    rc=doWhere(C); 
+    rc=doWhere(); 
     break;
   case 'q':
-    rc=doDisconnect(C,cmd);
+    rc=doDisconnect(cmd);
     break;
   case 'h': 
-    rc=doNumHome(C);
+    rc=doNumHome();
     break;
   case 'j': 
-    rc=doNumJail(C);
+    rc=doNumJail();
     break;
   case 'f': 
-    rc = doNumFloor(C);
+    rc = doNumFloor();
     break;
   case 'a': 
-    rc = doNumWall(C);
+    rc = doNumWall();
     break;
   case 'm': 
-    rc = doDim(C);
+    rc = doDim();
     break;
   case 'i': 
-    rc = doCInfo(C);
+    rc = doCInfo();
     break;
   case 'u': 
-    rc = doDump(C);
+    rc = doDump();
     break;
   case 'v': 
-    rc = doMove(C);
+    rc = doMove();
     break;
   case 'b': 
     rc = doDebug();
@@ -627,45 +654,32 @@ prompt(int menu)
 }
 
 static int
-clientInit(Client *C){
+clientInit(){
   int mt;
-  bzero(C, sizeof(Client));
 
-  C->Player = (Player *)malloc(sizeof(Player));
-  C->Map = (Map *)malloc(sizeof(Map));
+  Client.Player = (Player *)malloc(sizeof(Player));
+  Client.Map = (Map *)malloc(sizeof(Map));
   globals.cell = (Cell *)malloc(sizeof(Cell));
 
-  bzero(C->Player,sizeof(C->Player));
-  bzero(C->Map,sizeof(C->Map));
+  bzero(Client.Player,sizeof(Client.Player));
+  bzero(Client.Map,sizeof(Client.Map));
   bzero(globals.cell,sizeof(globals.cell));
   
-  C->Gamestate = gamestate_create();
+  Client.Gamestate = gamestate_create();
   
-  if (proto_client_init(&(C->ph))<0) {
+  if (proto_client_init(&(Client.ph))<0) {
     fprintf(stderr, "client: main: ERROR initializing proto system\n");
     return -1;
   }
   
-  proto_client_set_session_lost_handler(C->ph, proto_client_session_lost_default_hdlr);
+  proto_client_set_session_lost_handler(Client.ph, proto_client_session_lost_default_hdlr);
   
   for (mt=PROTO_MT_EVENT_BASE_RESERVED_FIRST+1;
        mt<PROTO_MT_EVENT_BASE_RESERVED_LAST; mt++){
-    if(mt == PROTO_MT_EVENT_BASE_MOVE)
-      proto_client_set_event_handler(C->ph, mt, event_move_handler);
-    else if(mt == PROTO_MT_EVENT_BASE_PICKUP)
-      proto_client_set_event_handler(C->ph, mt, event_pickup_handler);
-    else if(mt == PROTO_MT_EVENT_BASE_DROP)
-      proto_client_set_event_handler(C->ph, mt, event_drop_handler);
-    else if(mt == PROTO_MT_EVENT_BASE_WIN)
-      proto_client_set_event_handler(C->ph, mt, event_win_handler);
-    else if(mt == PROTO_MT_EVENT_BASE_SERVER_QUIT)
-      proto_client_set_event_handler(C->ph, mt, event_server_quit_handler);
-    else if(mt == PROTO_MT_EVENT_BASE_PLAYER_QUIT)
-      proto_client_set_event_handler(C->ph, mt, event_player_quit_handler);
-    else if(mt == PROTO_MT_EVENT_BASE_PLAYER_JOIN)
-      proto_client_set_event_handler(C->ph, mt, event_player_join_handler);
+    if(mt == PROTO_MT_EVENT_BASE_SERVER_QUIT)
+      proto_client_set_event_handler(Client.ph, mt, event_server_quit_handler);
     else
-      proto_client_set_event_handler(C->ph, mt, event_null_handler);
+      proto_client_set_event_handler(Client.ph, mt, event_null_handler);
   }
   
   return 1;
@@ -674,13 +688,12 @@ clientInit(Client *C){
 void *
 shell(void *arg)
 {
-  Client *C = arg;
   char c;
   int rc;
   int menu=1;
 
   while (1) {
-    if ((c=prompt(menu))!=0) rc=docmd(C, c);
+    if ((c=prompt(menu))!=0) rc=docmd(c);
     if (rc<0) break;
     if (rc==1) menu=1; else menu=0;
   }
@@ -692,16 +705,14 @@ shell(void *arg)
 int 
 main(int argc, char **argv)
 {
-  Client c;
-  
   bzero(&globals, sizeof(globals));
   
-  if (clientInit(&c) < 0) {
+  if (clientInit() < 0) {
     fprintf(stderr, "ERROR: clientInit failed\n");
     return -1;
   }    
   
-  shell(&c);
+  shell(NULL);
   
   return 0;
 }
