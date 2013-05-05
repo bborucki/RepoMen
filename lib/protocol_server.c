@@ -37,7 +37,7 @@
 #include "player.h"
 #include "gamestate.h"
 
-#define DEBUG_MAP 1
+#define DEBUG_MAP 0
 
 #define PROTO_SERVER_MAX_EVENT_SUBSCRIBERS 1024
 #define MAX_OBJECTS 404
@@ -496,7 +496,7 @@ proto_server_move_handler(Proto_Session *s){
   valid = 0;
   flagindex = -1;
   valid = player_move(dir,p,Server_ObjectMap, Server_Gamestate);
-  printf("Valid bit%d\n", valid);
+  //  printf("Valid bit%d\n", valid);
   if (valid>0) {
     sh.pstate.v3.raw = 1;
     printf("Player %d is moving to (%d,%d)\n",id,p->pcell->x,p->pcell->y);

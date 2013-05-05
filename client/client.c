@@ -232,8 +232,8 @@ doRPC(char c){
       if(s->rhdr.pstate.v0.raw == Client.Player->id){
 
 	rc = 2;
-	Client.ui->x = s->rhdr.pstate.v1.raw;
-	Client.ui->y = s->rhdr.pstate.v2.raw;
+	Client.Player->x = s->rhdr.pstate.v1.raw;
+	Client.Player->y = s->rhdr.pstate.v2.raw;
 	//	printf("Now at (%d,%d)\n", Client.Player->x, Client.Player->y);
 
 	//insert way of blocking for a server move update

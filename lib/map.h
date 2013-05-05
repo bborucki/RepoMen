@@ -1,7 +1,7 @@
 #ifndef __MAP_H__
 #define __MAP_H__
 
-#define MAP_NAME "./lib/daGame.map2"
+#define MAP_NAME "./lib/daGame.map"
 #define BUFF_SIZE 300
 #define TEAM_1_MAX 100
 #define TEAM_2_MAX 200

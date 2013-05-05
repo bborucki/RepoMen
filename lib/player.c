@@ -6,7 +6,7 @@
 #include "types.h"
 #include "objectmap.h"
 
-#define DEBUG_MAP 1
+#define DEBUG_MAP 0
 
 extern void
 player_dump(Player *p){
@@ -195,17 +195,17 @@ player_move(dir_t dir, Player *p, ObjectMap *o, Gamestate *g){
   y = p->pcell->y;
   
   if(dir == UP){
-    nx = x-1;
-    ny = y;
-  } else if (dir == DOWN){
-    nx = x+1;
-    ny = y;
-  } else if (dir == LEFT){
     nx = x;
     ny = y-1;
-  } else {
+  } else if (dir == DOWN){
     nx = x;
     ny = y+1;
+  } else if (dir == LEFT){
+    nx = x-1;
+    ny = y;
+  } else {
+    nx = x+1;
+    ny = y;
   }
 
   if((ret = objectmap_validate_move(nx,ny,p,o)) > 0){

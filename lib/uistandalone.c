@@ -376,14 +376,14 @@ ui_paintmap(UI *ui){
 
   h = ui->screen->h;
   w = ui->screen->w;
-  i = floor(ui->x/h);
+  i = floor(ui->uiplayer->x/h);
 
   for (t.y=0; t.y<h; t.y+=t.h, i++) {
-    for (t.x=0, j = floor(ui->x/h); t.x<w; t.x+=t.w, j++) {
+    for (t.x=0, j = floor(ui->uiplayer->x/h); t.x<w; t.x+=t.w, j++) {
       if(cell_get_type(ui->uimap,i,j) == FLOOR){
 	draw_cell(ui, FLOOR_S, &t, ui->screen);
       } else {
-	draw_cell(ui, REDWALL_S, &t, ui->screen);
+	draw_cell(ui, GREENWALL_S, &t, ui->screen);
       }
     }
   }
@@ -577,18 +577,20 @@ struct DummyPlayerDesc {
 static void 
 dummyPlayer_init(UI *ui) {
   pthread_mutex_init(&(dummyPlayer.lock), NULL);
-  dummyPlayer.id = 0;
-  dummyPlayer.x = 0; dummyPlayer.y = 0; dummyPlayer.team = 0; dummyPlayer.state = 0;
+  dummyPlayer.id = ui->uiplayer->id;
+  dummyPlayer.x = ui->uiplayer->x; 
+  dummyPlayer.y = ui->uiplayer->y; 
+  dummyPlayer.team = ui->uiplayer->team;
+  dummyPlayer.state = ui->uiplayer->state;
   ui_uip_init(ui, &dummyPlayer.uip, dummyPlayer.id, dummyPlayer.team); 
 }
 
 static void 
 dummyPlayer_paint(UI *ui, SDL_Rect *t){
-  pthread_mutex_lock(&dummyPlayer.lock);
-    t->y = dummyPlayer.y * t->h; t->x = dummyPlayer.x * t->w;
-    dummyPlayer.uip->clip.x = dummyPlayer.uip->base_clip_x +
+  t->y = dummyPlayer.y * t->h; t->x = dummyPlayer.x * t->w;
+  dummyPlayer.uip->clip.x = dummyPlayer.uip->base_clip_x +
       pxSpriteOffSet(dummyPlayer.team, dummyPlayer.state);
-    SDL_BlitSurface(dummyPlayer.uip->img, &(dummyPlayer.uip->clip), ui->screen, t);
+  SDL_BlitSurface(dummyPlayer.uip->img, &(dummyPlayer.uip->clip), ui->screen, t);
   pthread_mutex_unlock(&dummyPlayer.lock);
 }
 

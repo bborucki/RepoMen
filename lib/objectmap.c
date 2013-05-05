@@ -9,7 +9,7 @@
 #include "player.h"
 #include "gamestate.h"
 
-#define DEBUG_MAP 1
+#define DEBUG_MAP 0
 
 extern int
 objectmap_remove_player(int x, int y, ObjectMap *o){
