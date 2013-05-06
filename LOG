@@ -181,3 +181,22 @@ TODO:
  - remove maze sending over hello rpc
  - need to find a way to make the client block until hello/move events are
  recieved 
+
+
+--------------------------------------------------------------------------
+Chris 5/6
+Fixed valid/invalid move bug in server.
+
+I'm not sure about removing the objectmap server-side. Having this in place
+eliminates the need for a linear search every time that a player moves
+to see whether or not that cell is already occupied. 
+
+TODO:
+-Trying to figure out map painting error. Graphics inconsistent with state 
+at this point. Should be all home cells in this area, and surrounding
+IWALLS.
+
+-finish implementing some of the final game conditions, digging, winning
+
+-Help out with other client-side tasks
+

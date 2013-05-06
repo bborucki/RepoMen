@@ -41,12 +41,19 @@ objectmap_validate_move(int x, int y, Player *p, ObjectMap *o){
   if(o->objects[idx] != NULL){
     if((otherPlayer = o->objects[idx]->player) != NULL)
       return player_is_taggable(p,otherPlayer);
-    else if(o->objects[idx]->type == IWALL)
+    else if(o->objects[idx]->type == IWALL){
+      printf("hit an iwall\n");
       return 0;
-    else if(o->objects[idx]->type == WALL && p->shovel != NONE)
-      return 3;
-    else
+    } else if(o->objects[idx]->type == WALL){
+      if(p->shovel != NONE){
+	printf("hit a wall with shovel\n");
+	return 3;
+      } else{
+	return -1;
+      }
+    } else{
       return 1;
+    }
   }
   return 0;
 }

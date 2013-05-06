@@ -382,7 +382,7 @@ ui_paintmap(UI *ui){
     for (t.x=0, j = floor(ui->uiplayer->x/h); t.x<w; t.x+=t.w, j++) {
       if(cell_get_type(ui->uimap,i,j) == FLOOR){
 	draw_cell(ui, FLOOR_S, &t, ui->screen);
-      } else {
+      }else {
 	draw_cell(ui, GREENWALL_S, &t, ui->screen);
       }
     }
