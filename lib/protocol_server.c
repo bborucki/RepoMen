@@ -278,7 +278,7 @@ proto_session_lost_default_handler(Proto_Session *s){
   fprintf(stderr, "Player %d has disconnected\n", s->player->id);
 
   //player removal handled in goodbye_handler
-
+  
   //  proto_session_dump(s);
   return -1;
 }
@@ -334,17 +334,21 @@ proto_server_hello_handler(Proto_Session *s){
     gamestate_dump(Server_Gamestate);
     proto_session_body_marshall_gamestate(s,Server_Gamestate);
     //    proto_session_body_marshall_map(s,Server_Map);
+    if(nextTeam == TEAM1){
+      nextTeam = TEAM2;
+      numPlayers1++;
+    } else{
+      nextTeam = TEAM1;
+      numPlayers2++;
+    }
+    pidx = player_find_next_id(Server_Gamestate->plist);
+    if(pidx<0)
+      gamefull = 1;
+
     s->player = p;
   } else {
     sh.pstate.v0.raw = 0;
   }
-  if(nextTeam == TEAM1)
-    nextTeam = TEAM2;
-  else
-    nextTeam = TEAM1;
-  pidx = player_find_next_id(Server_Gamestate->plist);
-  if(pidx<0)
-    gamefull = 1;
 
   proto_session_hdr_marshall(s, &sh);
   
@@ -455,7 +459,7 @@ proto_server_pickup_handler(Proto_Session *s){
   id = rh.pstate.v0.raw;
   p = gamestate_get_player(Server_Gamestate,id);
   
-  ret = player_obj_pickup(p,Server_ObjectMap);
+  ret = player_obj_pickup(p,Server_ObjectMap,Server_Gamestate);
   sh.pstate.v0.raw = id;//same header for both reply and update
   sh.pstate.v1.raw = ret; //sending back the actual thing picked up
   proto_session_hdr_marshall(s, &sh);
@@ -472,7 +476,7 @@ proto_server_pickup_handler(Proto_Session *s){
 
 static int
 proto_server_move_handler(Proto_Session *s){
-  int i,rx,ry,id,rc;
+  int i,rx,ry,id,rc, winner;
   dir_t dir;
   Cell *cell = malloc(sizeof(Cell));
   Proto_Msg_Hdr sh;
@@ -550,6 +554,15 @@ proto_server_move_handler(Proto_Session *s){
     proto_session_hdr_marshall(fs,&sh);
     proto_server_post_event();
   }
+  
+  bzero(&sh, sizeof(sh));
+  if((winner = gamestate_team_wins()) >= 0){
+    sh.type = PROTO_MT_EVENT_BASE_WIN;
+    sh.gstate.v0.raw = winner;
+    proto_session_hdr_marshall(fs,&sh);
+    proto_server_post_event();
+  }
+
   return rc;
 }
 
@@ -584,10 +597,21 @@ proto_server_goodbye_handler(Proto_Session *s){
 
   rc = proto_session_send_msg(s,1);
 
+  if(p.team == TEAM1){
+    numPlayers1--;
+    if(p.state == SAFE)
+      numplayershome1--;
+  } else{
+    numPlayers2--;
+    if(p.state == SAFE)
+      numplayershome2--;
+  }
   gamestate_remove_player(Server_Gamestate,p.id);
   pidx = player_find_next_id(Server_Gamestate->plist);
   if(pidx<0)
     gamefull = 1;
+  else
+    gamefull = 0;
 
   us = proto_server_event_session();
   h.type = PROTO_MT_EVENT_BASE_PLAYER_QUIT;
@@ -604,9 +628,8 @@ proto_server_init(void){
   int rc;
   int dim;
 
-  gamefull = 0;
-  flag1found = 0;
-  flag2found = 0;
+  gamefull=flag1found=flag2found=flag1home1=flag2home1=flag1home2=
+    flag2home2=numplayershome1=numplayershome2=numPlayers1=numPlayers2 = 0;
   
   if((Server_Map = map_init(MAP_NAME)) == NULL)
     return -1;

@@ -9,6 +9,18 @@
 #define MAXNUMCELLS 40000
 #define MAXNUMPLAYERS 190
 
+
+extern int
+gamestate_team_wins(){
+  if(flag1home1 == 1 && flag2home1 == 1 && numplayershome1 == numPlayers1)
+    return TEAM1;
+  if(flag1home2 == 1 && flag2home2 == 1 && numplayershome2 == numPlayers2)
+    return TEAM2;
+  else
+    return -1;
+}
+
+
 extern int
 gamestate_dump(Gamestate *g){
   int ncells; 

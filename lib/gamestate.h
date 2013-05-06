@@ -29,6 +29,7 @@ struct Gamestate_ {
 extern Gamestate * gamestate_create();
 extern int gamestate_move_player(Gamestate *g, int pid, int x, int y);
 extern int gamestate_add_cell(Gamestate *g, Cell *c);
+extern int gamestate_team_wins();
 extern int gamestate_remove_cell(Gamestate *g, int x, int y);
 extern int gamestate_add_player(Gamestate *g, Player *p);
 extern int gamestate_remove_player(Gamestate *g, int playerid);

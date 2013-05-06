@@ -24,6 +24,6 @@ extern int player_move(dir_t dir, Player *p, ObjectMap *o, Gamestate *g);
 extern int player_is_taggable(Player *tager, Player *tagee);
 extern int player_tagHandler(Player *tagee, ObjectMap *o, Gamestate *g);
 extern int player_find_empty_home(Player* p, team_t t, ObjectMap *o, int playerid);
-extern int player_obj_pickup(Player* p, ObjectMap *o);
+extern int player_obj_pickup(Player* p, ObjectMap *o, Gamestate *g);
 extern int player_find_next_id(Player **players);
 #endif

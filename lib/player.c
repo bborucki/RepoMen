@@ -29,19 +29,23 @@ player_find_next_id(Player **players){
 }
 
 extern int 
-player_obj_pickup(Player* p, ObjectMap *o){
-  int x,y,idx;
+player_obj_pickup(Player* p, ObjectMap *o, Gamestate *g){
+  int idx,x,y;
   team_t t;
+  x = p->x;
+  y = p->y;
   idx = x*(o->dim)+y;
   if(o->objects[idx] == NULL || o->objects[idx]->obj == NONE)
     return -1;
   if(o->objects[idx]->obj == FLAG1 ||o->objects[idx]->obj == FLAG2){
     p->flag = o->objects[idx]->obj;
     o->objects[idx]->obj = NONE;
+    gamestate_remove_cell(g,x,y);
     return p->flag;
   } else if(o->objects[idx]->obj == SHOVEL1 || o->objects[idx]->obj == SHOVEL2){
     p->shovel = o->objects[idx]->obj;
     o->objects[idx]->obj = NONE;
+    gamestate_remove_cell(g,x,y);
     return p->shovel;
   }
   return -1;
@@ -211,17 +215,31 @@ player_move(dir_t dir, Player *p, ObjectMap *o, Gamestate *g){
   if((ret = objectmap_validate_move(nx,ny,p,o)) > 0){
     if(ret == 2)
       player_tagHandler(otherPlayer,o,g);
+    if(ret == 3)
+      objectmap_digger(p,nx,ny,o,g);
+
     nidx = nx*dim + ny;
-    //return code 3 for ret is digging
 
     if(p->state == SAFE && o->objects[nidx]->type == FLOOR)
       p->state = FREE;
 
     if(p->state == FREE){
-      if(o->objects[nidx]->type == HOME1 && p->team == TEAM1)
+      if(o->objects[nidx]->type == HOME1 && p->team == TEAM1){
 	p->state = SAFE;
-      else if(o->objects[nidx]->type == HOME2 && p->team == TEAM2)
+	if(p->flag == FLAG1)
+	  flag1home1 = 1;
+	if(p->flag == FLAG2)
+	  flag2home1 = 1;
+	numplayershome1++;
+      }
+      else if(o->objects[nidx]->type == HOME2 && p->team == TEAM2){
 	p->state = SAFE;
+	if(p->flag == FLAG1)
+	  flag1home2 = 1;
+	if(p->flag == FLAG2)
+	  flag2home2 = 1;
+	numplayershome2++;
+      }
     }
 
     objectmap_remove_player(p->pcell->x,p->pcell->y, o);

@@ -11,6 +11,17 @@
 
 #define DEBUG_MAP 0
 
+extern int 
+objectmap_digger(Player *p, int x, int y, ObjectMap *o, Gamestate *g){
+  int idx = x*(o->dim)+y;
+  o->objects[idx]->type = FLOOR;
+  gamestate_add_cell(g,o->objects[idx]);
+  objectmap_place_shovel(o,g,p->shovel);
+  p->shovel = NONE;
+  return 1;
+}
+
+
 extern int
 objectmap_remove_player(int x, int y, ObjectMap *o){
   int idx = x*(o->dim)+y;
@@ -59,23 +70,23 @@ objectmap_validate_move(int x, int y, Player *p, ObjectMap *o){
 }
 
 extern int
-objectmap_place_shovel(ObjectMap *o, Gamestate *g, team_t team){
+  objectmap_place_shovel(ObjectMap *o, Gamestate *g, object_t object){
   int x,y,idx;
   int dim = o->dim;
 
-  if(team == TEAM1){
+  if(object == SHOVEL1){
     x = 109;
     y = 2;
     idx = x*dim+y;
     printf("x = %d, y = %d \n", x, y);
-    o->objects[idx]->obj = SHOVEL1;
+    o->objects[idx]->obj = object;
   }
   else{
     x = 109;
     y = 197;
     idx = x*dim+y;
     printf("x = %d, y = %d \n", x, y);
-    o->objects[idx]->obj = SHOVEL2;
+    o->objects[idx]->obj = object;
   }
   gamestate_add_cell(g, o->objects[idx]);
 }
@@ -160,8 +171,8 @@ objectmap_create(Map *m, Gamestate *g){
   if(!DEBUG_MAP){
     objectmap_place_flag(o,TEAM1);
     objectmap_place_flag(o,TEAM2);
-    objectmap_place_shovel(o,g,TEAM1);
-    objectmap_place_shovel(o,g,TEAM2);
+    objectmap_place_shovel(o,g,SHOVEL1);
+    objectmap_place_shovel(o,g,SHOVEL2);
   }
   
   return o;
