@@ -728,7 +728,8 @@ ui_docmd(char cmd){
     break;
   case 'q':
     printf("q ->quitting...\n");
-    rc=-1;
+    if(doRPC('g')>0)
+      rc=-1;
     break;
   case 'e':
     printf("w ->do rpc: pickup\n");

@@ -200,3 +200,21 @@ IWALLS.
 
 -Help out with other client-side tasks
 
+------------------------------------------------------------------------
+Chris 5/7
+
+Fixed session lost bug server side so now they are correctly removed from
+the gamestate.
+
+Added call to goodbye rpc when client hits q, so it actually calls
+goodbye handler
+
+I'll start looking into the map transpose discussed in Brian's last commit
+I think it comes down to row-major order. This is how I set up the server
+and map logic. Player (x,y) = (3,6) would be objectmap[3][6], or location P 
+below
+
+0 0 0 0 0 0 0
+0 0 0 0 0 0 0 
+0 0 0 0 0 0 0
+0 0 0 0 0 0 P 

@@ -276,8 +276,21 @@ proto_server_start_rpc_loop(void){
 static int 
 proto_session_lost_default_handler(Proto_Session *s){
   fprintf(stderr, "Player %d has disconnected\n", s->player->id);
-
-  //player removal handled in goodbye_handler
+  
+  if(Server_Gamestate->plist[s->player->id] != NULL){
+    gamestate_remove_player(Server_Gamestate, s->player->id);
+    objectmap_remove_player(s->player->x,s->player->y, Server_ObjectMap);
+  }
+  if(p.team == TEAM1){
+    numPlayers1--;
+    if(p.state == SAFE)
+      numplayershome1--;
+  } else{
+    numPlayers2--;
+    if(p.state == SAFE)
+      numplayershome2--;
+  }
+  pidx = player_find_next_id(Server_Gamestate->plist);
   
   //  proto_session_dump(s);
   return -1;
