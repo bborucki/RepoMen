@@ -378,7 +378,7 @@ ui_paintmap(UI *ui){
   w = ui->screen->w;
   i = ((ui->uiplayer->x)/10)*10;
 
-  //  printf("x(i) = %d, y(j) = %d\n",ui->uiplayer->x,ui->uiplayer->y);
+  printf("x(i) = %d, y(j) = %d\n",ui->uiplayer->x,ui->uiplayer->y);
 
   for (t.y=0; t.y<h; t.y+=t.h, i++) {
     for (t.x=0, j = (ui->uiplayer->y/10)*10; t.x<w; t.x+=t.w, j++) {
