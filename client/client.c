@@ -131,7 +131,7 @@ event_player_join_handler(Proto_Session *s){
   }
 
   gamestate_add_player(Client.Gamestate,p);
-  gamestate_dump(Client.Gamestate);
+  //  gamestate_dump(Client.Gamestate);
   return 1;
 }
 

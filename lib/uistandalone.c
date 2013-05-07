@@ -376,10 +376,13 @@ ui_paintmap(UI *ui){
 
   h = ui->screen->h;
   w = ui->screen->w;
-  i = floor(ui->uiplayer->x/h);
+  i = ((ui->uiplayer->x)/10)*10;
+
+  //  printf("x(i) = %d, y(j) = %d\n",ui->uiplayer->x,ui->uiplayer->y);
 
   for (t.y=0; t.y<h; t.y+=t.h, i++) {
-    for (t.x=0, j = floor(ui->uiplayer->x/h); t.x<w; t.x+=t.w, j++) {
+    for (t.x=0, j = (ui->uiplayer->y/10)*10; t.x<w; t.x+=t.w, j++) {
+      //      printf("ix = %d, j = %d\n", i, j);
       if(cell_get_type(ui->uimap,i,j) == FLOOR){
 	draw_cell(ui, FLOOR_S, &t, ui->screen);
       }else {
@@ -587,7 +590,17 @@ dummyPlayer_init(UI *ui) {
 
 static void 
 dummyPlayer_paint(UI *ui, SDL_Rect *t){
-  t->y = dummyPlayer.y * t->h; t->x = dummyPlayer.x * t->w;
+  int h = ui->screen->h;
+  int w = ui->screen->w;
+
+  int x = dummyPlayer.x;
+  int y = dummyPlayer.y;
+
+  printf("asd x = %d, y = %d asd\n", (x%10)*32, (y%10)*32);
+
+  t->y = (y%10)*32; t->x = (x%10)*32;
+  //t->y = dummyPlayer.y * t->h; t->x = dummyPlayer.x* t->w;
+  printf("tx = %d, ty = %d\n", t->x, t->y);
   dummyPlayer.uip->clip.x = dummyPlayer.uip->base_clip_x +
       pxSpriteOffSet(dummyPlayer.team, dummyPlayer.state);
   SDL_BlitSurface(dummyPlayer.uip->img, &(dummyPlayer.uip->clip), ui->screen, t);
