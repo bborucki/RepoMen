@@ -108,7 +108,6 @@ player_find_empty_home(Player* p, team_t t, ObjectMap *o, int playerid){
 	  p->flag = NONE;
 	  p->state = SAFE;
 	  o->objects[idx]->player = p;
-	  printf("y = %d\n", y);
 	  return 1;
 	}
       }
@@ -198,17 +197,17 @@ player_move(dir_t dir, Player *p, ObjectMap *o, Gamestate *g){
   y = p->pcell->y;
   
   if(dir == UP){
-    nx = x;
-    ny = y-1;
-  } else if (dir == DOWN){
-    nx = x;
-    ny = y+1;
-  } else if (dir == LEFT){
     nx = x-1;
     ny = y;
-  } else {
+  } else if (dir == DOWN){
     nx = x+1;
     ny = y;
+  } else if (dir == LEFT){
+    nx = x;
+    ny = y-1;
+  } else {
+    nx = x;
+    ny = y+1;
   }
 
   if((ret = objectmap_validate_move(nx,ny,p,o)) > 0){

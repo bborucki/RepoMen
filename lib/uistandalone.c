@@ -377,12 +377,12 @@ ui_paintmap(UI *ui){
   h = ui->screen->h;
   w = ui->screen->w;
   i = ((ui->uiplayer->x)/10)*10;
-
+  j = ((ui->uiplayer->y)/10)*10;
   printf("x(i) = %d, y(j) = %d\n",ui->uiplayer->x,ui->uiplayer->y);
 
   for (t.y=0; t.y<h; t.y+=t.h, i++) {
     for (t.x=0, j = (ui->uiplayer->y/10)*10; t.x<w; t.x+=t.w, j++) {
-      //      printf("ix = %d, j = %d\n", i, j);
+      //      printf("ix = %d, jy = %d\n", i, j);
       if(cell_get_type(ui->uimap,i,j) == FLOOR){
 	draw_cell(ui, FLOOR_S, &t, ui->screen);
       }else {
